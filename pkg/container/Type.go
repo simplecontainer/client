@@ -3,8 +3,6 @@ package container
 import (
 	"smr/pkg/definitions"
 	"smr/pkg/network"
-	"smr/pkg/utils"
-	"strings"
 )
 
 type Container struct {
@@ -28,7 +26,7 @@ type Static struct {
 	MappingPorts           []network.PortMappings
 	ExposedPorts           []string
 	MountFiles             []string
-	Definition             definitions.Definition
+	Definition             definitions.Container
 }
 
 type Runtime struct {
@@ -54,6 +52,7 @@ type Status struct {
 	Healthy        bool
 	Ready          bool
 	Running        bool
+	Reconciling    bool
 }
 
 type Resource struct {
@@ -72,25 +71,3 @@ type ExecResult struct {
 	Stderr string
 	Exit   int
 }
-
-type ByDepenendecies []*Container
-
-func (d ByDepenendecies) Len() int { return len(d) }
-func (d ByDepenendecies) Less(i, j int) bool {
-	for _, deps := range d[i].Static.Definition.Spec.Container.Dependencies {
-		group, id := utils.ExtractGroupAndId(deps.Name)
-
-		if id == "*" {
-			if strings.Contains(d[j].Static.GeneratedNameNoProject, group) {
-				return false
-			}
-		} else {
-			if id == d[j].Static.GeneratedNameNoProject {
-				return false
-			}
-		}
-	}
-
-	return true
-}
-func (d ByDepenendecies) Swap(i, j int) { d[i], d[j] = d[j], d[i] }

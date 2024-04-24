@@ -1,0 +1,15 @@
+kind: resource
+resource:
+  meta:
+    group: traefik
+    identifier: "*"
+  spec:
+    data:
+      traefik-configuration: |
+        providers:
+          docker:
+            exposedByDefault: false
+        
+        api:
+          insecure: true
+          dashboard: true

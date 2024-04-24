@@ -2,21 +2,16 @@ package definitions
 
 import (
 	"encoding/json"
-	"fmt"
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"
-	"reflect"
 )
 
 func ReadFile(filePath string) string {
 	var jsonData []byte = nil
 
 	if filePath != "" {
-
-		file := fmt.Sprintf("%s", filePath)
-
-		YAML, err := os.ReadFile(file)
+		YAML, err := os.ReadFile(filePath)
 		if err != nil {
 			log.Printf("YAML file not found:   #%v ", err)
 		}
@@ -34,14 +29,6 @@ func ReadFile(filePath string) string {
 	}
 
 	return string(jsonData)
-}
-
-func Compare(definition1 Definition, definition2 Definition) bool {
-	if reflect.DeepEqual(definition1, definition2) {
-		return true
-	} else {
-		return false
-	}
 }
 
 func convert(i interface{}) interface{} {
