@@ -1,23 +1,32 @@
 package commands
 
 import (
+	"github.com/simplecontainer/client/pkg/manager"
 	"os"
-	"smr/pkg/manager"
 )
 
 var Commands []Command
 
 func PreloadCommands() {
+	Context()
 	Apply()
-	Create()
 	Delete()
 	Ps()
+
+	SecretCommand()
+	ContainersCommand()
+	GitopsCommand()
+	ConfigurationCommand()
+	ResourceCommand()
+	CertKeyCommand()
+	HttpAuthCommand()
+	LogsCommand()
 }
 
 func Run(mgr *manager.Manager) {
 	for _, comm := range Commands {
-		for _, arg := range os.Args {
-			if comm.name == arg {
+		for k, arg := range os.Args {
+			if comm.name == arg && k == 1 {
 				if comm.condition(mgr) {
 					for _, fn := range comm.depends_on {
 						fn(mgr, os.Args)

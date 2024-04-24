@@ -1,8 +1,13 @@
 package commands
 
 import (
-	"smr/pkg/manager"
+	"fmt"
+	"github.com/simplecontainer/client/pkg/commands/ps"
+	"github.com/simplecontainer/client/pkg/manager"
+	"os"
 )
+
+const HELP_PS string = "Eg: smr ps ['', watch]"
 
 func Ps() {
 	Commands = append(Commands, Command{
@@ -10,12 +15,21 @@ func Ps() {
 		condition: func(*manager.Manager) bool { return true },
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				mgr.OutputTable()
+				if len(os.Args) > 2 {
+					switch os.Args[2] {
+					case "watch":
+						ps.Ps(mgr.Context, true)
+						break
+					default:
+						fmt.Println(HELP_PS)
+					}
+				} else {
+					ps.Ps(mgr.Context, false)
+				}
 			},
 		},
 		depends_on: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				mgr.Config.Load(mgr.Runtime.PROJECTDIR)
 			},
 		},
 	})
