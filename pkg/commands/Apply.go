@@ -2,9 +2,10 @@ package commands
 
 import (
 	"fmt"
+	"github.com/qdnqn/smr-client/pkg/commands/apply"
+	"github.com/qdnqn/smr-client/pkg/manager"
+	"github.com/qdnqn/smr/pkg/definitions"
 	"os"
-	"smr/pkg/definitions"
-	"smr/pkg/manager"
 )
 
 func Apply() {
@@ -21,12 +22,11 @@ func Apply() {
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
 				definition := definitions.ReadFile(args[2])
-				mgr.Apply(definition)
+				apply.Apply(mgr.Context, definition)
 			},
 		},
 		depends_on: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				mgr.Config.Load(mgr.Runtime.PROJECTDIR)
 			},
 		},
 	})

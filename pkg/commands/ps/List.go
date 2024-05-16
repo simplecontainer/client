@@ -1,15 +1,20 @@
-package manager
+package ps
 
 import (
 	"fmt"
 	"github.com/fatih/color"
+	"github.com/qdnqn/smr-client/pkg/context"
+	"github.com/qdnqn/smr-client/pkg/network"
 	"github.com/rodaine/table"
-	"smr/pkg/cli"
 	"sort"
 )
 
-func (mgr *Manager) OutputTable() {
-	containers := cli.SendPs("http://localhost:8080/ps")
+func Ps(context *context.Context) {
+	containers := network.SendPs(context.Client, fmt.Sprintf("%s/api/v1/ps", context.ApiURL))
+
+	if containers == nil {
+		return
+	}
 
 	keys := make([]string, 0, len(containers))
 

@@ -1,16 +1,16 @@
 package commands
 
 import (
+	"github.com/qdnqn/smr-client/pkg/manager"
 	"os"
-	"smr/pkg/manager"
 )
 
 var Commands []Command
 
 func PreloadCommands() {
 	Apply()
-	Create()
-	Delete()
+	Context()
+	Gitops()
 	Ps()
 }
 

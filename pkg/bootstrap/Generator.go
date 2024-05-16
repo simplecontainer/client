@@ -2,16 +2,20 @@ package bootstrap
 
 import (
 	"fmt"
+	"github.com/qdnqn/smr/pkg/config"
+	"github.com/qdnqn/smr/pkg/logger"
+	"github.com/qdnqn/smr/pkg/static"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 	"os"
-	"smr/pkg/config"
-	"smr/pkg/logger"
-	"smr/pkg/static"
 )
 
 func CreateDirectoryTree(projectDir string) {
-	for _, path := range static.STRUCTURE {
+	if _, err := os.Stat(projectDir); err == nil {
+		return
+	}
+
+	for _, path := range static.CLIENT_STRUCTURE {
 		dir := fmt.Sprintf("%s/%s", projectDir, path)
 
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
