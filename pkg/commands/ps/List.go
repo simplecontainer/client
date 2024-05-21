@@ -26,7 +26,7 @@ func Ps(context *context.Context) {
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 	columnFmt := color.New(color.FgYellow).SprintfFunc()
 
-	tbl := table.New("Name", "Image", "IPs", "Ports", "Dependencies", "Status")
+	tbl := table.New("Group", "Name", "Image", "IPs", "Ports", "Dependencies", "Status")
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 	for _, k := range keys {
@@ -49,12 +49,12 @@ func Ps(context *context.Context) {
 			}
 
 			if v.Status.DependsSolved {
-				status += fmt.Sprintf("%s ", "Dependency solved")
+				status += fmt.Sprintf("%s ", "Healthy")
 			} else {
-				status += fmt.Sprintf("%s ", "Dependency waiting")
+				status += fmt.Sprintf("%s ", "Starting")
 			}
 
-			tbl.AddRow(v.Static.Name, fmt.Sprintf("%s:%s", v.Static.Image, v.Static.Tag), ips, ports, deps, status)
+			tbl.AddRow(v.Static.Group, v.Static.Name, fmt.Sprintf("%s:%s", v.Static.Image, v.Static.Tag), ips, ports, deps, status)
 		}
 	}
 

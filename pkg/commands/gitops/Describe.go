@@ -7,9 +7,13 @@ import (
 )
 
 func Describe(context *context.Context) {
-	gitops := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/gitops", context.ApiURL), nil)
+	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/gitops", context.ApiURL), nil)
 
-	for _, x := range gitops.Data["SupportedOperations"].([]interface{}) {
-		fmt.Println(x.(string))
+	if !response.Error && len(response.Data) > 0 {
+		for _, x := range response.Data["SupportedOperations"].([]interface{}) {
+			fmt.Println(x.(string))
+		}
+	} else {
+		fmt.Println(response.Explanation)
 	}
 }

@@ -3,12 +3,12 @@ package network
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/qdnqn/smr/pkg/operators"
+	"github.com/qdnqn/smr/pkg/httpcontract"
 	"io"
 	"net/http"
 )
 
-func SendOperator(client *http.Client, URL string, data map[string]any) *operators.Response {
+func SendOperator(client *http.Client, URL string, data map[string]any) *httpcontract.ResponseOperator {
 	var req *http.Request
 	var err error
 
@@ -16,7 +16,7 @@ func SendOperator(client *http.Client, URL string, data map[string]any) *operato
 		marshaled, err := json.Marshal(data)
 
 		if err != nil {
-			return &operators.Response{
+			return &httpcontract.ResponseOperator{
 				HttpStatus:       0,
 				Explanation:      "failed to marshal data for sending request",
 				ErrorExplanation: err.Error(),
@@ -34,7 +34,7 @@ func SendOperator(client *http.Client, URL string, data map[string]any) *operato
 	}
 
 	if err != nil {
-		return &operators.Response{
+		return &httpcontract.ResponseOperator{
 			HttpStatus:       0,
 			Explanation:      "failed to craft request",
 			ErrorExplanation: err.Error(),
@@ -47,7 +47,7 @@ func SendOperator(client *http.Client, URL string, data map[string]any) *operato
 	resp, err := client.Do(req)
 
 	if err != nil {
-		return &operators.Response{
+		return &httpcontract.ResponseOperator{
 			HttpStatus:       0,
 			Explanation:      "failed to connect to the smr-agent",
 			ErrorExplanation: err.Error(),
@@ -60,7 +60,7 @@ func SendOperator(client *http.Client, URL string, data map[string]any) *operato
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return &operators.Response{
+		return &httpcontract.ResponseOperator{
 			HttpStatus:       0,
 			Explanation:      "invalid response from the smr-agent",
 			ErrorExplanation: err.Error(),
@@ -70,11 +70,11 @@ func SendOperator(client *http.Client, URL string, data map[string]any) *operato
 		}
 	}
 
-	var response operators.Response
+	var response httpcontract.ResponseOperator
 	err = json.Unmarshal(body, &response)
 
 	if err != nil {
-		return &operators.Response{
+		return &httpcontract.ResponseOperator{
 			HttpStatus:       0,
 			Explanation:      "failed to unmarshal body response from smr-agent",
 			ErrorExplanation: err.Error(),

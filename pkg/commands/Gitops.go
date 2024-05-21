@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+const HELP string = "Eg: smr gitops [describe, list, sync]"
+
 func Gitops() {
 	Commands = append(Commands, Command{
 		name: "gitops",
@@ -15,19 +17,23 @@ func Gitops() {
 		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				switch os.Args[2] {
-				case "describe":
-					gitops.Describe(mgr.Context)
-					break
-				case "list":
-					gitops.List(mgr.Context)
-					break
-				case "sync":
-					if len(os.Args) > 4 {
-						gitops.Sync(mgr.Context, os.Args[3], os.Args[4])
+				if len(os.Args) > 2 {
+					switch os.Args[2] {
+					case "describe":
+						gitops.Describe(mgr.Context)
+						break
+					case "list":
+						gitops.List(mgr.Context)
+						break
+					case "sync":
+						if len(os.Args) > 4 {
+							gitops.Sync(mgr.Context, os.Args[3], os.Args[4])
+						}
+					default:
+						fmt.Println(HELP)
 					}
-				default:
-					fmt.Println("Available commands are: list, sync")
+				} else {
+					fmt.Println(HELP)
 				}
 			},
 		},
