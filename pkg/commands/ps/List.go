@@ -26,7 +26,7 @@ func Ps(context *context.Context) {
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 	columnFmt := color.New(color.FgYellow).SprintfFunc()
 
-	tbl := table.New("Group", "Name", "Image", "IPs", "Ports", "Dependencies", "Status")
+	tbl := table.New("GROUP", "NAME", "IMAGE", "IP", "PORTS", "DEPS", "STATE")
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 	for _, k := range keys {

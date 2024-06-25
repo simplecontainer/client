@@ -1,6 +1,6 @@
-# Simple container manager - smr
+# Simple container manager client
 **Note: The project is in active development.**
 
-Simple container manager. Key store, GitOps, Templating, Reconciliation, and Kubernetes-Alike resources on docker.
+This is CLI for the Simple container manager agent.
 # License
 This project is licensed under the GNU General Public License v3.0. See more in LICENSE file.

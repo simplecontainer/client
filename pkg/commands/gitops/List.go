@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"github.com/qdnqn/smr-client/pkg/context"
+	"github.com/qdnqn/smr-client/pkg/helpers"
 	"github.com/qdnqn/smr-client/pkg/network"
 	gitopsSmrAgent "github.com/qdnqn/smr/pkg/gitops"
 	"github.com/rodaine/table"
@@ -32,14 +33,14 @@ func List(context *context.Context) {
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 	columnFmt := color.New(color.FgYellow).SprintfFunc()
 
-	tbl := table.New("Group", "Name", "Repository", "Revision", "Last Synced Commit", "Automatic Sync", "Pooling Interval", "Ssh", "Http Auth")
+	tbl := table.New("GROUP", "NAME", "REPOSITORY", "REVISION", "SYNCED", "AUTO", "STATE")
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 	for _, g := range gitops {
 		lastSyncedCommit := g.LastSyncedCommit.String()
 
 		if g.LastSyncedCommit.IsZero() {
-			lastSyncedCommit = "Never synced"
+			lastSyncedCommit = "0000000"
 		}
 
 		certRef := fmt.Sprintf("%s.%s", g.CertKeyRef.Group, g.CertKeyRef.Identifier)
@@ -57,11 +58,10 @@ func List(context *context.Context) {
 			g.Definition.Meta.Identifier,
 			g.RepoURL,
 			g.Revision,
-			lastSyncedCommit,
+			lastSyncedCommit[:7],
 			g.AutomaticSync,
-			g.PoolingInterval,
-			certRef,
-			httpRef)
+			helpers.CliMask(g.InSync, "InSync", "Drifted"),
+		)
 	}
 
 	tbl.Print()

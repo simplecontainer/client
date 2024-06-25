@@ -8,16 +8,23 @@ import (
 var Commands []Command
 
 func PreloadCommands() {
-	Apply()
 	Context()
-	Gitops()
+	Apply()
+	Delete()
 	Ps()
+
+	ContainersCommand()
+	GitopsCommand()
+	ConfigurationCommand()
+	ResourceCommand()
+	CertKeyCommand()
+	HttpAuthCommand()
 }
 
 func Run(mgr *manager.Manager) {
 	for _, comm := range Commands {
-		for _, arg := range os.Args {
-			if comm.name == arg {
+		for k, arg := range os.Args {
+			if comm.name == arg && k == 1 {
 				if comm.condition(mgr) {
 					for _, fn := range comm.depends_on {
 						fn(mgr, os.Args)
