@@ -32,6 +32,13 @@ func ContainersCommand() {
 							fmt.Println(HELP_CONTAINERS)
 						}
 						break
+					case "view":
+						if len(os.Args) > 4 {
+							containers.View(mgr.Context, os.Args[3], os.Args[4])
+						} else {
+							fmt.Println(HELP_CONTAINERS)
+						}
+						break
 					case "edit":
 						if len(os.Args) > 4 {
 							containers.Edit(mgr.Context, os.Args[3], os.Args[4])

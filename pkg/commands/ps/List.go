@@ -26,7 +26,7 @@ func Ps(context *context.Context) {
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 	columnFmt := color.New(color.FgYellow).SprintfFunc()
 
-	tbl := table.New("GROUP", "NAME", "IMAGE", "IP", "PORTS", "DEPS", "STATE")
+	tbl := table.New("GROUP", "NAME", "DOCKER NAME", "IMAGE", "IP", "PORTS", "DEPS", "STATE")
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 	for _, k := range keys {
@@ -41,7 +41,7 @@ func Ps(context *context.Context) {
 			}
 
 			for _, u := range v.Runtime.Networks {
-				ips += fmt.Sprintf("%s ", u.IP)
+				ips += fmt.Sprintf("%s(%s) ", u.IP, u.NetworkName)
 			}
 
 			for _, u := range v.Static.Definition.Spec.Container.Dependencies {
@@ -54,7 +54,15 @@ func Ps(context *context.Context) {
 				status += fmt.Sprintf("%s ", "Starting")
 			}
 
-			tbl.AddRow(v.Static.Group, v.Static.Name, fmt.Sprintf("%s:%s", v.Static.Image, v.Static.Tag), ips, ports, deps, status)
+			tbl.AddRow(
+				v.Static.Group,
+				v.Static.Name,
+				v.Static.GeneratedName,
+				fmt.Sprintf("%s:%s", v.Static.Image, v.Static.Tag),
+				ips,
+				ports,
+				deps,
+				status)
 		}
 	}
 

@@ -37,12 +37,6 @@ func List(context *context.Context) {
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 	for _, g := range gitops {
-		lastSyncedCommit := g.LastSyncedCommit.String()
-
-		if g.LastSyncedCommit.IsZero() {
-			lastSyncedCommit = "0000000"
-		}
-
 		certRef := fmt.Sprintf("%s.%s", g.CertKeyRef.Group, g.CertKeyRef.Identifier)
 		httpRef := fmt.Sprintf("%s.%s", g.HttpAuthRef.Group, g.HttpAuthRef.Identifier)
 
@@ -58,7 +52,7 @@ func List(context *context.Context) {
 			g.Definition.Meta.Identifier,
 			g.RepoURL,
 			g.Revision,
-			lastSyncedCommit[:7],
+			helpers.CliMask(g.LastSyncedCommit.IsZero(), "Never synced", g.LastSyncedCommit.String()[:7]),
 			g.AutomaticSync,
 			helpers.CliMask(g.InSync, "InSync", "Drifted"),
 		)
