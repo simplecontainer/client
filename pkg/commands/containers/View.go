@@ -3,8 +3,8 @@ package containers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/qdnqn/smr-client/pkg/context"
-	"github.com/qdnqn/smr-client/pkg/network"
+	"github.com/simplecontainer/client/pkg/context"
+	"github.com/simplecontainer/client/pkg/network"
 )
 
 func View(context *context.Context, group string, identifier string) {

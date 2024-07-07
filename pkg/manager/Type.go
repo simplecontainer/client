@@ -1,13 +1,11 @@
 package manager
 
 import (
-	"github.com/qdnqn/smr-client/pkg/context"
-	"github.com/qdnqn/smr/pkg/config"
-	"github.com/qdnqn/smr/pkg/runtime"
+	"github.com/simplecontainer/client/pkg/configuration"
+	"github.com/simplecontainer/client/pkg/context"
 )
 
 type Manager struct {
-	Config  *config.Config
-	Runtime *runtime.Runtime
-	Context *context.Context
+	Configuration *configuration.Configuration
+	Context       *context.Context
 }

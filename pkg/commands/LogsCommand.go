@@ -2,27 +2,26 @@ package commands
 
 import (
 	"fmt"
-	"github.com/qdnqn/smr/pkg/definitions"
-	"github.com/simplecontainer/client/pkg/commands/remove"
 	"github.com/simplecontainer/client/pkg/manager"
+	"github.com/simplecontainer/client/pkg/network"
 	"os"
 )
 
-func Delete() {
+const HELP_LOGS string = "Eg: smr logs {group} {identifier}"
+
+func LogsCommand() {
 	Commands = append(Commands, Command{
-		name: "delete",
+		name: "logs",
 		condition: func(*manager.Manager) bool {
-			if len(os.Args) > 2 {
-				return true
-			} else {
-				fmt.Println("try to specify a file")
-				return false
-			}
+			return true
 		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				definition := definitions.ReadFile(args[2])
-				remove.Remove(mgr.Context, definition)
+				if len(os.Args) > 3 {
+					network.SendLogs(mgr.Context.Client, fmt.Sprintf("%s/api/v1/logs/%s/%s/%s", mgr.Context.ApiURL, os.Args[2], os.Args[3], os.Args[4]))
+				} else {
+					fmt.Println(HELP_LOGS)
+				}
 			},
 		},
 		depends_on: []func(*manager.Manager, []string){

@@ -3,8 +3,8 @@ package context
 import (
 	"fmt"
 	"github.com/manifoldco/promptui"
-	"github.com/qdnqn/smr-client/pkg/context"
 	"github.com/qdnqn/smr/pkg/logger"
+	"github.com/simplecontainer/client/pkg/context"
 	"log"
 	"os"
 )

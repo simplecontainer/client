@@ -2,8 +2,8 @@ package context
 
 import (
 	"fmt"
-	context2 "github.com/qdnqn/smr-client/pkg/context"
 	"github.com/qdnqn/smr/pkg/logger"
+	context2 "github.com/simplecontainer/client/pkg/context"
 	"go.uber.org/zap"
 	"net/http"
 	"os"

@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/qdnqn/smr-client/pkg/manager"
+	"github.com/simplecontainer/client/pkg/manager"
 	"os"
 )
 
@@ -13,12 +13,14 @@ func PreloadCommands() {
 	Delete()
 	Ps()
 
+	SecretCommand()
 	ContainersCommand()
 	GitopsCommand()
 	ConfigurationCommand()
 	ResourceCommand()
 	CertKeyCommand()
 	HttpAuthCommand()
+	LogsCommand()
 }
 
 func Run(mgr *manager.Manager) {

@@ -2,8 +2,8 @@ package remove
 
 import (
 	"fmt"
-	"github.com/qdnqn/smr-client/pkg/context"
-	"github.com/qdnqn/smr-client/pkg/network"
+	"github.com/simplecontainer/client/pkg/context"
+	"github.com/simplecontainer/client/pkg/network"
 )
 
 func Remove(context *context.Context, jsonData string) {

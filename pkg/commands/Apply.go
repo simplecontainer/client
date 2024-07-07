@@ -2,9 +2,9 @@ package commands
 
 import (
 	"fmt"
-	"github.com/qdnqn/smr-client/pkg/commands/apply"
-	"github.com/qdnqn/smr-client/pkg/manager"
-	"github.com/qdnqn/smr/pkg/definitions"
+	"github.com/simplecontainer/client/pkg/commands/apply"
+	"github.com/simplecontainer/client/pkg/definitions"
+	"github.com/simplecontainer/client/pkg/manager"
 	"os"
 )
 

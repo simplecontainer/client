@@ -3,7 +3,6 @@ package network
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/qdnqn/smr/pkg/httpcontract"
 	"github.com/qdnqn/smr/pkg/logger"
 	"go.uber.org/zap"
@@ -19,12 +18,13 @@ func SendFile(client *http.Client, URL string, jsonData string) *httpcontract.Re
 	req, err := http.NewRequest("POST", URL, bytes.NewBuffer([]byte(jsonData)))
 	req.Header.Set("Content-Type", "application/json")
 
-	fmt.Println(jsonData)
-
 	resp, err := client.Do(req)
+
 	if err != nil {
-		panic(err)
+		logger.Log.Info("failed to connect to the smr-agent", zap.String("error", err.Error()))
+		return nil
 	}
+
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)

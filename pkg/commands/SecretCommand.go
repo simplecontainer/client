@@ -2,16 +2,16 @@ package commands
 
 import (
 	"fmt"
-	"github.com/simplecontainer/client/pkg/commands/certkey"
+	"github.com/simplecontainer/client/pkg/commands/secret"
 	"github.com/simplecontainer/client/pkg/manager"
 	"os"
 )
 
-const HELP_CERTKEY string = "Eg: smr configuration [describe, list]"
+const HELP_SECRET string = "Eg: smr secret [describe, list]"
 
-func CertKeyCommand() {
+func SecretCommand() {
 	Commands = append(Commands, Command{
-		name: "certkey",
+		name: "secret",
 		condition: func(*manager.Manager) bool {
 			return true
 		},
@@ -19,31 +19,28 @@ func CertKeyCommand() {
 			func(mgr *manager.Manager, args []string) {
 				if len(os.Args) > 2 {
 					switch os.Args[2] {
-					case "describe":
-						certkey.Describe(mgr.Context)
-						break
 					case "list":
-						certkey.List(mgr.Context)
+						secret.List(mgr.Context)
 						break
 					case "get":
-						if len(os.Args) > 4 {
-							certkey.Get(mgr.Context, os.Args[3], os.Args[4])
+						if len(os.Args) > 3 {
+							secret.Get(mgr.Context, os.Args[3])
 						} else {
-							fmt.Println(HELP_CERTKEY)
+							fmt.Println(HELP_SECRET)
 						}
 						break
-					case "edit":
+					case "create":
 						if len(os.Args) > 4 {
-							certkey.Edit(mgr.Context, os.Args[3], os.Args[4])
+							secret.Create(mgr.Context, os.Args[3], os.Args[4])
 						} else {
-							fmt.Println(HELP_CERTKEY)
+							fmt.Println(HELP_SECRET)
 						}
 						break
 					default:
-						fmt.Println(HELP_CERTKEY)
+						fmt.Println(HELP_SECRET)
 					}
 				} else {
-					fmt.Println(HELP_CERTKEY)
+					fmt.Println(HELP_SECRET)
 				}
 			},
 		},

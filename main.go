@@ -1,32 +1,28 @@
 package main
 
 import (
-	"github.com/qdnqn/smr-client/pkg/bootstrap"
-	"github.com/qdnqn/smr-client/pkg/commands"
-	_ "github.com/qdnqn/smr-client/pkg/commands"
-	"github.com/qdnqn/smr-client/pkg/context"
-	"github.com/qdnqn/smr-client/pkg/manager"
-	"github.com/qdnqn/smr/pkg/config"
-	"github.com/qdnqn/smr/pkg/logger"
-	"github.com/qdnqn/smr/pkg/runtime"
-	"github.com/spf13/viper"
+	"github.com/simplecontainer/client/pkg/bootstrap"
+	"github.com/simplecontainer/client/pkg/commands"
+	_ "github.com/simplecontainer/client/pkg/commands"
+	"github.com/simplecontainer/client/pkg/configuration"
+	"github.com/simplecontainer/client/pkg/context"
+	"github.com/simplecontainer/client/pkg/manager"
+	"github.com/simplecontainer/client/pkg/startup"
+	"github.com/simplecontainer/smr/pkg/logger"
 )
 
 func main() {
 	logger.Log = logger.NewLogger()
 
-	conf := config.NewConfig()
-	conf.ReadFlags()
+	config := configuration.NewConfig()
+	startup.Load(config, config.Root)
 
 	manager := &manager.Manager{}
-	manager.Config = conf
+	manager.Configuration = config
 
-	viper.Set("project", "smr")
-	manager.Runtime = runtime.GetRuntimeInfo()
+	bootstrap.CreateDirectoryTree(manager.Configuration.Environment.PROJECTDIR)
 
-	bootstrap.CreateDirectoryTree(manager.Runtime.PROJECTDIR)
-
-	manager.Context = context.LoadContext(manager.Runtime.PROJECTDIR)
+	manager.Context = context.LoadContext(manager.Configuration.Environment.PROJECTDIR)
 
 	if manager.Context == nil {
 		logger.Log.Fatal("please first connect to one smr-agent instance")

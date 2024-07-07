@@ -2,8 +2,8 @@ package commands
 
 import (
 	"fmt"
-	"github.com/qdnqn/smr-client/pkg/commands/context"
-	"github.com/qdnqn/smr-client/pkg/manager"
+	"github.com/simplecontainer/client/pkg/commands/context"
+	"github.com/simplecontainer/client/pkg/manager"
 	"os"
 )
 
@@ -18,7 +18,7 @@ func Context() {
 				switch os.Args[2] {
 				case "connect":
 					if len(os.Args) > 4 {
-						context.Connect(os.Args[3], os.Args[4], mgr.Runtime.PROJECTDIR)
+						context.Connect(os.Args[3], os.Args[4], mgr.Configuration.Environment.PROJECTDIR)
 					} else {
 						fmt.Println("Try this: smr context connect https://API_URL:1443 PATH_TO_CERT.PEM --context NAME_YOU_WANT")
 					}

@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fatih/color"
-	"github.com/qdnqn/smr-client/pkg/context"
-	"github.com/qdnqn/smr-client/pkg/network"
 	v1 "github.com/qdnqn/smr/pkg/definitions/v1"
 	"github.com/rodaine/table"
+	"github.com/simplecontainer/client/pkg/context"
+	"github.com/simplecontainer/client/pkg/network"
 )
 
 func List(context *context.Context) {

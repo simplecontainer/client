@@ -1,21 +1,20 @@
-package configuration
+package secret
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/fatih/color"
-	v1 "github.com/qdnqn/smr/pkg/definitions/v1"
 	"github.com/rodaine/table"
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/network"
 )
 
 func List(context *context.Context) {
-	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/configuration/List", context.ApiURL), nil)
+	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/secrets/keys", context.ApiURL), nil)
 
-	objects := make(map[string]*v1.Configuration)
+	objects := make([]string, 0)
 
-	bytes, err := json.Marshal(response.Data)
+	bytes, err := json.Marshal(response.Data["keys"])
 
 	if err != nil {
 		fmt.Println("invalid response sent from the smr-agent")
@@ -32,13 +31,12 @@ func List(context *context.Context) {
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 	columnFmt := color.New(color.FgYellow).SprintfFunc()
 
-	tbl := table.New("GROUP", "NAME")
+	tbl := table.New("SECRET NAME")
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 	for _, obj := range objects {
 		tbl.AddRow(
-			obj.Meta.Group,
-			obj.Meta.Identifier,
+			obj,
 		)
 	}
 

@@ -2,8 +2,8 @@ package network
 
 import (
 	"encoding/json"
-	"github.com/qdnqn/smr/pkg/container"
-	"github.com/qdnqn/smr/pkg/logger"
+	"github.com/simplecontainer/smr/implementations/container/container"
+	"github.com/simplecontainer/smr/pkg/logger"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
@@ -14,7 +14,9 @@ func SendPs(client *http.Client, URL string) map[string]map[string]*container.Co
 
 	if err != nil {
 		logger.Log.Info("failed to connect to the smr-agent", zap.String("error", err.Error()))
+		return nil
 	}
+
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)

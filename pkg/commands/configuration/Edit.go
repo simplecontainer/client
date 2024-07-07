@@ -3,10 +3,10 @@ package configuration
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/qdnqn/smr-client/pkg/commands/apply"
-	"github.com/qdnqn/smr-client/pkg/context"
-	"github.com/qdnqn/smr-client/pkg/helpers"
-	"github.com/qdnqn/smr-client/pkg/network"
+	"github.com/simplecontainer/client/pkg/commands/apply"
+	"github.com/simplecontainer/client/pkg/context"
+	"github.com/simplecontainer/client/pkg/helpers"
+	"github.com/simplecontainer/client/pkg/network"
 )
 
 func Edit(context *context.Context, group string, identifier string) {
@@ -24,12 +24,14 @@ func Edit(context *context.Context, group string, identifier string) {
 		return
 	}
 
-	data, err := helpers.TmpEditor(bytes)
+	data, changed, err := helpers.TmpEditor(bytes)
 
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
 
-	apply.Apply(context, string(data))
+	if changed {
+		apply.Apply(context, string(data))
+	}
 }

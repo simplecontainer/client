@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fatih/color"
-	"github.com/qdnqn/smr-client/pkg/context"
-	"github.com/qdnqn/smr-client/pkg/helpers"
-	"github.com/qdnqn/smr-client/pkg/network"
-	gitopsSmrAgent "github.com/qdnqn/smr/pkg/gitops"
 	"github.com/rodaine/table"
+	"github.com/simplecontainer/client/pkg/context"
+	"github.com/simplecontainer/client/pkg/helpers"
+	"github.com/simplecontainer/client/pkg/network"
+	gitopsBase "github.com/simplecontainer/smr/implementations/gitops/gitops"
 )
 
 func List(context *context.Context) {
 	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/gitops/List", context.ApiURL), nil)
 
-	gitops := make(map[string]*gitopsSmrAgent.Gitops)
+	gitopsObj := make(map[string]*gitopsBase.Gitops)
 
 	bytes, err := json.Marshal(response.Data)
 
@@ -23,7 +23,7 @@ func List(context *context.Context) {
 		return
 	}
 
-	err = json.Unmarshal(bytes, &gitops)
+	err = json.Unmarshal(bytes, &gitopsObj)
 
 	if err != nil {
 		fmt.Println("invalid response sent from the smr-agent")
@@ -36,7 +36,7 @@ func List(context *context.Context) {
 	tbl := table.New("GROUP", "NAME", "REPOSITORY", "REVISION", "SYNCED", "AUTO", "STATE")
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
-	for _, g := range gitops {
+	for _, g := range gitopsObj {
 		certRef := fmt.Sprintf("%s.%s", g.CertKeyRef.Group, g.CertKeyRef.Identifier)
 		httpRef := fmt.Sprintf("%s.%s", g.HttpAuthRef.Group, g.HttpAuthRef.Identifier)
 

@@ -2,8 +2,8 @@ package apply
 
 import (
 	"fmt"
-	"github.com/qdnqn/smr-client/pkg/context"
-	"github.com/qdnqn/smr-client/pkg/network"
+	"github.com/simplecontainer/client/pkg/context"
+	"github.com/simplecontainer/client/pkg/network"
 )
 
 func Apply(context *context.Context, jsonData string) {

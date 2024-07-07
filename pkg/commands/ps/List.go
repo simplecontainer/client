@@ -3,68 +3,104 @@ package ps
 import (
 	"fmt"
 	"github.com/fatih/color"
-	"github.com/qdnqn/smr-client/pkg/context"
-	"github.com/qdnqn/smr-client/pkg/network"
 	"github.com/rodaine/table"
+	"github.com/simplecontainer/client/pkg/context"
+	"github.com/simplecontainer/client/pkg/helpers"
+	"github.com/simplecontainer/client/pkg/network"
+	"github.com/simplecontainer/smr/implementations/container/container"
+	"os"
+	"os/exec"
 	"sort"
+	"time"
 )
 
-func Ps(context *context.Context) {
-	containers := network.SendPs(context.Client, fmt.Sprintf("%s/api/v1/ps", context.ApiURL))
+func Ps(context *context.Context, watch bool) {
+	for {
+		if watch {
+			c := exec.Command("clear")
+			c.Stdout = os.Stdout
+			c.Run()
+		}
 
-	if containers == nil {
-		return
-	}
+		response := network.SendPs(context.Client, fmt.Sprintf("%s/api/v1/ps", context.ApiURL))
 
-	keys := make([]string, 0, len(containers))
+		if response == nil {
+			return
+		}
 
-	for k := range containers {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
+		keys := make([]string, 0)
+		containers := make(map[string]*container.Container)
 
-	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
-	columnFmt := color.New(color.FgYellow).SprintfFunc()
+		for _, group := range response {
+			for containerName, container := range group {
+				containers[containerName] = container
+				keys = append(keys, containerName)
+			}
+		}
 
-	tbl := table.New("GROUP", "NAME", "DOCKER NAME", "IMAGE", "IP", "PORTS", "DEPS", "STATE")
-	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
+		sort.Strings(keys)
 
-	for _, k := range keys {
-		for _, v := range containers[k] {
+		headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
+		columnFmt := color.New(color.FgYellow).SprintfFunc()
+
+		tbl := table.New("GROUP", "NAME", "DOCKER NAME", "IMAGE", "IP", "PORTS", "DEPS", "DOCKER STATE", "SMR STATE")
+		tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
+
+		for _, k := range keys {
 			ips := ""
 			ports := ""
 			deps := ""
-			status := ""
 
-			for _, x := range v.Static.MappingPorts {
-				ports += fmt.Sprintf("%s:%s ", x.Host, x.Container)
+			for _, x := range containers[k].Static.MappingPorts {
+				if x.Host != "" {
+					ports += fmt.Sprintf("%s:%s, ", x.Host, x.Container)
+				} else {
+					ports += fmt.Sprintf("%s, ", x.Container)
+				}
 			}
 
-			for _, u := range v.Runtime.Networks {
-				ips += fmt.Sprintf("%s(%s) ", u.IP, u.NetworkName)
+			networkKeys := make([]string, 0)
+			for netwrokKey, _ := range containers[k].Runtime.Networks {
+				networkKeys = append(networkKeys, netwrokKey)
 			}
 
-			for _, u := range v.Static.Definition.Spec.Container.Dependencies {
+			sort.Strings(networkKeys)
+
+			for _, u := range networkKeys {
+				if containers[k].Runtime.Networks[u].IP != "" {
+					ips += fmt.Sprintf("%s (%s), ", containers[k].Runtime.Networks[u].IP, containers[k].Runtime.Networks[u].NetworkName)
+				}
+			}
+
+			for _, u := range containers[k].Static.Definition.Spec.Container.Dependencies {
 				deps += fmt.Sprintf("%s ", u.Name)
 			}
 
-			if v.Status.DependsSolved {
-				status += fmt.Sprintf("%s ", "Healthy")
-			} else {
-				status += fmt.Sprintf("%s ", "Starting")
-			}
+			lastUpdate := time.Since(containers[k].Status.LastUpdate)
 
 			tbl.AddRow(
-				v.Static.Group,
-				v.Static.Name,
-				v.Static.GeneratedName,
-				fmt.Sprintf("%s:%s", v.Static.Image, v.Static.Tag),
-				ips,
-				ports,
-				deps,
-				status)
+				helpers.CliRemoveComa(containers[k].Static.Group),
+				helpers.CliRemoveComa(containers[k].Static.Name),
+				helpers.CliRemoveComa(containers[k].Static.GeneratedName),
+				fmt.Sprintf("%s:%s", containers[k].Static.Image, containers[k].Static.Tag),
+				helpers.CliRemoveComa(ips),
+				helpers.CliRemoveComa(ports),
+				helpers.CliRemoveComa(deps),
+				containers[k].Runtime.State,
+				fmt.Sprintf("%s (%s)", containers[k].Status.State, lastUpdate.String()),
+			)
+
+		}
+
+		tbl.Print()
+
+		if watch {
+			time.Sleep(1 * time.Second)
+			c := exec.Command("clear")
+			c.Stdout = os.Stdout
+			c.Run()
+		} else {
+			return
 		}
 	}
-
-	tbl.Print()
 }

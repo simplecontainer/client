@@ -2,8 +2,8 @@ package commands
 
 import (
 	"fmt"
-	"github.com/qdnqn/smr-client/pkg/commands/configuration"
-	"github.com/qdnqn/smr-client/pkg/manager"
+	"github.com/simplecontainer/client/pkg/commands/configuration"
+	"github.com/simplecontainer/client/pkg/manager"
 	"os"
 )
 
