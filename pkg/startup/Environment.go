@@ -14,17 +14,8 @@ func GetEnvironmentInfo() *configuration.Environment {
 		panic(err.Error())
 	}
 
-	OPTDIR := "/opt/smr"
-
-	if _, err := os.Stat(OPTDIR); err != nil {
-		if err = os.Mkdir(OPTDIR, os.FileMode(0750)); err != nil {
-			panic(err.Error())
-		}
-	}
-
 	return &configuration.Environment{
 		HOMEDIR:    HOMEDIR,
-		OPTDIR:     OPTDIR,
 		PROJECT:    fmt.Sprintf("%s", static.PROJECT),
 		PROJECTDIR: fmt.Sprintf("%s/%s/%s", HOMEDIR, static.ROOTDIR, static.PROJECT),
 		CLIENTIP:   GetOutboundIP().String(),
