@@ -49,7 +49,7 @@ func List(context *context.Context) {
 		}
 
 		tbl.AddRow(g.Definition.Meta.Group,
-			g.Definition.Meta.Identifier,
+			g.Definition.Meta.Name,
 			g.RepoURL,
 			g.Revision,
 			helpers.CliMask(g.LastSyncedCommit.IsZero(), "Never synced", g.LastSyncedCommit.String()[:7]),
