@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const HELP_GITOPS string = "Eg: smr gitops [describe, list, sync]"
+const HELP_GITOPS string = "Eg: smr gitops [describe, list, get, edit, sync]"
 
 func GitopsCommand() {
 	Commands = append(Commands, Command{

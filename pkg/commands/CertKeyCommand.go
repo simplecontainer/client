@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const HELP_CERTKEY string = "Eg: smr configuration [describe, list]"
+const HELP_CERTKEY string = "Eg: smr configuration [describe, list, get, edit]"
 
 func CertKeyCommand() {
 	Commands = append(Commands, Command{

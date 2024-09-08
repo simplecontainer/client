@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const HELP_SECRET string = "Eg: smr secret [describe, list]"
+const HELP_SECRET string = "Eg: smr secret [describe, list, get, edit]"
 
 func SecretCommand() {
 	Commands = append(Commands, Command{

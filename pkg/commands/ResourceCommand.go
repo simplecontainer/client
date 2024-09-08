@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const HELP_RESOURCE string = "Eg: smr resource [describe, list]"
+const HELP_RESOURCE string = "Eg: smr resource [describe, list, get, edit]"
 
 func ResourceCommand() {
 	Commands = append(Commands, Command{
