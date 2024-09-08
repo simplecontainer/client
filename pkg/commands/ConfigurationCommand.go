@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const HELP_CONFIGURATION string = "Eg: smr configuration [describe, list, get]"
+const HELP_CONFIGURATION string = "Eg: smr configuration [describe, list, get, edit]"
 
 func ConfigurationCommand() {
 	Commands = append(Commands, Command{

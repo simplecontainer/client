@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const HELP_HTTPAUTH string = "Eg: smr httpauth [describe, list]"
+const HELP_HTTPAUTH string = "Eg: smr httpauth [describe, list, get, edit]"
 
 func HttpAuthCommand() {
 	Commands = append(Commands, Command{

@@ -5,6 +5,7 @@ import (
 	"github.com/simplecontainer/client/pkg/commands/apply"
 	"github.com/simplecontainer/client/pkg/definitions"
 	"github.com/simplecontainer/client/pkg/manager"
+	"net/url"
 	"os"
 )
 
@@ -21,8 +22,25 @@ func Apply() {
 		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				definition := definitions.ReadFile(args[2])
-				apply.Apply(mgr.Context, definition)
+				u, err := url.ParseRequestURI(args[2])
+
+				definition := ""
+
+				if err != nil {
+					definition, err = definitions.ReadFile(args[2])
+				} else {
+					definition, err = definitions.DownloadFile(u)
+				}
+
+				if err != nil {
+					fmt.Println(err)
+				} else {
+					if definition != "" {
+						apply.Apply(mgr.Context, definition)
+					} else {
+						fmt.Println("specified file/url is not valid definition")
+					}
+				}
 			},
 		},
 		depends_on: []func(*manager.Manager, []string){

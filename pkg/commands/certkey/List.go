@@ -38,7 +38,7 @@ func List(context *context.Context) {
 	for _, obj := range objects {
 		tbl.AddRow(
 			obj.Meta.Group,
-			obj.Meta.Identifier,
+			obj.Meta.Name,
 		)
 	}
 

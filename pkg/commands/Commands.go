@@ -12,6 +12,7 @@ func PreloadCommands() {
 	Apply()
 	Delete()
 	Ps()
+	Restore()
 
 	SecretCommand()
 	ContainersCommand()

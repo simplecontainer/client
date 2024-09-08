@@ -30,6 +30,3 @@ jobs:
       - name: Build code
         run: |
           go build -o client-${{ matrix.platform }}
-
-
-

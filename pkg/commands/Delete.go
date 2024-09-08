@@ -2,9 +2,11 @@ package commands
 
 import (
 	"fmt"
+	"github.com/simplecontainer/client/pkg/commands/apply"
 	"github.com/simplecontainer/client/pkg/commands/remove"
+	"github.com/simplecontainer/client/pkg/definitions"
 	"github.com/simplecontainer/client/pkg/manager"
-	"github.com/simplecontainer/smr/pkg/definitions"
+	"net/url"
 	"os"
 )
 
@@ -21,7 +23,27 @@ func Delete() {
 		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				definition := definitions.ReadFile(args[2])
+
+				u, err := url.ParseRequestURI(args[2])
+
+				definition := ""
+
+				if err != nil {
+					definition, err = definitions.ReadFile(args[2])
+				} else {
+					definition, err = definitions.DownloadFile(u)
+				}
+
+				if err != nil {
+					fmt.Println(err)
+				} else {
+					if definition != "" {
+						apply.Apply(mgr.Context, definition)
+					} else {
+						fmt.Println("specified file/url is not valid definition")
+					}
+				}
+
 				remove.Remove(mgr.Context, definition)
 			},
 		},

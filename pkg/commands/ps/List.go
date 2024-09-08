@@ -73,10 +73,10 @@ func Ps(context *context.Context, watch bool) {
 			}
 
 			for _, u := range containers[k].Static.Definition.Spec.Container.Dependencies {
-				deps += fmt.Sprintf("%s ", u.Name)
+				deps += fmt.Sprintf("%s.%s ", u.Group, u.Name)
 			}
 
-			lastUpdate := time.Since(containers[k].Status.LastUpdate).Round(60 * time.Second)
+			lastUpdate := time.Since(containers[k].Status.LastUpdate).Round(time.Second)
 
 			tbl.AddRow(
 				helpers.CliRemoveComa(containers[k].Static.Group),
@@ -87,7 +87,7 @@ func Ps(context *context.Context, watch bool) {
 				helpers.CliRemoveComa(ports),
 				helpers.CliRemoveComa(deps),
 				containers[k].Runtime.State,
-				fmt.Sprintf("%s (%s)", containers[k].Status.State, lastUpdate.String()),
+				fmt.Sprintf("%s (%s)", containers[k].Status.GetState(), lastUpdate.String()),
 			)
 
 		}
