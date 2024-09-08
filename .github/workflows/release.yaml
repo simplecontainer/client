@@ -30,6 +30,7 @@ jobs:
         run: |
           go build -o client-${{ matrix.platform }}
           upx -9 -k client-${{ matrix.platform }}
+          checkout
           echo ${{ github.ref_name }} > version
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
