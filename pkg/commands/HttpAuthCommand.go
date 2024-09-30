@@ -7,13 +7,13 @@ import (
 	"os"
 )
 
-const HELP_HTTPAUTH string = "Eg: smr httpauth [describe, list, get, edit]"
+const HELP_HTTPAUTH string = "Eg: smr httpauth [describe, edit, get, list]"
 
 func HttpAuthCommand() {
 	Commands = append(Commands, Command{
 		name: "httpauth",
-		condition: func(*manager.Manager) bool {
-			return true
+		condition: func(mgr *manager.Manager) bool {
+			return mgr.Context.ConnectionTest()
 		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
@@ -49,6 +49,10 @@ func HttpAuthCommand() {
 		},
 		depends_on: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
+				if mgr.Context == nil {
+					fmt.Println("no active context found - please add least one context")
+					os.Exit(1)
+				}
 			},
 		},
 	})

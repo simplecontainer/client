@@ -18,6 +18,7 @@ func main() {
 	startup.Load(config, config.Root)
 
 	managerObj := &manager.Manager{}
+	managerObj.VersionClient = SMR_VERSION
 	managerObj.Configuration = config
 
 	bootstrap.CreateDirectoryTree(managerObj.Configuration.Environment.PROJECTDIR)

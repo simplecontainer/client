@@ -14,9 +14,6 @@ jobs:
         platform: ['linux-amd64']
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.BOT_USER_PAT }}
-          show-progress: false
       - name: Install UPX
         uses: crazy-max/ghaction-upx@v3
         with:
@@ -31,20 +28,15 @@ jobs:
         run: go test
       - name: Build code
         run: |
+          echo ${{ github.ref_name }} > version
           go build -o client-${{ matrix.platform }}
           upx -9 -k client-${{ matrix.platform }}
-          echo ${{ github.ref_name }} > version
-          git tag -d ${{ github.ref_name }}
-          git push --delete origin ${{ github.ref_name }}
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: Automated version tracking [no ci]
+          commit_message: Automated version tracking
 
-          branch: main
           file_pattern: 'version'
           repository: .
-          tagging_message: '${{ github.ref_name }}'
-          push_options: '--force'
 
           commit_user_name: bot
           commit_user_email: bot@qdnqn.org

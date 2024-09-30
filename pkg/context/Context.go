@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/simplecontainer/client/pkg/helpers"
+	"github.com/simplecontainer/client/pkg/network"
 	"github.com/simplecontainer/client/pkg/static"
 	"github.com/simplecontainer/smr/pkg/logger"
 	"github.com/spf13/viper"
@@ -109,6 +110,16 @@ func (context *Context) GenerateHttpClient(CertBundle []byte) (*http.Client, err
 			},
 		},
 	}, nil
+}
+
+func (context *Context) ConnectionTest() bool {
+	response := network.SendGet(context.Client, fmt.Sprintf("%s/healthz", context.ApiURL))
+
+	if response != nil && response.HttpStatus == http.StatusOK {
+		return true
+	} else {
+		return false
+	}
 }
 
 func (context *Context) GetActiveContext(projectDir string) bool {

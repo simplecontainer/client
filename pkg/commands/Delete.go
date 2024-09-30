@@ -13,9 +13,9 @@ import (
 func Delete() {
 	Commands = append(Commands, Command{
 		name: "delete",
-		condition: func(*manager.Manager) bool {
+		condition: func(mgr *manager.Manager) bool {
 			if len(os.Args) > 2 {
-				return true
+				return mgr.Context.ConnectionTest()
 			} else {
 				fmt.Println("try to specify a file")
 				return false
@@ -49,6 +49,10 @@ func Delete() {
 		},
 		depends_on: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
+				if mgr.Context == nil {
+					fmt.Println("no active context found - please add least one context")
+					os.Exit(1)
+				}
 			},
 		},
 	})

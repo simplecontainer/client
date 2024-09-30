@@ -8,4 +8,5 @@ import (
 type Manager struct {
 	Configuration *configuration.Configuration
 	Context       *context.Context
+	VersionClient string
 }
