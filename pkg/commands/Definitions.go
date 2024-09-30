@@ -2,29 +2,31 @@ package commands
 
 import (
 	"fmt"
-	"github.com/simplecontainer/client/pkg/commands/ps"
+	"github.com/simplecontainer/client/pkg/commands/definitions"
 	"github.com/simplecontainer/client/pkg/manager"
 	"os"
 )
 
-const HELP_PS string = "Eg: smr ps ['', watch]"
+const HELP_DEFINITIONS string = `
+Definitions command used to see loaded definitions on the agent.
+Eg: smr definitions ['',... any output from the smr definitions]"
+`
 
-func Ps() {
+func Definitions() {
 	Commands = append(Commands, Command{
-		name:      "ps",
+		name:      "definitions",
 		condition: func(mgr *manager.Manager) bool { return mgr.Context.ConnectionTest() },
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				if len(os.Args) > 2 {
-					switch os.Args[2] {
-					case "watch":
-						ps.Ps(mgr.Context, true)
-						break
-					default:
-						fmt.Println(HELP_PS)
-					}
-				} else {
-					ps.Ps(mgr.Context, false)
+				switch len(os.Args) {
+				case 2:
+					definitions.Definitions(mgr.Context, "")
+					break
+				case 3:
+					definitions.Definitions(mgr.Context, os.Args[2])
+					break
+				default:
+					fmt.Println(HELP_DEFINITIONS)
 				}
 			},
 		},

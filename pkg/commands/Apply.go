@@ -45,6 +45,12 @@ func Apply() {
 		},
 		depends_on: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
+				if mgr.Context != nil {
+
+				} else {
+					fmt.Println("no active context found - please add least one context")
+					os.Exit(1)
+				}
 			},
 		},
 	})

@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"fmt"
+	"github.com/rodaine/table"
 	"github.com/simplecontainer/client/pkg/manager"
 	"os"
 )
@@ -13,6 +15,8 @@ func PreloadCommands() {
 	Delete()
 	Ps()
 	Restore()
+	Definitions()
+	Version()
 
 	SecretCommand()
 	ContainersCommand()
@@ -37,7 +41,18 @@ func Run(mgr *manager.Manager) {
 						fn(mgr, os.Args)
 					}
 				}
+
+				return
 			}
 		}
 	}
+
+	tbl := table.New("Command", "Help")
+
+	for _, comm := range Commands {
+		tbl.AddRow(comm.name, fmt.Sprintf("smr %s help", comm.name))
+	}
+
+	fmt.Print("Available Commands: \n\n")
+	tbl.Print()
 }

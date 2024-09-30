@@ -7,13 +7,13 @@ import (
 	"os"
 )
 
-const HELP_GITOPS string = "Eg: smr gitops [describe, list, get, edit, sync]"
+const HELP_GITOPS string = "Eg: smr gitops [describe, edit, get, list, sync]"
 
 func GitopsCommand() {
 	Commands = append(Commands, Command{
 		name: "gitops",
-		condition: func(*manager.Manager) bool {
-			return true
+		condition: func(mgr *manager.Manager) bool {
+			return mgr.Context.ConnectionTest()
 		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
@@ -53,6 +53,10 @@ func GitopsCommand() {
 		},
 		depends_on: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
+				if mgr.Context == nil {
+					fmt.Println("no active context found - please add least one context")
+					os.Exit(1)
+				}
 			},
 		},
 	})

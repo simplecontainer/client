@@ -7,13 +7,13 @@ import (
 	"os"
 )
 
-const HELP_RESOURCE string = "Eg: smr resource [describe, list, get, edit]"
+const HELP_RESOURCE string = "Eg: smr resource [describe, edit, get, list]"
 
 func ResourceCommand() {
 	Commands = append(Commands, Command{
 		name: "resource",
-		condition: func(*manager.Manager) bool {
-			return true
+		condition: func(mgr *manager.Manager) bool {
+			return mgr.Context.ConnectionTest()
 		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
@@ -49,6 +49,10 @@ func ResourceCommand() {
 		},
 		depends_on: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
+				if mgr.Context == nil {
+					fmt.Println("no active context found - please add least one context")
+					os.Exit(1)
+				}
 			},
 		},
 	})

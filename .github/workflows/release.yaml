@@ -28,9 +28,9 @@ jobs:
         run: go test
       - name: Build code
         run: |
+          echo ${{ github.ref_name }} > version
           go build -o client-${{ matrix.platform }}
           upx -9 -k client-${{ matrix.platform }}
-          echo ${{ github.ref_name }} > version
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Automated version tracking
