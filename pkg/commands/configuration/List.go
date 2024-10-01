@@ -13,7 +13,7 @@ import (
 func List(context *context.Context) {
 	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/configuration/List", context.ApiURL), nil)
 
-	objects := make(map[string]*v1.Configuration)
+	objects := make(map[string]*v1.ConfigurationDefinition)
 
 	bytes, err := json.Marshal(response.Data)
 

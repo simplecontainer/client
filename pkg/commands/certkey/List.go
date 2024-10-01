@@ -13,7 +13,7 @@ import (
 func List(context *context.Context) {
 	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/certkey/List", context.ApiURL), nil)
 
-	objects := make(map[string]*v1.CertKey)
+	objects := make(map[string]*v1.CertKeyDefinition)
 
 	bytes, err := json.Marshal(response.Data)
 

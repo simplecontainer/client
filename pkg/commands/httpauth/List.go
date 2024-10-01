@@ -13,7 +13,7 @@ import (
 func List(context *context.Context) {
 	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/httpauth/List", context.ApiURL), nil)
 
-	objects := make(map[string]*v1.HttpAuth)
+	objects := make(map[string]*v1.HttpAuthDefinition)
 
 	bytes, err := json.Marshal(response.Data)
 

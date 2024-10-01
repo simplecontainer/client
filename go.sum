@@ -221,6 +221,8 @@ github.com/simplecontainer/smr v0.0.0-20240822144348-ebd8a90ddf63 h1:DsoAPDvF/ed
 github.com/simplecontainer/smr v0.0.0-20240822144348-ebd8a90ddf63/go.mod h1:qxI6STvaU2VtHK55KbfsZdV3xlNbasvcU5sh4vUowog=
 github.com/simplecontainer/smr v0.0.0-20240825132701-e0f606f049e5 h1:BqY1WxJTgiy8+njvX/U3N1cXKsGQLO0SO7eYCHEf20I=
 github.com/simplecontainer/smr v0.0.0-20240825132701-e0f606f049e5/go.mod h1:qxI6STvaU2VtHK55KbfsZdV3xlNbasvcU5sh4vUowog=
+github.com/simplecontainer/smr v0.0.3-0.20241001112307-da3932410bd6 h1:lWSgCCChC9RWkB1LMebFDKyrDhQP9xYoAG0Q6NCkzzw=
+github.com/simplecontainer/smr v0.0.3-0.20241001112307-da3932410bd6/go.mod h1:qxI6STvaU2VtHK55KbfsZdV3xlNbasvcU5sh4vUowog=
 github.com/sirupsen/logrus v1.9.3 h1:dueUQJ1C2q9oE3F7wvmSGAaVtTmUizReu6fjN8uqzbQ=
 github.com/sirupsen/logrus v1.9.3/go.mod h1:naHLuLoDiP4jHNo9R0sCBMtWGeIprob74mVsIT4qYEQ=
 github.com/sourcegraph/conc v0.3.0 h1:OQTbbt6P72L20UqAkXXuLOj79LfEanQ+YQFNpLA9ySo=
