@@ -35,6 +35,7 @@ jobs:
         with:
           commit_message: Automated version tracking
 
+          branch: main
           file_pattern: 'version'
           repository: .
 
