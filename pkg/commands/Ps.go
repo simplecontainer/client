@@ -11,8 +11,10 @@ const HELP_PS string = "Eg: smr ps ['', watch]"
 
 func Ps() {
 	Commands = append(Commands, Command{
-		name:      "ps",
-		condition: func(mgr *manager.Manager) bool { return mgr.Context.ConnectionTest() },
+		name: "ps",
+		condition: func(mgr *manager.Manager) bool {
+			return mgr.Context.ConnectionTest(mgr.Context)
+		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
 				if len(os.Args) > 2 {
@@ -30,10 +32,6 @@ func Ps() {
 		},
 		depends_on: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				if mgr.Context == nil {
-					fmt.Println("no active context found - please add least one context")
-					os.Exit(1)
-				}
 			},
 		},
 	})

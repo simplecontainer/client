@@ -14,15 +14,14 @@ func Delete() {
 	Commands = append(Commands, Command{
 		name: "delete",
 		condition: func(mgr *manager.Manager) bool {
-			if len(os.Args) > 2 {
-				return mgr.Context.ConnectionTest()
-			} else {
-				fmt.Println("try to specify a file")
-				return false
-			}
+			return mgr.Context.ConnectionTest(mgr.Context)
 		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
+				if len(os.Args) < 2 {
+					fmt.Println("try to specify a file")
+					return
+				}
 
 				u, err := url.ParseRequestURI(args[2])
 
@@ -49,10 +48,6 @@ func Delete() {
 		},
 		depends_on: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				if mgr.Context == nil {
-					fmt.Println("no active context found - please add least one context")
-					os.Exit(1)
-				}
 			},
 		},
 	})

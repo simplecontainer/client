@@ -112,7 +112,12 @@ func (context *Context) GenerateHttpClient(CertBundle []byte) (*http.Client, err
 	}, nil
 }
 
-func (context *Context) ConnectionTest() bool {
+func (context *Context) ConnectionTest(mgrCtx *Context) bool {
+	if mgrCtx == nil {
+		fmt.Println("no active context found - please add least one context")
+		os.Exit(1)
+	}
+
 	response := network.SendGet(context.Client, fmt.Sprintf("%s/healthz", context.ApiURL))
 
 	if response != nil && response.HttpStatus == http.StatusOK {

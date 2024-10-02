@@ -14,8 +14,10 @@ Eg: smr definitions ['',... any output from the smr definitions]"
 
 func Definitions() {
 	Commands = append(Commands, Command{
-		name:      "definitions",
-		condition: func(mgr *manager.Manager) bool { return mgr.Context.ConnectionTest() },
+		name: "definitions",
+		condition: func(mgr *manager.Manager) bool {
+			return mgr.Context.ConnectionTest(mgr.Context)
+		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
 				switch len(os.Args) {
@@ -32,10 +34,6 @@ func Definitions() {
 		},
 		depends_on: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				if mgr.Context == nil {
-					fmt.Println("no active context found - please add least one context")
-					os.Exit(1)
-				}
 			},
 		},
 	})

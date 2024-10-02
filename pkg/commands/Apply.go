@@ -12,16 +12,16 @@ import (
 func Apply() {
 	Commands = append(Commands, Command{
 		name: "apply",
-		condition: func(*manager.Manager) bool {
-			if len(os.Args) > 2 {
-				return true
-			} else {
-				fmt.Println("try to specify a file")
-				return false
-			}
+		condition: func(mgr *manager.Manager) bool {
+			return mgr.Context.ConnectionTest(mgr.Context)
 		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
+				if len(os.Args) < 2 {
+					fmt.Println("try to specify a file")
+					return
+				}
+
 				u, err := url.ParseRequestURI(args[2])
 
 				definition := ""
@@ -47,12 +47,6 @@ func Apply() {
 		},
 		depends_on: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				if mgr.Context != nil {
-
-				} else {
-					fmt.Println("no active context found - please add least one context")
-					os.Exit(1)
-				}
 			},
 		},
 	})
