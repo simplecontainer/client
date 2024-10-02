@@ -14,6 +14,9 @@ jobs:
         platform: ['linux-amd64']
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.BOT_USER_PAT }}
+          show-progress: false
       - name: Install UPX
         uses: crazy-max/ghaction-upx@v3
         with:
