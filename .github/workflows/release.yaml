@@ -38,6 +38,7 @@ jobs:
           branch: main
           file_pattern: 'version'
           repository: .
+          tagging_message: '${{ github.ref_name }}'
 
           commit_user_name: bot
           commit_user_email: bot@qdnqn.org
