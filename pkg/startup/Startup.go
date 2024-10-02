@@ -15,6 +15,7 @@ func Load(configObj *configuration.Configuration, projectDir string) {
 func ReadFlags(configObj *configuration.Configuration) {
 	/* Operation mode */
 	flag.String("context", "", "Context name")
+	flag.Bool("y", false, "Override prompt confirmation")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()
@@ -22,4 +23,5 @@ func ReadFlags(configObj *configuration.Configuration) {
 	viper.BindPFlags(pflag.CommandLine)
 
 	configObj.Flags.Context = viper.GetString("context")
+	configObj.Flags.Y = viper.GetBool("y")
 }

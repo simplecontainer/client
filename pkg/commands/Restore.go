@@ -22,16 +22,20 @@ func Restore() {
 					Items: []string{"no", "yes"},
 				}
 
-				_, result, err := prompt.Run()
+				if !mgr.Configuration.Flags.Y {
+					_, result, err := prompt.Run()
 
-				if err != nil {
-					logger.Log.Fatal("failed to select from list of contexts")
-				}
+					if err != nil {
+						logger.Log.Fatal("failed to select from list of contexts")
+					}
 
-				if result == "yes" {
-					restore.Restore(mgr.Context)
+					if result == "yes" {
+						restore.Restore(mgr.Context)
+					} else {
+						fmt.Println("restore canceled")
+					}
 				} else {
-					fmt.Println("restore canceled")
+					restore.Restore(mgr.Context)
 				}
 			},
 		},

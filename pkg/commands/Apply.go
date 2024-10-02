@@ -26,11 +26,13 @@ func Apply() {
 
 				definition := ""
 
-				if err != nil {
+				if err != nil || !u.IsAbs() {
 					definition, err = definitions.ReadFile(args[2])
 				} else {
 					definition, err = definitions.DownloadFile(u)
 				}
+
+				fmt.Println(definition)
 
 				if err != nil {
 					fmt.Println(err)

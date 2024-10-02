@@ -28,7 +28,7 @@ func Delete() {
 
 				definition := ""
 
-				if err != nil {
+				if err != nil || !u.IsAbs() {
 					definition, err = definitions.ReadFile(args[2])
 				} else {
 					definition, err = definitions.DownloadFile(u)

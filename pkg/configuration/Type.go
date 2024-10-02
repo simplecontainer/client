@@ -9,6 +9,7 @@ type Configuration struct {
 
 type Flags struct {
 	Context string
+	Y       bool
 }
 
 type Environment struct {
