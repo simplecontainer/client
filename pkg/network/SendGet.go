@@ -34,8 +34,13 @@ func SendGet(client *http.Client, URL string) *httpcontract.ResponseImplementati
 
 		return data
 	} else {
-		logger.Log.Info("invalid response from the smr-agent", zap.String("status", resp.Status))
+		return &httpcontract.ResponseImplementation{
+			HttpStatus:       resp.StatusCode,
+			Explanation:      string(body),
+			ErrorExplanation: "unexpected response from the server",
+			Error:            true,
+			Success:          false,
+			Data:             nil,
+		}
 	}
-
-	return nil
 }

@@ -16,6 +16,7 @@ func PreloadCommands() {
 	Ps()
 	Restore()
 	Definitions()
+	Users()
 	Version()
 
 	SecretCommand()

@@ -3,17 +3,19 @@ package network
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/simplecontainer/smr/pkg/httpcontract"
 	"io"
 	"net/http"
 )
 
-func SendOperator(client *http.Client, URL string, data map[string]any) *httpcontract.ResponseOperator {
+func SendPost(client *http.Client, URL string, data map[string]any) *httpcontract.ResponseOperator {
 	var req *http.Request
 	var err error
 
 	if len(data) > 0 {
-		marshaled, err := json.Marshal(data)
+		var marshaled []byte
+		marshaled, err = json.Marshal(data)
 
 		if err != nil {
 			return &httpcontract.ResponseOperator{
@@ -27,21 +29,34 @@ func SendOperator(client *http.Client, URL string, data map[string]any) *httpcon
 		}
 
 		req, err = http.NewRequest("POST", URL, bytes.NewBuffer(marshaled))
+
+		if err != nil {
+			return &httpcontract.ResponseOperator{
+				HttpStatus:       0,
+				Explanation:      "failed to create http request",
+				ErrorExplanation: err.Error(),
+				Error:            true,
+				Success:          false,
+				Data:             nil,
+			}
+		}
+
 		req.Header.Set("Content-Type", "application/json")
 	} else {
-		req, err = http.NewRequest("GET", URL, nil)
-		req.Header.Set("Content-Type", "application/json")
-	}
+		req, err = http.NewRequest("POST", URL, nil)
 
-	if err != nil {
-		return &httpcontract.ResponseOperator{
-			HttpStatus:       0,
-			Explanation:      "failed to craft request",
-			ErrorExplanation: err.Error(),
-			Error:            true,
-			Success:          false,
-			Data:             nil,
+		if err != nil {
+			return &httpcontract.ResponseOperator{
+				HttpStatus:       0,
+				Explanation:      "failed to create http request",
+				ErrorExplanation: err.Error(),
+				Error:            true,
+				Success:          false,
+				Data:             nil,
+			}
 		}
+
+		req.Header.Set("Content-Type", "application/json")
 	}
 
 	resp, err := client.Do(req)
@@ -56,12 +71,19 @@ func SendOperator(client *http.Client, URL string, data map[string]any) *httpcon
 			Data:             nil,
 		}
 	}
-	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
+	defer func(Body io.ReadCloser) {
+		err = Body.Close()
+		if err != nil {
+			return
+		}
+	}(resp.Body)
+
+	var body []byte
+	body, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return &httpcontract.ResponseOperator{
-			HttpStatus:       0,
+			HttpStatus:       resp.StatusCode,
 			Explanation:      "invalid response from the smr-agent",
 			ErrorExplanation: err.Error(),
 			Error:            true,
@@ -71,13 +93,12 @@ func SendOperator(client *http.Client, URL string, data map[string]any) *httpcon
 	}
 
 	if resp.StatusCode == http.StatusOK {
-
 		var response httpcontract.ResponseOperator
 		err = json.Unmarshal(body, &response)
 
 		if err != nil {
 			return &httpcontract.ResponseOperator{
-				HttpStatus:       0,
+				HttpStatus:       resp.StatusCode,
 				Explanation:      "failed to unmarshal body response from smr-agent",
 				ErrorExplanation: err.Error(),
 				Error:            true,
@@ -91,7 +112,7 @@ func SendOperator(client *http.Client, URL string, data map[string]any) *httpcon
 		return &httpcontract.ResponseOperator{
 			HttpStatus:       resp.StatusCode,
 			Explanation:      string(body),
-			ErrorExplanation: "unexpected response from the server",
+			ErrorExplanation: fmt.Sprintf("unexpected response from the server: %s", req.RequestURI),
 			Error:            true,
 			Success:          false,
 			Data:             nil,

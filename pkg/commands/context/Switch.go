@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/manifoldco/promptui"
 	"github.com/simplecontainer/client/pkg/context"
-	"github.com/simplecontainer/smr/pkg/logger"
 	"log"
 	"os"
 )
@@ -43,10 +42,12 @@ func Switch(contextName string, context *context.Context) {
 			Items: dirs,
 		}
 
-		_, result, err := prompt.Run()
+		var result string
+		_, result, err = prompt.Run()
 
 		if err != nil {
-			logger.Log.Fatal("failed to select from list of contexts")
+			fmt.Println("failed to select from list of contexts")
+			return
 		}
 
 		context.SetActiveContext(result)

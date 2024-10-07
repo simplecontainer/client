@@ -15,24 +15,32 @@ func Context() {
 		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				switch os.Args[2] {
-				case "connect":
-					if len(os.Args) > 4 {
-						context.Connect(os.Args[3], os.Args[4], mgr.Configuration.Environment.PROJECTDIR)
+				if len(os.Args) < 3 {
+					if mgr.Context != nil {
+						fmt.Println(fmt.Sprintf("active context is %s", mgr.Context.Name))
 					} else {
-						fmt.Println("Try this: smr context connect https://API_URL:1443 PATH_TO_CERT.PEM --context NAME_YOU_WANT")
+						fmt.Println("no active context found - please add least one context")
 					}
-					break
-				case "switch":
-					contextName := ""
-					if len(os.Args) > 3 {
-						contextName = os.Args[3]
-					}
+				} else {
+					switch os.Args[2] {
+					case "connect":
+						if len(os.Args) > 4 {
+							context.Connect(os.Args[3], os.Args[4], mgr.Configuration.Environment.PROJECTDIR)
+						} else {
+							fmt.Println("Try this: smr context connect https://API_URL:1443 PATH_TO_CERT.PEM --context NAME_YOU_WANT")
+						}
+						break
+					case "switch":
+						contextName := ""
+						if len(os.Args) > 3 {
+							contextName = os.Args[3]
+						}
 
-					context.Switch(contextName, mgr.Context)
-					break
-				default:
-					fmt.Println("Available commands are: connect, switch")
+						context.Switch(contextName, mgr.Context)
+						break
+					default:
+						fmt.Println("Available commands are: connect, switch")
+					}
 				}
 			},
 		},
