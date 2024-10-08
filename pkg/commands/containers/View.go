@@ -1,4 +1,4 @@
-package containers
+package container
 
 import (
 	"encoding/json"

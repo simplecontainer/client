@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const HELP_GITOPS string = "Eg: smr gitops [describe, edit, get, list, sync]"
+const HELP_GITOPS string = "Eg: smr gitops [describe, delete, edit, get, list, sync]"
 
 func GitopsCommand() {
 	Commands = append(Commands, Command{
@@ -35,6 +35,13 @@ func GitopsCommand() {
 					case "edit":
 						if len(os.Args) > 4 {
 							gitops.Edit(mgr.Context, os.Args[3], os.Args[4])
+						} else {
+							fmt.Println(HELP_GITOPS)
+						}
+						break
+					case "delete":
+						if len(os.Args) > 4 {
+							gitops.Delete(mgr.Context, os.Args[3], os.Args[4])
 						} else {
 							fmt.Println(HELP_GITOPS)
 						}

@@ -11,7 +11,7 @@ import (
 )
 
 func List(context *context.Context) {
-	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/containers/List", context.ApiURL), nil)
+	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/container/List", context.ApiURL), nil)
 
 	objects := make(map[string]*v1.ContainerDefinition)
 

@@ -7,7 +7,7 @@ import (
 )
 
 func Describe(context *context.Context) {
-	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/containers", context.ApiURL), nil)
+	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/container", context.ApiURL), nil)
 
 	if !response.Error && len(response.Data) > 0 {
 		for _, x := range response.Data["SupportedOperations"].([]interface{}) {

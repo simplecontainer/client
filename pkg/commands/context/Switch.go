@@ -32,6 +32,7 @@ func Switch(contextName string, context *context.Context) {
 
 	if contextName != "" {
 		if validCtxProvided {
+			context.SetActiveContext(contextName)
 			fmt.Println(fmt.Sprintf("active context is %s", contextName))
 		} else {
 			fmt.Println(fmt.Sprintf("context %s does not exist", contextName))

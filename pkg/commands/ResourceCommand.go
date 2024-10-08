@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const HELP_RESOURCE string = "Eg: smr resource [describe, edit, get, list]"
+const HELP_RESOURCE string = "Eg: smr resource [describe, delete, edit, get, list]"
 
 func ResourceCommand() {
 	Commands = append(Commands, Command{
@@ -35,6 +35,13 @@ func ResourceCommand() {
 					case "edit":
 						if len(os.Args) > 4 {
 							resource.Edit(mgr.Context, os.Args[3], os.Args[4])
+						} else {
+							fmt.Println(HELP_RESOURCE)
+						}
+						break
+					case "delete":
+						if len(os.Args) > 4 {
+							resource.Delete(mgr.Context, os.Args[3], os.Args[4])
 						} else {
 							fmt.Println(HELP_RESOURCE)
 						}

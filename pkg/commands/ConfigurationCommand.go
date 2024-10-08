@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const HELP_CONFIGURATION string = "Eg: smr configuration [describe, edit, get, list]"
+const HELP_CONFIGURATION string = "Eg: smr configuration [describe, delete, edit, get, list]"
 
 func ConfigurationCommand() {
 	Commands = append(Commands, Command{
@@ -35,6 +35,13 @@ func ConfigurationCommand() {
 					case "edit":
 						if len(os.Args) > 4 {
 							configuration.Edit(mgr.Context, os.Args[3], os.Args[4])
+						} else {
+							fmt.Println(HELP_CONFIGURATION)
+						}
+						break
+					case "delete":
+						if len(os.Args) > 4 {
+							configuration.Delete(mgr.Context, os.Args[3], os.Args[4])
 						} else {
 							fmt.Println(HELP_CONFIGURATION)
 						}

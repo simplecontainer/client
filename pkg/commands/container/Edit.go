@@ -10,7 +10,7 @@ import (
 )
 
 func Edit(context *context.Context, group string, identifier string) {
-	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/containers/Get", context.ApiURL),
+	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/container/Get", context.ApiURL),
 		map[string]any{
 			"group":      group,
 			"identifier": identifier,

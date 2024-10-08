@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const HELP_HTTPAUTH string = "Eg: smr httpauth [describe, edit, get, list]"
+const HELP_HTTPAUTH string = "Eg: smr httpauth [describe, delete, edit, get, list]"
 
 func HttpAuthCommand() {
 	Commands = append(Commands, Command{
@@ -35,6 +35,13 @@ func HttpAuthCommand() {
 					case "edit":
 						if len(os.Args) > 4 {
 							httpauth.Edit(mgr.Context, os.Args[3], os.Args[4])
+						} else {
+							fmt.Println(HELP_HTTPAUTH)
+						}
+						break
+					case "delete":
+						if len(os.Args) > 4 {
+							httpauth.Delete(mgr.Context, os.Args[3], os.Args[4])
 						} else {
 							fmt.Println(HELP_HTTPAUTH)
 						}

@@ -2,16 +2,16 @@ package commands
 
 import (
 	"fmt"
-	"github.com/simplecontainer/client/pkg/commands/certkey"
+	"github.com/simplecontainer/client/pkg/commands/containers"
 	"github.com/simplecontainer/client/pkg/manager"
 	"os"
 )
 
-const HELP_CERTKEY string = "Eg: smr configuration [describe, delete, edit, get, list]"
+const HELP_CONTAINERS string = "Eg: smr configuration [describe, delete, edit, get, list, view]"
 
-func CertKeyCommand() {
+func ContainersCommand() {
 	Commands = append(Commands, Command{
-		name: "certkey",
+		name: "containers",
 		condition: func(mgr *manager.Manager) bool {
 			return mgr.Context.ConnectionTest(mgr.Context)
 		},
@@ -20,37 +20,44 @@ func CertKeyCommand() {
 				if len(os.Args) > 2 {
 					switch os.Args[2] {
 					case "describe":
-						certkey.Describe(mgr.Context)
+						container.Describe(mgr.Context)
 						break
 					case "list":
-						certkey.List(mgr.Context)
+						container.List(mgr.Context)
 						break
 					case "get":
 						if len(os.Args) > 4 {
-							certkey.Get(mgr.Context, os.Args[3], os.Args[4])
+							container.Get(mgr.Context, os.Args[3], os.Args[4])
 						} else {
-							fmt.Println(HELP_CERTKEY)
+							fmt.Println(HELP_CONTAINERS)
+						}
+						break
+					case "view":
+						if len(os.Args) > 4 {
+							container.View(mgr.Context, os.Args[3], os.Args[4])
+						} else {
+							fmt.Println(HELP_CONTAINERS)
 						}
 						break
 					case "edit":
 						if len(os.Args) > 4 {
-							certkey.Edit(mgr.Context, os.Args[3], os.Args[4])
+							container.Edit(mgr.Context, os.Args[3], os.Args[4])
 						} else {
-							fmt.Println(HELP_CERTKEY)
+							fmt.Println(HELP_CONTAINERS)
 						}
 						break
 					case "delete":
 						if len(os.Args) > 4 {
-							certkey.Delete(mgr.Context, os.Args[3], os.Args[4])
+							container.Delete(mgr.Context, os.Args[3], os.Args[4])
 						} else {
-							fmt.Println(HELP_CERTKEY)
+							fmt.Println(HELP_CONTAINERS)
 						}
 						break
 					default:
-						fmt.Println(HELP_CERTKEY)
+						fmt.Println(HELP_CONTAINERS)
 					}
 				} else {
-					fmt.Println(HELP_CERTKEY)
+					fmt.Println(HELP_CONTAINERS)
 				}
 			},
 		},
