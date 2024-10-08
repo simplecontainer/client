@@ -7,8 +7,8 @@ import (
 	"github.com/simplecontainer/client/pkg/network"
 )
 
-func Get(context *context.Context, group string, identifier string) {
-	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/containers/Get", context.ApiURL),
+func View(context *context.Context, group string, identifier string) {
+	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/container/View", context.ApiURL),
 		map[string]any{
 			"group":      group,
 			"identifier": identifier,

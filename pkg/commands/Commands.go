@@ -21,6 +21,7 @@ func PreloadCommands() {
 
 	SecretCommand()
 	ContainersCommand()
+	ContainerCommand()
 	GitopsCommand()
 	ConfigurationCommand()
 	ResourceCommand()

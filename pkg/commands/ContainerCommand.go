@@ -2,14 +2,14 @@ package commands
 
 import (
 	"fmt"
-	"github.com/simplecontainer/client/pkg/commands/containers"
+	"github.com/simplecontainer/client/pkg/commands/container"
 	"github.com/simplecontainer/client/pkg/manager"
 	"os"
 )
 
-const HELP_CONTAINERS string = "Eg: smr configuration [describe, edit, get, list, view]"
+const HELP_CONTAINER string = "Eg: smr configuration [describe, delete, edit, get, list, view]"
 
-func ContainersCommand() {
+func ContainerCommand() {
 	Commands = append(Commands, Command{
 		name: "container",
 		condition: func(mgr *manager.Manager) bool {
@@ -20,37 +20,44 @@ func ContainersCommand() {
 				if len(os.Args) > 2 {
 					switch os.Args[2] {
 					case "describe":
-						containers.Describe(mgr.Context)
+						container.Describe(mgr.Context)
 						break
 					case "list":
-						containers.List(mgr.Context)
+						container.List(mgr.Context)
 						break
 					case "get":
 						if len(os.Args) > 4 {
-							containers.Get(mgr.Context, os.Args[3], os.Args[4])
+							container.Get(mgr.Context, os.Args[3], os.Args[4])
 						} else {
-							fmt.Println(HELP_CONTAINERS)
+							fmt.Println(HELP_CONTAINER)
 						}
 						break
 					case "view":
 						if len(os.Args) > 4 {
-							containers.View(mgr.Context, os.Args[3], os.Args[4])
+							container.View(mgr.Context, os.Args[3], os.Args[4])
 						} else {
-							fmt.Println(HELP_CONTAINERS)
+							fmt.Println(HELP_CONTAINER)
 						}
 						break
 					case "edit":
 						if len(os.Args) > 4 {
-							containers.Edit(mgr.Context, os.Args[3], os.Args[4])
+							container.Edit(mgr.Context, os.Args[3], os.Args[4])
 						} else {
-							fmt.Println(HELP_CONTAINERS)
+							fmt.Println(HELP_CONTAINER)
+						}
+						break
+					case "delete":
+						if len(os.Args) > 4 {
+							container.Delete(mgr.Context, os.Args[3], os.Args[4])
+						} else {
+							fmt.Println(HELP_CONTAINER)
 						}
 						break
 					default:
-						fmt.Println(HELP_CONTAINERS)
+						fmt.Println(HELP_CONTAINER)
 					}
 				} else {
-					fmt.Println(HELP_CONTAINERS)
+					fmt.Println(HELP_CONTAINER)
 				}
 			},
 		},
