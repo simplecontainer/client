@@ -48,6 +48,10 @@ func List(context *context.Context) {
 			httpRef = ""
 		}
 
+		if g.Definition == nil {
+			continue
+		}
+
 		tbl.AddRow(g.Definition.Meta.Group,
 			g.Definition.Meta.Name,
 			g.RepoURL,
