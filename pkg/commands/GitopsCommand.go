@@ -46,6 +46,10 @@ func GitopsCommand() {
 							fmt.Println(HELP_GITOPS)
 						}
 						break
+					case "refresh":
+						if len(os.Args) > 4 {
+							gitops.Refresh(mgr.Context, os.Args[3], os.Args[4])
+						}
 					case "sync":
 						if len(os.Args) > 4 {
 							gitops.Sync(mgr.Context, os.Args[3], os.Args[4])
