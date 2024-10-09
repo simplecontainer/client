@@ -37,8 +37,8 @@ func List(context *context.Context) {
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 	for _, g := range gitopsObj {
-		certRef := fmt.Sprintf("%s.%s", g.CertKeyRef.Group, g.CertKeyRef.Identifier)
-		httpRef := fmt.Sprintf("%s.%s", g.HttpAuthRef.Group, g.HttpAuthRef.Identifier)
+		certRef := fmt.Sprintf("%s.%s", g.Auth.CertKeyRef.Group, g.Auth.CertKeyRef.Name)
+		httpRef := fmt.Sprintf("%s.%s", g.Auth.HttpAuthRef.Group, g.Auth.HttpAuthRef.Name)
 
 		if certRef == "." {
 			certRef = ""
@@ -54,11 +54,11 @@ func List(context *context.Context) {
 
 		tbl.AddRow(g.Definition.Meta.Group,
 			g.Definition.Meta.Name,
-			g.RepoURL,
+			helpers.CliMask(g.Commit.ID().IsZero(), fmt.Sprintf("%s (Not pulled)", g.RepoURL), fmt.Sprintf("%s (%s)", g.RepoURL, g.Commit.ID().String()[:7])),
 			g.Revision,
-			helpers.CliMask(g.LastSyncedCommit.IsZero(), "Never synced", g.LastSyncedCommit.String()[:7]),
+			helpers.CliMask(g.Status.LastSyncedCommit.IsZero(), "Never synced", g.Status.LastSyncedCommit.String()[:7]),
 			g.AutomaticSync,
-			helpers.CliMask(g.InSync, "InSync", "Drifted"),
+			helpers.CliMask(g.Status.InSync, "InSync", "Drifted"),
 		)
 	}
 
