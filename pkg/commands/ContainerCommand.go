@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const HELP_CONTAINER string = "Eg: smr configuration [describe, delete, edit, get, list, view]"
+const HELP_CONTAINER string = "Eg: smr configuration [describe, delete, edit, get, list, restart, view]"
 
 func ContainerCommand() {
 	Commands = append(Commands, Command{
@@ -42,6 +42,13 @@ func ContainerCommand() {
 					case "edit":
 						if len(os.Args) > 4 {
 							container.Edit(mgr.Context, os.Args[3], os.Args[4])
+						} else {
+							fmt.Println(HELP_CONTAINER)
+						}
+						break
+					case "restart":
+						if len(os.Args) > 4 {
+							container.Restart(mgr.Context, os.Args[3], os.Args[4])
 						} else {
 							fmt.Println(HELP_CONTAINER)
 						}
