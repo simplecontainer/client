@@ -14,7 +14,9 @@ func Sync(context *context.Context, group string, identifier string) {
 
 	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/gitops/Sync", context.ApiURL), data)
 
-	fmt.Println(response.Explanation)
+	if response.Explanation != "" {
+		fmt.Println(response.Explanation)
+	}
 
 	if response.Error {
 		fmt.Println(response.ErrorExplanation)

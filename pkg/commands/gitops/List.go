@@ -54,7 +54,7 @@ func List(context *context.Context) {
 
 		tbl.AddRow(g.Definition.Meta.Group,
 			g.Definition.Meta.Name,
-			helpers.CliMask(g.Commit.ID().IsZero(), fmt.Sprintf("%s (Not pulled)", g.RepoURL), fmt.Sprintf("%s (%s)", g.RepoURL, g.Commit.ID().String()[:7])),
+			helpers.CliMask(g.Commit != nil && g.Commit.ID().IsZero(), fmt.Sprintf("%s (Not pulled)", g.RepoURL), fmt.Sprintf("%s (%s)", g.RepoURL, g.Commit.ID().String()[:7])),
 			g.Revision,
 			helpers.CliMask(g.Status.LastSyncedCommit.IsZero(), "Never synced", g.Status.LastSyncedCommit.String()[:7]),
 			g.AutomaticSync,

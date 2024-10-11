@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"github.com/simplecontainer/client/pkg/commands/apply"
 	"github.com/simplecontainer/client/pkg/commands/remove"
 	"github.com/simplecontainer/client/pkg/definitions"
 	"github.com/simplecontainer/client/pkg/manager"
@@ -37,13 +36,11 @@ func Delete() {
 					fmt.Println(err)
 				} else {
 					if definition != "" {
-						apply.Apply(mgr.Context, definition)
+						remove.Remove(mgr.Context, definition)
 					} else {
 						fmt.Println("specified file/url is not valid definition")
 					}
 				}
-
-				remove.Remove(mgr.Context, definition)
 			},
 		},
 		depends_on: []func(*manager.Manager, []string){

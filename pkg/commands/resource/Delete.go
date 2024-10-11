@@ -14,7 +14,9 @@ func Delete(context *context.Context, group string, identifier string) {
 		},
 	)
 
-	fmt.Println(response.Explanation)
+	if response.Explanation != "" {
+		fmt.Println(response.Explanation)
+	}
 
 	if response.Error {
 		fmt.Println(response.ErrorExplanation)
