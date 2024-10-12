@@ -32,8 +32,6 @@ func Apply() {
 					definition, err = definitions.DownloadFile(u)
 				}
 
-				fmt.Println(definition)
-
 				if err != nil {
 					fmt.Println(err)
 				} else {
