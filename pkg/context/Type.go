@@ -14,5 +14,6 @@ type Context struct {
 	Cert          *bytes.Buffer `json:"-"`
 	PrivateKey    *bytes.Buffer `json:"-"`
 	ActiveContext string        `json:"-"`
+	ActiveGroup   string        `json:"-"`
 	Client        *http.Client  `json:"-"`
 }
