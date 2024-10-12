@@ -51,7 +51,7 @@ func Ps(context *context.Context, watch bool) {
 			ports := ""
 			deps := ""
 
-			for _, x := range containers[k].Static.MappingPorts {
+			for _, x := range containers[k].Static.Ports.Ports {
 				if x.Host != "" {
 					ports += fmt.Sprintf("%s:%s, ", x.Host, x.Container)
 				} else {
