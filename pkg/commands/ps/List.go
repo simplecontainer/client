@@ -59,16 +59,9 @@ func Ps(context *context.Context, watch bool) {
 				}
 			}
 
-			networkKeys := make([]string, 0)
-			for networkKey, _ := range containers[k].Runtime.Networks {
-				networkKeys = append(networkKeys, networkKey)
-			}
-
-			sort.Strings(networkKeys)
-
-			for _, u := range networkKeys {
-				if containers[k].Runtime.Networks[u].IP != "" {
-					ips += fmt.Sprintf("%s (%s), ", containers[k].Runtime.Networks[u].IP, containers[k].Runtime.Networks[u].NetworkName)
+			for _, network := range containers[k].Runtime.Networks.Networks {
+				if network.Docker.IP != "" {
+					ips += fmt.Sprintf("%s (%s), ", network.Docker.IP, network.Reference.Name)
 				}
 			}
 

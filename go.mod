@@ -6,7 +6,7 @@ require (
 	github.com/fatih/color v1.17.0
 	github.com/manifoldco/promptui v0.9.0
 	github.com/rodaine/table v1.3.0
-	github.com/simplecontainer/smr v0.0.38
+	github.com/simplecontainer/smr v0.0.50
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
 	go.uber.org/zap v1.27.0
@@ -51,6 +51,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.22.0 // indirect
+	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v1.1.2 // indirect

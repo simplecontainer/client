@@ -118,6 +118,8 @@ github.com/go-playground/universal-translator v0.18.1 h1:Bcnm0ZwsGyWbCzImXv+pAJn
 github.com/go-playground/universal-translator v0.18.1/go.mod h1:xekY+UJKNuX9WP91TpwSH2VMlDf28Uj24BCp08ZFTUY=
 github.com/go-playground/validator/v10 v10.22.0 h1:k6HsTZ0sTnROkhS//R0O+55JgM8C4Bx7ia+JlgcnOao=
 github.com/go-playground/validator/v10 v10.22.0/go.mod h1:dbuPbCMFw/DrkbEynArYaCwl3amGuJotoKCe95atGMM=
+github.com/go-sql-driver/mysql v1.7.1 h1:lUIinVbN1DY0xBg0eMOzmmtGoHwWBbvnWubQUrtU8EI=
+github.com/go-sql-driver/mysql v1.7.1/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
 github.com/goccy/go-json v0.10.2 h1:CrxCmQqYDkv1z7lO7Wbh2HN93uovUHgrECaO5ZrCXAU=
 github.com/goccy/go-json v0.10.2/go.mod h1:6MelG93GURQebXPDq3khkgXZkazVtN9CRI+MGFi0w8I=
 github.com/gogo/protobuf v1.3.2 h1:Ov1cvc58UF3b5XjBnZv7+opcTcQFZebYjWzi34vdm4Q=
@@ -250,6 +252,10 @@ github.com/simplecontainer/smr v0.0.22 h1:uPD8lk1RLUqaBLnU324Wg0g86czxpmTnRCShGq
 github.com/simplecontainer/smr v0.0.22/go.mod h1:Gt+8U5LuyIyI5ydrl5lShNUY5E9EKIHAxaac+IK7+io=
 github.com/simplecontainer/smr v0.0.38 h1:LIjLiQPKbehMZ33Ej0OWgnmNxIP+0aaIbfOg9DH8+5Q=
 github.com/simplecontainer/smr v0.0.38/go.mod h1:Gt+8U5LuyIyI5ydrl5lShNUY5E9EKIHAxaac+IK7+io=
+github.com/simplecontainer/smr v0.0.49 h1:hgsWXpx0X9pYIwP9TU+471hk1ejKeKzljTAKlVTzku8=
+github.com/simplecontainer/smr v0.0.49/go.mod h1:Gt+8U5LuyIyI5ydrl5lShNUY5E9EKIHAxaac+IK7+io=
+github.com/simplecontainer/smr v0.0.50 h1:9z8JUwzNqWQJXxzOwFxm2rel0kiOYesDayc12GlH5jE=
+github.com/simplecontainer/smr v0.0.50/go.mod h1:Gt+8U5LuyIyI5ydrl5lShNUY5E9EKIHAxaac+IK7+io=
 github.com/sirupsen/logrus v1.7.0/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=
 github.com/sirupsen/logrus v1.9.3 h1:dueUQJ1C2q9oE3F7wvmSGAaVtTmUizReu6fjN8uqzbQ=
 github.com/sirupsen/logrus v1.9.3/go.mod h1:naHLuLoDiP4jHNo9R0sCBMtWGeIprob74mVsIT4qYEQ=
