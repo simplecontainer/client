@@ -12,7 +12,7 @@ LATEST_SMR_COMMIT="$(git rev-parse --short $BRANCH)"
 cd "$BASE_DIR"
 
 echo "***********************************************"
-echo "$BASE_DIR/../implementations/$DIRNAME"
+echo "$BASE_DIR"
 echo "***********************************************"
 
 go build -ldflags '-s -w' -o client

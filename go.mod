@@ -6,7 +6,7 @@ require (
 	github.com/fatih/color v1.17.0
 	github.com/manifoldco/promptui v0.9.0
 	github.com/rodaine/table v1.3.0
-	github.com/simplecontainer/smr v0.0.50
+	github.com/simplecontainer/smr v0.0.52
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
 	go.uber.org/zap v1.27.0
@@ -21,7 +21,6 @@ require (
 	github.com/ProtonMail/go-crypto v1.0.0 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/apparentlymart/go-cidr v1.1.0 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect

@@ -3,7 +3,7 @@ package network
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/simplecontainer/smr/pkg/httpcontract"
+	"github.com/simplecontainer/smr/pkg/contracts"
 	"github.com/simplecontainer/smr/pkg/logger"
 	"go.uber.org/zap"
 	"io"
@@ -14,7 +14,7 @@ type Result struct {
 	Data string `json:"data"`
 }
 
-func SendFile(client *http.Client, URL string, jsonData string) *httpcontract.ResponseImplementation {
+func SendFile(client *http.Client, URL string, jsonData string) *contracts.ResponseImplementation {
 	req, err := http.NewRequest("POST", URL, bytes.NewBuffer([]byte(jsonData)))
 	req.Header.Set("Content-Type", "application/json")
 
@@ -33,7 +33,7 @@ func SendFile(client *http.Client, URL string, jsonData string) *httpcontract.Re
 		logger.Log.Info("invalid response from the smr-agent", zap.String("error", err.Error()))
 	}
 
-	var response httpcontract.ResponseImplementation
+	var response contracts.ResponseImplementation
 	err = json.Unmarshal(body, &response)
 
 	if err != nil {

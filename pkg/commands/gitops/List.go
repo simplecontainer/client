@@ -8,7 +8,7 @@ import (
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/client/pkg/network"
-	gitopsBase "github.com/simplecontainer/smr/implementations/gitops/gitops"
+	gitopsBase "github.com/simplecontainer/smr/pkg/kinds/gitops/implementation"
 )
 
 func List(context *context.Context) {

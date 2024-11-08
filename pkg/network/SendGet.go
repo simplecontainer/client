@@ -2,14 +2,14 @@ package network
 
 import (
 	"encoding/json"
-	"github.com/simplecontainer/client/pkg/httpcontract"
+	"github.com/simplecontainer/smr/pkg/contracts"
 	"github.com/simplecontainer/smr/pkg/logger"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
 )
 
-func SendGet(client *http.Client, URL string) *httpcontract.ResponseImplementation {
+func SendGet(client *http.Client, URL string) *contracts.ResponseImplementation {
 	resp, err := client.Get(URL)
 
 	if err != nil {
@@ -25,7 +25,7 @@ func SendGet(client *http.Client, URL string) *httpcontract.ResponseImplementati
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var data *httpcontract.ResponseImplementation
+		var data *contracts.ResponseImplementation
 		err := json.Unmarshal(body, &data)
 
 		if err != nil {
@@ -34,7 +34,7 @@ func SendGet(client *http.Client, URL string) *httpcontract.ResponseImplementati
 
 		return data
 	} else {
-		return &httpcontract.ResponseImplementation{
+		return &contracts.ResponseImplementation{
 			HttpStatus:       resp.StatusCode,
 			Explanation:      string(body),
 			ErrorExplanation: "unexpected response from the server",

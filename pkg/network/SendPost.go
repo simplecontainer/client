@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/simplecontainer/smr/pkg/httpcontract"
+	"github.com/simplecontainer/smr/pkg/contracts"
 	"io"
 	"net/http"
 )
 
-func SendPost(client *http.Client, URL string, data map[string]any) *httpcontract.ResponseOperator {
+func SendPost(client *http.Client, URL string, data map[string]any) *contracts.ResponseOperator {
 	var req *http.Request
 	var err error
 
@@ -18,7 +18,7 @@ func SendPost(client *http.Client, URL string, data map[string]any) *httpcontrac
 		marshaled, err = json.Marshal(data)
 
 		if err != nil {
-			return &httpcontract.ResponseOperator{
+			return &contracts.ResponseOperator{
 				HttpStatus:       0,
 				Explanation:      "failed to marshal data for sending request",
 				ErrorExplanation: err.Error(),
@@ -31,7 +31,7 @@ func SendPost(client *http.Client, URL string, data map[string]any) *httpcontrac
 		req, err = http.NewRequest("POST", URL, bytes.NewBuffer(marshaled))
 
 		if err != nil {
-			return &httpcontract.ResponseOperator{
+			return &contracts.ResponseOperator{
 				HttpStatus:       0,
 				Explanation:      "failed to create http request",
 				ErrorExplanation: err.Error(),
@@ -46,7 +46,7 @@ func SendPost(client *http.Client, URL string, data map[string]any) *httpcontrac
 		req, err = http.NewRequest("POST", URL, nil)
 
 		if err != nil {
-			return &httpcontract.ResponseOperator{
+			return &contracts.ResponseOperator{
 				HttpStatus:       0,
 				Explanation:      "failed to create http request",
 				ErrorExplanation: err.Error(),
@@ -62,7 +62,7 @@ func SendPost(client *http.Client, URL string, data map[string]any) *httpcontrac
 	resp, err := client.Do(req)
 
 	if err != nil {
-		return &httpcontract.ResponseOperator{
+		return &contracts.ResponseOperator{
 			HttpStatus:       0,
 			Explanation:      "failed to connect to the smr-agent",
 			ErrorExplanation: err.Error(),
@@ -82,7 +82,7 @@ func SendPost(client *http.Client, URL string, data map[string]any) *httpcontrac
 	var body []byte
 	body, err = io.ReadAll(resp.Body)
 	if err != nil {
-		return &httpcontract.ResponseOperator{
+		return &contracts.ResponseOperator{
 			HttpStatus:       resp.StatusCode,
 			Explanation:      "invalid response from the smr-agent",
 			ErrorExplanation: err.Error(),
@@ -93,11 +93,11 @@ func SendPost(client *http.Client, URL string, data map[string]any) *httpcontrac
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var response httpcontract.ResponseOperator
+		var response contracts.ResponseOperator
 		err = json.Unmarshal(body, &response)
 
 		if err != nil {
-			return &httpcontract.ResponseOperator{
+			return &contracts.ResponseOperator{
 				HttpStatus:       resp.StatusCode,
 				Explanation:      "failed to unmarshal body response from smr-agent",
 				ErrorExplanation: err.Error(),
@@ -109,7 +109,7 @@ func SendPost(client *http.Client, URL string, data map[string]any) *httpcontrac
 
 		return &response
 	} else {
-		return &httpcontract.ResponseOperator{
+		return &contracts.ResponseOperator{
 			HttpStatus:       resp.StatusCode,
 			Explanation:      string(body),
 			ErrorExplanation: fmt.Sprintf("unexpected response from the server: %s", req.RequestURI),

@@ -2,14 +2,14 @@ package network
 
 import (
 	"fmt"
-	"github.com/simplecontainer/smr/implementations/container/container"
+	"github.com/simplecontainer/smr/pkg/kinds/container/platforms"
 	"github.com/simplecontainer/smr/pkg/logger"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
 )
 
-func SendLogs(client *http.Client, URL string) map[string]map[string]*container.Container {
+func SendLogs(client *http.Client, URL string) map[string]map[string]platforms.IContainer {
 	var readBytes int
 	resp, err := client.Get(URL)
 
