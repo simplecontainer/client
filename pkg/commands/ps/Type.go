@@ -17,6 +17,8 @@ type ContainerInformation struct {
 	Dependencies  string
 	DockerState   string
 	SmrState      string
+	NodeName      string
+	NodeIP        string
 	LastUpdate    time.Duration
 }
 

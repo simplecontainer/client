@@ -180,7 +180,7 @@ func (context *Context) SaveToFile(projectDir string) bool {
 	contextPath := fmt.Sprintf("%s/%s/%s", projectDir, "contexts", viper.GetString("context"))
 
 	if _, err = os.Stat(contextPath); err == nil {
-		if helpers.Confirm("Context with the same name already exists. Do you want to overwrite it?") {
+		if helpers.Confirm("Context with the same name already exists. Do you want to overwrite it?") || viper.GetBool("y") {
 			err = os.WriteFile(contextPath, jsonData, 0600)
 			if err != nil {
 				logger.Log.Fatal("active context file not saved", zap.String("error", err.Error()))

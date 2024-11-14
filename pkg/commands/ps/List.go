@@ -104,6 +104,9 @@ func Ps(context *context.Context, watch bool) {
 
 					info.LastUpdate = time.Since(containerObj.General.Status.LastUpdate).Round(time.Second)
 
+					info.NodeIP = containerObj.General.Runtime.NodeIP
+					info.NodeName = containerObj.General.Runtime.NodeName
+
 					display[group] = append(display[group], info)
 
 					break
@@ -114,12 +117,13 @@ func Ps(context *context.Context, watch bool) {
 		headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 		columnFmt := color.New(color.FgYellow).SprintfFunc()
 
-		tbl := table.New("GROUP", "NAME", "DOCKER NAME", "IMAGE", "IP", "PORTS", "DEPS", "ENGINE STATE", "SMR STATE")
+		tbl := table.New("NODE", "GROUP", "NAME", "DOCKER NAME", "IMAGE", "IP", "PORTS", "DEPS", "ENGINE STATE", "SMR STATE")
 		tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 		for _, group := range display {
 			for _, container := range group {
 				tbl.AddRow(
+					fmt.Sprintf("%s (%s)", container.NodeName, container.NodeIP),
 					helpers.CliRemoveComa(container.Group),
 					helpers.CliRemoveComa(container.Name),
 					helpers.CliRemoveComa(container.GeneratedName),
