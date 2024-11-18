@@ -32,7 +32,7 @@ func AgentDefinition() *v1.ContainerDefinition {
 					},
 					{
 						Container: "2379",
-						Host:      "127.0.0.1:2379",
+						Host:      fmt.Sprintf("127.0.0.1:%s", viper.GetString("etcdport")),
 					},
 				},
 				Volumes: []v1.ContainerVolume{

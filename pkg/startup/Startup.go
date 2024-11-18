@@ -17,7 +17,7 @@ func Load(configObj *configuration.Configuration, projectDir string) {
 func ReadFlags(configObj *configuration.Configuration) {
 	/* Operation mode */
 	flag.String("context", "", "Context name")
-	flag.Bool("y", false, "Override prompt confirmation")
+	flag.Bool("y", false, "Say yes to everything")
 
 	HOMEDIR, _ := os.UserHomeDir()
 
@@ -39,7 +39,7 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.String("node", "", "Node ID in the cluster - must be unique")
 	flag.String("url", "", "Reachable Node https://URL:PORT combination")
 	flag.String("cluster", "", "Reachable list of peers; comma separated - eg. https://URL:PORT,...")
-	flag.String("remote-agent", "", "Domain/IP of the remote agent that is already in the cluster")
+	flag.String("etcdport", "2379", "Etcd client port listen and advertise")
 	flag.Bool("join", false, "Join the cluster")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)

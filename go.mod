@@ -2,9 +2,9 @@ module github.com/simplecontainer/client
 
 go 1.22.0
 
-//replace github.com/simplecontainer/smr => /home/qdnqn/projects/smr/smr
-
 require (
+	github.com/cenkalti/backoff/v4 v4.3.0
+	github.com/docker/docker v20.10.21+incompatible
 	github.com/fatih/color v1.17.0
 	github.com/manifoldco/promptui v0.9.0
 	github.com/rodaine/table v1.3.0
@@ -24,7 +24,6 @@ require (
 	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
-	github.com/docker/docker v20.10.21+incompatible // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
