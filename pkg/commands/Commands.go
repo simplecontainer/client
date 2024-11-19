@@ -18,6 +18,7 @@ func PreloadCommands() {
 	Definitions()
 	Users()
 	Version()
+	Node()
 
 	SecretCommand()
 	ContainersCommand()

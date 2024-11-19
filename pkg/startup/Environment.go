@@ -16,8 +16,8 @@ func GetEnvironmentInfo() *configuration.Environment {
 
 	return &configuration.Environment{
 		HOMEDIR:    HOMEDIR,
-		PROJECT:    fmt.Sprintf("%s", static.PROJECT),
-		PROJECTDIR: fmt.Sprintf("%s/%s/%s", HOMEDIR, static.ROOTDIR, static.PROJECT),
+		PROJECT:    fmt.Sprintf("%s", static.ROOTSMR),
+		PROJECTDIR: fmt.Sprintf("%s/%s/%s", HOMEDIR, static.ROOTDIR, static.ROOTSMR),
 		CLIENTIP:   GetOutboundIP().String(),
 	}
 }
