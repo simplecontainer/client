@@ -6,8 +6,6 @@
 
 Simplecontainer is based on the server-client architecture. You can interact with the remote/local client via mTLS.
 
-This repository is holding client for the simplecontainer daemon.
-
 Installation of the client
 --------------------------
 
