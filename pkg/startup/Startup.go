@@ -32,6 +32,7 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.String("entrypoint", "/opt/smr/smr", "Entrypoint for the smr")
 	flag.String("args", "create smr --agent smr-agent", "args")
 	flag.String("hostport", "1443", "Expose smr on hostport")
+	flag.String("overlayport", "", "Expose overlay on port")
 
 	flag.String("platform", static.PLATFORM_DOCKER, "Container engine name. Supported: [docker]")
 	flag.String("agent", "smr-agent", "Name of the smr agent container")

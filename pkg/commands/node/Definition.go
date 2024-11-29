@@ -34,6 +34,10 @@ func AgentDefinition() *v1.ContainerDefinition {
 						Container: "2379",
 						Host:      fmt.Sprintf("127.0.0.1:%s", viper.GetString("etcdport")),
 					},
+					{
+						Container: "9212",
+						Host:      viper.GetString("overlayport"),
+					},
 				},
 				Volumes: []v1.ContainerVolume{
 					{
