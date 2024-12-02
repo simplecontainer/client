@@ -4,6 +4,7 @@ import (
 	"fmt"
 	v1 "github.com/simplecontainer/smr/pkg/definitions/v1"
 	"github.com/spf13/viper"
+	"os"
 	"strings"
 )
 
@@ -21,7 +22,7 @@ func AgentDefinition() *v1.ContainerDefinition {
 				Envs: []string{
 					fmt.Sprintf("DOMAIN=%s", viper.GetString("domains")),
 					fmt.Sprintf("EXTERNALIP=%s", viper.GetString("ips")),
-					fmt.Sprintf("HOMEDIR=%s", viper.GetString("homedir")),
+					fmt.Sprintf("HOMEDIR=%s", os.Getenv("HOME")),
 				},
 				Entrypoint: strings.Split(viper.GetString("entrypoint"), " "),
 				Args:       strings.Split(viper.GetString("args"), " "),
