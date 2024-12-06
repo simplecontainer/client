@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/cenkalti/backoff/v4"
 	context2 "github.com/simplecontainer/client/pkg/context"
-	"github.com/simplecontainer/smr/pkg/logger"
+	"github.com/simplecontainer/client/pkg/logger"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"net/http"

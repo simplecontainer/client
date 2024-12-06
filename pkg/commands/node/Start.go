@@ -2,9 +2,11 @@ package node
 
 import (
 	"fmt"
+	"github.com/simplecontainer/client/pkg/flannel"
 	"github.com/simplecontainer/client/pkg/manager"
 	"github.com/simplecontainer/client/pkg/network"
 	"github.com/spf13/viper"
+	"golang.org/x/net/context"
 	"strconv"
 )
 
@@ -17,5 +19,16 @@ func Start(mgr *manager.Manager) {
 		"node":    viper.GetString("node"),
 	})
 
-	fmt.Println(response)
+	if response.Success {
+		ctx := context.Background()
+		err := flannel.Run(ctx, mgr.Context, mgr.Configuration, response.Data["agent"].(string))
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		fmt.Println("flannel exited")
+	} else {
+		fmt.Println(response.ErrorExplanation)
+	}
 }

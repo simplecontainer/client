@@ -104,8 +104,8 @@ func Ps(context *context.Context, watch bool) {
 
 					info.LastUpdate = time.Since(containerObj.General.Status.LastUpdate).Round(time.Second)
 
-					info.NodeIP = containerObj.General.Runtime.NodeIP
-					info.NodeName = containerObj.General.Runtime.NodeName
+					//info.NodeIP = containerObj.General.Runtime.NodeIP
+					//info.NodeName = containerObj.General.Runtime.NodeName
 
 					display[group] = append(display[group], info)
 

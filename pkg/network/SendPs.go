@@ -1,7 +1,7 @@
 package network
 
 import (
-	"github.com/simplecontainer/smr/pkg/logger"
+	"github.com/simplecontainer/client/pkg/logger"
 	"go.uber.org/zap"
 	"io"
 	"net/http"

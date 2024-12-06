@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/manifoldco/promptui"
 	"github.com/simplecontainer/client/pkg/commands/restore"
+	"github.com/simplecontainer/client/pkg/logger"
 	"github.com/simplecontainer/client/pkg/manager"
-	"github.com/simplecontainer/smr/pkg/logger"
 )
 
 func Restore() {

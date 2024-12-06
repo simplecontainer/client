@@ -54,6 +54,11 @@ func DownloadFile(URL *url.URL) (string, error) {
 		return "", err
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("definition not found at specific URL")
+		os.Exit(1)
+	}
+
 	return ReadFile(path)
 }
 

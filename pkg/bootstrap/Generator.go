@@ -2,8 +2,8 @@ package bootstrap
 
 import (
 	"fmt"
+	"github.com/simplecontainer/client/pkg/logger"
 	"github.com/simplecontainer/client/pkg/static"
-	"github.com/simplecontainer/smr/pkg/logger"
 	"os"
 )
 

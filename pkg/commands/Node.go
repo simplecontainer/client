@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"github.com/simplecontainer/client/pkg/commands/node"
+	"github.com/simplecontainer/client/pkg/definitions"
 	"github.com/simplecontainer/client/pkg/manager"
 	"github.com/simplecontainer/smr/pkg/configuration"
 	"github.com/simplecontainer/smr/pkg/static"
@@ -45,7 +46,7 @@ func Node() {
 				case "run":
 					switch viper.GetString("platform") {
 					case static.PLATFORM_DOCKER:
-						node.RunDocker(config, node.AgentDefinition())
+						node.RunDocker(config, definitions.AgentDefinition())
 						break
 					default:
 						fmt.Println("platform is not supported")

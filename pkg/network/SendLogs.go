@@ -2,8 +2,8 @@ package network
 
 import (
 	"fmt"
+	"github.com/simplecontainer/client/pkg/logger"
 	"github.com/simplecontainer/smr/pkg/kinds/container/platforms"
-	"github.com/simplecontainer/smr/pkg/logger"
 	"go.uber.org/zap"
 	"io"
 	"net/http"

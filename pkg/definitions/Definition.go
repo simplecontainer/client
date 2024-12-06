@@ -1,4 +1,4 @@
-package node
+package definitions
 
 import (
 	"fmt"
@@ -69,6 +69,18 @@ func AgentDefinition() *v1.ContainerDefinition {
 				Replicas: 1,
 				Dns:      []string{"127.0.0.1"},
 			},
+		},
+	}
+}
+func FlannelDefinition(subnetCIDR string) *v1.NetworkDefinition {
+	return &v1.NetworkDefinition{
+		Meta: v1.NetworkMeta{
+			Group: "internal",
+			Name:  "flannel",
+		},
+		Spec: v1.NetworkSpec{
+			Driver:          "bridge",
+			IPV4AddressPool: subnetCIDR,
 		},
 	}
 }

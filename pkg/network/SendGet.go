@@ -2,8 +2,8 @@ package network
 
 import (
 	"encoding/json"
+	"github.com/simplecontainer/client/pkg/logger"
 	"github.com/simplecontainer/smr/pkg/contracts"
-	"github.com/simplecontainer/smr/pkg/logger"
 	"go.uber.org/zap"
 	"io"
 	"net/http"

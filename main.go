@@ -6,16 +6,24 @@ import (
 	_ "github.com/simplecontainer/client/pkg/commands"
 	"github.com/simplecontainer/client/pkg/configuration"
 	"github.com/simplecontainer/client/pkg/context"
+	"github.com/simplecontainer/client/pkg/logger"
 	"github.com/simplecontainer/client/pkg/manager"
 	"github.com/simplecontainer/client/pkg/startup"
-	"github.com/simplecontainer/smr/pkg/logger"
+	"github.com/simplecontainer/smr/pkg/static"
+	"os"
 )
 
 func main() {
-	logger.Log = logger.NewLogger()
-
 	config := configuration.NewConfig()
 	startup.Load(config, config.Root)
+
+	logLevel := os.Getenv("LOG_LEVEL")
+	if logLevel == "" {
+		logLevel = static.DEFAULT_LOG_LEVEL
+	}
+
+	logger.Log = logger.NewLogger(config.Environment.LOGDIR, logLevel)
+	logger.LogFlannel = logger.NewLoggerFlannel(config.Environment.LOGDIR, logLevel)
 
 	managerObj := &manager.Manager{}
 	managerObj.VersionClient = SMR_VERSION

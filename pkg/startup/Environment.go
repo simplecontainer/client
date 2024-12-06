@@ -14,10 +14,18 @@ func GetEnvironmentInfo() *configuration.Environment {
 		panic(err.Error())
 	}
 
+	sudoUser := os.Getenv("SUDO_USER")
+
+	if HOMEDIR == "/root" && sudoUser != "" {
+		HOMEDIR = fmt.Sprintf("/home/%s", sudoUser)
+	}
+
 	return &configuration.Environment{
 		HOMEDIR:    HOMEDIR,
 		PROJECT:    fmt.Sprintf("%s", static.ROOTSMR),
 		PROJECTDIR: fmt.Sprintf("%s/%s/%s", HOMEDIR, static.ROOTDIR, static.ROOTSMR),
+		LOGDIR:     fmt.Sprintf("%s/%s/%s/logs", HOMEDIR, static.ROOTDIR, static.ROOTSMR),
+		FLANNELDIR: fmt.Sprintf("%s/%s/%s/flannel", HOMEDIR, static.ROOTDIR, static.ROOTSMR),
 		CLIENTIP:   GetOutboundIP().String(),
 	}
 }
