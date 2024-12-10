@@ -76,7 +76,7 @@ func FlannelDefinition(subnetCIDR string) *v1.NetworkDefinition {
 	return &v1.NetworkDefinition{
 		Meta: v1.NetworkMeta{
 			Group: "internal",
-			Name:  "flannel",
+			Name:  "cluster",
 		},
 		Spec: v1.NetworkSpec{
 			Driver:          "bridge",

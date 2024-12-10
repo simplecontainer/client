@@ -1,8 +1,6 @@
 package ps
 
 import (
-	"github.com/simplecontainer/smr/pkg/kinds/container/platforms"
-	"github.com/simplecontainer/smr/pkg/kinds/container/platforms/engines/docker"
 	"time"
 )
 
@@ -20,15 +18,4 @@ type ContainerInformation struct {
 	NodeName      string
 	NodeIP        string
 	LastUpdate    time.Duration
-}
-
-type Container struct {
-	General *platforms.General
-	Type    string
-}
-
-type ContainerDocker struct {
-	Platform *docker.Docker
-	General  *platforms.General
-	Type     string
 }
