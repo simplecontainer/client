@@ -8,6 +8,17 @@ import (
 )
 
 func SendGet(client *http.Client, URL string) *contracts.ResponseImplementation {
+	if client == nil {
+		return &contracts.ResponseImplementation{
+			HttpStatus:       0,
+			Explanation:      "",
+			ErrorExplanation: "client is invalid",
+			Error:            true,
+			Success:          false,
+			Data:             nil,
+		}
+	}
+
 	resp, err := client.Get(URL)
 
 	if err != nil {
