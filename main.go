@@ -22,14 +22,14 @@ func main() {
 		logLevel = static.DEFAULT_LOG_LEVEL
 	}
 
-	logger.Log = logger.NewLogger(config.Environment.LOGDIR, logLevel)
-	logger.LogFlannel = logger.NewLoggerFlannel(config.Environment.LOGDIR, logLevel)
-
 	managerObj := &manager.Manager{}
 	managerObj.VersionClient = SMR_VERSION
 	managerObj.Configuration = config
 
 	bootstrap.CreateDirectoryTree(managerObj.Configuration.Environment.ROOTDIR)
+
+	logger.Log = logger.NewLogger(config.Environment.LOGDIR, logLevel)
+	logger.LogFlannel = logger.NewLoggerFlannel(config.Environment.LOGDIR, logLevel)
 
 	managerObj.Context = context.NewContext(managerObj.Configuration.Environment.ROOTDIR)
 	managerObj.Context.LoadContext()
