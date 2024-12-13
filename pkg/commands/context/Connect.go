@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cenkalti/backoff/v4"
-	context2 "github.com/simplecontainer/client/pkg/context"
+	context "github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/logger"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -12,9 +12,9 @@ import (
 	"os"
 )
 
-func Connect(URL string, CertBundlePath string, projectDir string) {
-	context := context2.NewContext(projectDir)
-	context.ApiURL = URL
+func Connect(URL string, CertBundlePath string, rootDir string) {
+	ctx := context.NewContext(rootDir)
+	ctx.ApiURL = URL
 
 	logger.Log.Info("trying to read cert bundle", zap.String("file", CertBundlePath))
 
@@ -24,7 +24,7 @@ func Connect(URL string, CertBundlePath string, projectDir string) {
 		return
 	}
 
-	context.Client, err = context.GenerateHttpClient(CertBundle)
+	ctx.Client, err = ctx.GenerateHttpClient(CertBundle)
 
 	if err != nil {
 		logger.Log.Info("failed to generate http client", zap.String("error", err.Error()))
@@ -34,13 +34,13 @@ func Connect(URL string, CertBundlePath string, projectDir string) {
 	if viper.GetBool("wait") {
 		err = backoff.Retry(func() error {
 			var resp *http.Response
-			resp, err = context.Client.Get(fmt.Sprintf("%s/healthz", context.ApiURL))
+			resp, err = ctx.Client.Get(fmt.Sprintf("%s/healthz", ctx.ApiURL))
 
 			if err != nil {
 				logger.Log.Info("failed to connect to the smr-agent, trying again....")
 			} else {
 				if resp.StatusCode == http.StatusOK {
-					if context.SaveToFile(projectDir) {
+					if ctx.SaveToFile() {
 						logger.Log.Info("authenticated against the smr-agent")
 						return nil
 					}
@@ -56,7 +56,7 @@ func Connect(URL string, CertBundlePath string, projectDir string) {
 			fmt.Println(err)
 		}
 	} else {
-		resp, err := context.Client.Get(fmt.Sprintf("%s/healthz", context.ApiURL))
+		resp, err := ctx.Client.Get(fmt.Sprintf("%s/healthz", ctx.ApiURL))
 
 		if err != nil {
 			logger.Log.Info("failed to connect to the smr-agent", zap.String("error", err.Error()))
@@ -64,7 +64,7 @@ func Connect(URL string, CertBundlePath string, projectDir string) {
 		}
 
 		if resp.StatusCode == http.StatusOK {
-			if context.SaveToFile(projectDir) {
+			if ctx.SaveToFile() {
 				logger.Log.Info("authenticated against the smr-agent")
 			}
 		} else {

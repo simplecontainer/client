@@ -52,7 +52,16 @@ func (context *Context) ReadFromFile() bool {
 	return true
 }
 
-func (context *Context) SaveToFile(projectDir string) bool {
+func (context *Context) SaveToFile() bool {
+	if context.Name == "" {
+		context.Name = viper.GetString("context")
+	}
+
+	if context.Name == "" {
+		fmt.Println("context name cannot be empty")
+		return false
+	}
+
 	jsonData, err := json.Marshal(context)
 
 	if err != nil {
@@ -60,7 +69,7 @@ func (context *Context) SaveToFile(projectDir string) bool {
 		return false
 	}
 
-	contextPath := fmt.Sprintf("%s/%s", projectDir, context.Name)
+	contextPath := fmt.Sprintf("%s/%s", context.Directory, context.Name)
 
 	if _, err = os.Stat(contextPath); err == nil {
 		if viper.GetBool("y") || helpers.Confirm("Context with the same name already exists. Do you want to overwrite it?") {
@@ -69,7 +78,7 @@ func (context *Context) SaveToFile(projectDir string) bool {
 				logger.Log.Fatal("active context file not saved", zap.String("error", err.Error()))
 			}
 
-			activeContextPath := fmt.Sprintf("%s/%s", projectDir, ".active")
+			activeContextPath := fmt.Sprintf("%s/%s", context.Directory, ".active")
 
 			err = os.WriteFile(activeContextPath, []byte(context.Name), 0755)
 			if err != nil {
@@ -87,7 +96,7 @@ func (context *Context) SaveToFile(projectDir string) bool {
 			logger.Log.Fatal("active context file not saved", zap.String("error", err.Error()))
 		}
 
-		activeContextPath := fmt.Sprintf("%s/%s", projectDir, ".active")
+		activeContextPath := fmt.Sprintf("%s/%s", context.Directory, ".active")
 
 		err = os.WriteFile(activeContextPath, []byte(context.Name), 0755)
 		if err != nil {

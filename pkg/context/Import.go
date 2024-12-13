@@ -36,7 +36,7 @@ func (context *Context) Import(encrypted string, key string) error {
 
 	if ctx.ConnectionTest() {
 		viper.Set("y", true)
-		ctx.SaveToFile(ctx.Directory)
+		ctx.SaveToFile()
 		fmt.Println("Successfully imported context and connected to simplecontainer!")
 	} else {
 		fmt.Println(fmt.Sprintf("Failed to connect to the %s with imported context", ctx.ApiURL))
