@@ -6,9 +6,9 @@ import (
 )
 
 type Context struct {
+	Directory     string
 	ApiURL        string
 	Name          string
-	DirectoryPath string
 	CertBundle    string
 	Ca            *bytes.Buffer `json:"-"`
 	Cert          *bytes.Buffer `json:"-"`

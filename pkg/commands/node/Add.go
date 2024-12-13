@@ -9,7 +9,6 @@ import (
 
 func Add(mgr *manager.Manager) {
 	response := network.SendPost(mgr.Context.Client, fmt.Sprintf("%s/cluster/node", mgr.Context.ApiURL), map[string]any{
-		"url":  viper.GetString("url"),
 		"node": viper.GetString("node"),
 	})
 

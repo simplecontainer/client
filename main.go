@@ -29,9 +29,10 @@ func main() {
 	managerObj.VersionClient = SMR_VERSION
 	managerObj.Configuration = config
 
-	bootstrap.CreateDirectoryTree(managerObj.Configuration.Environment.PROJECTDIR)
+	bootstrap.CreateDirectoryTree(managerObj.Configuration.Environment.ROOTDIR)
 
-	managerObj.Context = context.LoadContext(managerObj.Configuration.Environment.PROJECTDIR)
+	managerObj.Context = context.NewContext(managerObj.Configuration.Environment.ROOTDIR)
+	managerObj.Context.LoadContext()
 
 	commands.PreloadCommands()
 	commands.Run(managerObj)

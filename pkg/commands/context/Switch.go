@@ -10,7 +10,7 @@ import (
 
 func Switch(contextName string, context *context.Context) {
 	var dirs []string
-	entries, err := os.ReadDir(context.DirectoryPath)
+	entries, err := os.ReadDir(context.Directory)
 	if err != nil {
 		log.Fatal(err)
 	}

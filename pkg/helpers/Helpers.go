@@ -3,7 +3,6 @@ package helpers
 import (
 	"fmt"
 	"github.com/manifoldco/promptui"
-	"log"
 )
 
 func Confirm(message string) bool {
@@ -14,7 +13,8 @@ func Confirm(message string) bool {
 
 	_, result, err := ask.Run()
 	if err != nil {
-		log.Fatal("Prompt failed", err)
+		// if err provide simple yes no
+		return false
 	}
 
 	return result == "y"

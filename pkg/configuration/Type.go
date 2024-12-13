@@ -34,10 +34,8 @@ type Flags struct {
 
 type Environment struct {
 	HOMEDIR    string
-	OPTDIR     string
 	FLANNELDIR string
-	PROJECTDIR string
+	ROOTDIR    string
 	LOGDIR     string
-	PROJECT    string
 	CLIENTIP   string
 }

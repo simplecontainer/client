@@ -92,30 +92,26 @@ func SendPost(client *http.Client, URL string, data map[string]any) *contracts.R
 		}
 	}
 
-	if resp.StatusCode == http.StatusOK {
-		var response contracts.ResponseOperator
-		err = json.Unmarshal(body, &response)
+	var response contracts.ResponseOperator
+	err = json.Unmarshal(body, &response)
 
-		if err != nil {
-			return &contracts.ResponseOperator{
-				HttpStatus:       resp.StatusCode,
-				Explanation:      "failed to unmarshal body response from smr-agent",
-				ErrorExplanation: err.Error(),
-				Error:            true,
-				Success:          false,
-				Data:             nil,
-			}
-		}
-
-		return &response
-	} else {
+	if err != nil {
 		return &contracts.ResponseOperator{
 			HttpStatus:       resp.StatusCode,
-			Explanation:      string(body),
-			ErrorExplanation: fmt.Sprintf("unexpected response from the server: %s", req.RequestURI),
+			Explanation:      "failed to unmarshal body response from smr-agent",
+			ErrorExplanation: err.Error(),
 			Error:            true,
 			Success:          false,
 			Data:             nil,
 		}
+	}
+
+	return &contracts.ResponseOperator{
+		HttpStatus:       response.HttpStatus,
+		Explanation:      response.Explanation,
+		ErrorExplanation: fmt.Sprintf("%s", response.ErrorExplanation),
+		Error:            response.Error,
+		Success:          response.Success,
+		Data:             response.Data,
 	}
 }

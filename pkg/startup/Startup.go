@@ -88,11 +88,10 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.String("platform", static.PLATFORM_DOCKER, "Container engine name. Supported: [docker]")
 	flag.String("agent", "smr-agent", "Name of the smr agent container")
 
-	flag.String("node", "", "Node ID in the cluster - must be unique")
-	flag.String("url", "", "Reachable Node https://URL:PORT combination")
-	flag.String("cluster", "", "Reachable list of peers; comma separated - eg. https://URL:PORT,...")
+	flag.String("node", "", "Reachable Node https://URL:PORT URL")
+	flag.String("join", "", "Reachable URL of one member of the cluster")
+
 	flag.String("etcdport", "2379", "Etcd client port listen and advertise")
-	flag.Bool("join", false, "Join the cluster")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()

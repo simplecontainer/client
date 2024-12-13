@@ -12,7 +12,7 @@ func Restore() {
 	Commands = append(Commands, Command{
 		name: "restore",
 		condition: func(mgr *manager.Manager) bool {
-			return mgr.Context.ConnectionTest(mgr.Context)
+			return mgr.Context.ConnectionTest()
 		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
