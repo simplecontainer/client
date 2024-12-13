@@ -2,9 +2,7 @@ package network
 
 import (
 	"encoding/json"
-	"github.com/simplecontainer/client/pkg/logger"
 	"github.com/simplecontainer/smr/pkg/contracts"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
 )
@@ -13,15 +11,28 @@ func SendGet(client *http.Client, URL string) *contracts.ResponseImplementation 
 	resp, err := client.Get(URL)
 
 	if err != nil {
-		logger.Log.Info("failed to connect to the smr-agent", zap.String("error", err.Error()))
-		return nil
+		return &contracts.ResponseImplementation{
+			HttpStatus:       0,
+			Explanation:      "",
+			ErrorExplanation: err.Error(),
+			Error:            true,
+			Success:          false,
+			Data:             nil,
+		}
 	}
 
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		logger.Log.Info("invalid response from the smr-agent", zap.String("error", err.Error()))
+		return &contracts.ResponseImplementation{
+			HttpStatus:       resp.StatusCode,
+			Explanation:      "",
+			ErrorExplanation: err.Error(),
+			Error:            true,
+			Success:          false,
+			Data:             nil,
+		}
 	}
 
 	if resp.StatusCode == http.StatusOK {

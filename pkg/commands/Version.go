@@ -9,7 +9,7 @@ func Version() {
 	Commands = append(Commands, Command{
 		name: "version",
 		condition: func(mgr *manager.Manager) bool {
-			return mgr.Context.ConnectionTest()
+			return true
 		},
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
