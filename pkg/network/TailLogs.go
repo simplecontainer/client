@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func SendLogs(client *http.Client, URL string) map[string]map[string]platforms.IContainer {
+func TailLogs(client *http.Client, URL string) map[string]map[string]platforms.IContainer {
 	var readBytes int
 	resp, err := client.Get(URL)
 

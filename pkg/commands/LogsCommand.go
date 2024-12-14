@@ -18,7 +18,7 @@ func LogsCommand() {
 		functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
 				if len(os.Args) > 3 {
-					network.SendLogs(mgr.Context.Client, fmt.Sprintf("%s/api/v1/logs/%s/%s/%s", mgr.Context.ApiURL, os.Args[2], os.Args[3], os.Args[4]))
+					network.TailLogs(mgr.Context.Client, fmt.Sprintf("%s/api/v1/logs/%s/%s/%s", mgr.Context.ApiURL, os.Args[2], os.Args[3], os.Args[4]))
 				} else {
 					fmt.Println(HELP_LOGS)
 				}

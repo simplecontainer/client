@@ -4,15 +4,11 @@ import (
 	"fmt"
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/network"
+	"net/http"
 )
 
 func Delete(context *context.Context, group string, identifier string) {
-	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/httpauth/Delete", context.ApiURL),
-		map[string]any{
-			"group":      group,
-			"identifier": identifier,
-		},
-	)
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/operators/httpauth/delete/%s/%s", context.ApiURL, group, identifier), http.MethodDelete, nil)
 
 	if response.Explanation != "" {
 		fmt.Println(response.Explanation)

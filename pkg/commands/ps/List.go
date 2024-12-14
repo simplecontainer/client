@@ -11,6 +11,7 @@ import (
 	"github.com/simplecontainer/smr/pkg/kinds/container/platforms"
 	"github.com/simplecontainer/smr/pkg/kinds/container/platforms/engines/docker"
 	"github.com/simplecontainer/smr/pkg/static"
+	"net/http"
 	"os"
 	"os/exec"
 	"time"
@@ -28,8 +29,7 @@ func Ps(context *context.Context, watch bool) {
 			}
 		}
 
-		response := network.SendPs(context.Client, fmt.Sprintf("%s/api/v1/ps", context.ApiURL))
-
+		response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/ps", context.ApiURL), http.MethodGet, nil)
 		if response == nil {
 			return
 		}
@@ -37,11 +37,20 @@ func Ps(context *context.Context, watch bool) {
 		var display = make(map[string][]ContainerInformation)
 		var states = make(map[string]map[string]any)
 
-		err := json.Unmarshal(response, &states)
+		if response.Data != nil {
+			bytes, err := response.Data.MarshalJSON()
 
-		if err != nil {
-			fmt.Println("invalid response from the server")
-			return
+			if err != nil {
+				fmt.Println("invalid response from the server")
+				return
+			}
+
+			err = json.Unmarshal(bytes, &states)
+
+			if err != nil {
+				fmt.Println("invalid response from the server")
+				return
+			}
 		}
 
 		for groupName, group := range states {
@@ -49,6 +58,8 @@ func Ps(context *context.Context, watch bool) {
 				var container = make(map[string]interface{})
 
 				var bytes []byte
+				var err error
+
 				bytes, err = json.Marshal(state)
 
 				if err != nil {

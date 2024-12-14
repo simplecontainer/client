@@ -69,7 +69,7 @@ func (context *Context) ConnectionTest() bool {
 		os.Exit(1)
 	}
 
-	response := network.SendGet(context.Client, fmt.Sprintf("%s/connect", context.ApiURL))
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/connect", context.ApiURL), http.MethodGet, nil)
 
 	if response != nil && response.HttpStatus == http.StatusOK {
 		return true

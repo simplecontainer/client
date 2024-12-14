@@ -7,14 +7,15 @@ import (
 	"github.com/rodaine/table"
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/network"
+	"net/http"
 )
 
 func List(context *context.Context) {
-	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/secrets/keys", context.ApiURL), nil)
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/secrets/keys", context.ApiURL), http.MethodGet, nil)
 
 	objects := make([]string, 0)
 
-	bytes, err := json.Marshal(response.Data["keys"])
+	bytes, err := json.Marshal(response.Data)
 
 	if err != nil {
 		fmt.Println("invalid response sent from the smr-agent")

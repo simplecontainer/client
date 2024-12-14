@@ -1,4 +1,4 @@
-package apply
+package secret
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 	"net/http"
 )
 
-func Apply(context *context.Context, jsonData string) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/apply", context.ApiURL), http.MethodPost, jsonData)
+func Delete(context *context.Context, identifier string) {
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/secrets/delete/%s", context.ApiURL, identifier), http.MethodDelete, nil)
 
 	if response.Explanation != "" {
 		fmt.Println(response.Explanation)

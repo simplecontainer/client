@@ -1,29 +1,48 @@
 package definitions
 
 import (
-	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/network"
-	"log"
+	"net/http"
+	"os"
 )
 
 func Definitions(context *context.Context, definition string) {
-	response := network.SendGet(context.Client, fmt.Sprintf("%s/api/v1/definitions/%s", context.ApiURL, definition))
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/definitions/%s", context.ApiURL, definition), http.MethodGet, nil)
 
 	if definition == "" {
-		plugins := response.Data.([]interface{})
+		bytes, err := response.Data.MarshalJSON()
+
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		var plugins []string
+		err = json.Unmarshal(bytes, &plugins)
+
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 
 		for _, plugin := range plugins {
-			fmt.Println(plugin.(string))
+			fmt.Println(plugin)
 		}
 	} else {
 		if response != nil {
 			if response.Data != nil {
-				data, err := base64.StdEncoding.DecodeString(response.Data.(string))
+				bytes, err := response.Data.MarshalJSON()
+
 				if err != nil {
-					log.Fatal("error:", err)
+					fmt.Println(err)
+					os.Exit(1)
 				}
+
+				var data string
+				err = json.Unmarshal(bytes, &data)
 
 				fmt.Printf("%s\n", data)
 			} else {

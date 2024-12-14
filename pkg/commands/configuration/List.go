@@ -8,10 +8,11 @@ import (
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/network"
 	v1 "github.com/simplecontainer/smr/pkg/definitions/v1"
+	"net/http"
 )
 
 func List(context *context.Context) {
-	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/configuration/List", context.ApiURL), nil)
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/operators/configuration/List", context.ApiURL), http.MethodGet, nil)
 
 	objects := make(map[string]*v1.ConfigurationDefinition)
 

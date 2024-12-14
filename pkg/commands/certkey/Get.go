@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/network"
+	"net/http"
 )
 
 func Get(context *context.Context, group string, identifier string) {
-	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/certkey/Get", context.ApiURL),
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/operators/certkey/Get", context.ApiURL), http.MethodGet,
 		map[string]any{
 			"group":      group,
 			"identifier": identifier,
