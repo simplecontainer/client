@@ -8,6 +8,6 @@ import (
 )
 
 func Describe(context *context.Context) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/operators/container", context.ApiURL), http.MethodGet, nil)
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/container", context.ApiURL), http.MethodGet, nil)
 	fmt.Println(response.Data)
 }

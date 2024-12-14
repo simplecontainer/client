@@ -12,7 +12,7 @@ import (
 )
 
 func List(context *context.Context) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/operators/resource/list", context.ApiURL), http.MethodGet, nil)
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/resource/list", context.ApiURL), http.MethodGet, nil)
 
 	objects := make(map[string]*v1.ResourceDefinition)
 

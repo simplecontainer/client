@@ -9,7 +9,7 @@ import (
 )
 
 func View(context *context.Context, group string, identifier string) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/operators/container/View/%s/%s", context.ApiURL, group, identifier), http.MethodGet, nil)
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/container/View/%s/%s", context.ApiURL, group, identifier), http.MethodGet, nil)
 	bytes, err := json.MarshalIndent(response.Data, "", "  ")
 
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 )
 
 func Delete(context *context.Context, group string, identifier string) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/operators/gitops/delete/%s/%s", context.ApiURL, group, identifier), http.MethodDelete, nil)
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/gitops/delete/%s/%s", context.ApiURL, group, identifier), http.MethodDelete, nil)
 
 	if response.Explanation != "" {
 		fmt.Println(response.Explanation)

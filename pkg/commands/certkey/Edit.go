@@ -11,7 +11,7 @@ import (
 )
 
 func Edit(context *context.Context, group string, identifier string) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/operators/certkey/Get/%s/%s", context.ApiURL, group, identifier), http.MethodPut, nil)
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/certkey/Get/%s/%s", context.ApiURL, group, identifier), http.MethodPut, nil)
 	bytes, err := json.MarshalIndent(response.Data, "", "  ")
 
 	if err != nil {

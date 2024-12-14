@@ -13,7 +13,7 @@ import (
 )
 
 func List(context *context.Context) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/operators/gitops/List", context.ApiURL), http.MethodGet, nil)
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/gitops/list/empty/empty", context.ApiURL), http.MethodGet, nil)
 
 	gitopsObj := make(map[string]*gitopsBase.Gitops)
 
