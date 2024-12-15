@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-func Connect(URL string, CertBundlePath string, rootDir string) {
+func Connect(URL string, CertBundlePath string, rootDir string) error {
 	ctx := context.NewContext(rootDir)
 	ctx.ApiURL = URL
 
@@ -20,15 +20,13 @@ func Connect(URL string, CertBundlePath string, rootDir string) {
 
 	CertBundle, err := os.ReadFile(CertBundlePath)
 	if err != nil {
-		logger.Log.Info("certbundle file not found", zap.String("error", err.Error()))
-		return
+		return err
 	}
 
 	ctx.Client, err = ctx.GenerateHttpClient(CertBundle)
 
 	if err != nil {
-		logger.Log.Info("failed to generate http client", zap.String("error", err.Error()))
-		return
+		return err
 	}
 
 	if viper.GetBool("wait") {
@@ -37,11 +35,10 @@ func Connect(URL string, CertBundlePath string, rootDir string) {
 			resp, err = ctx.Client.Get(fmt.Sprintf("%s/healthz", ctx.ApiURL))
 
 			if err != nil {
-				logger.Log.Info("failed to connect to the smr-agent, trying again....")
+				return err
 			} else {
 				if resp.StatusCode == http.StatusOK {
 					if ctx.SaveToFile() {
-						logger.Log.Info("authenticated against the smr-agent")
 						return nil
 					}
 				} else {
@@ -53,22 +50,25 @@ func Connect(URL string, CertBundlePath string, rootDir string) {
 		}, backoff.NewExponentialBackOff())
 
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
+
+		return nil
 	} else {
 		resp, err := ctx.Client.Get(fmt.Sprintf("%s/healthz", ctx.ApiURL))
 
 		if err != nil {
-			logger.Log.Info("failed to connect to the smr-agent", zap.String("error", err.Error()))
-			return
+			return err
 		}
 
 		if resp.StatusCode == http.StatusOK {
 			if ctx.SaveToFile() {
-				logger.Log.Info("authenticated against the smr-agent")
+				return nil
 			}
+
+			return errors.New("failed to save context to contexts directory")
 		} else {
-			logger.Log.Fatal("failed to authenticate against the smr-agent")
+			return errors.New("failed to authenticate against the smr-agent")
 		}
 	}
 }

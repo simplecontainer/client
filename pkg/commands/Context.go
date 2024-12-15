@@ -29,7 +29,14 @@ func Context() {
 					switch os.Args[2] {
 					case "connect":
 						if len(os.Args) > 4 {
-							context.Connect(os.Args[3], os.Args[4], mgr.Configuration.Environment.ROOTDIR)
+							err := context.Connect(os.Args[3], os.Args[4], mgr.Configuration.Environment.ROOTDIR)
+
+							if err != nil {
+								fmt.Println(err.Error())
+								os.Exit(1)
+							}
+
+							fmt.Println("connected to the simplecontainer agent")
 						} else {
 							fmt.Println("Try this: smr context connect https://API_URL:1443 PATH_TO_CERT.PEM --context NAME_YOU_WANT")
 						}
