@@ -55,7 +55,7 @@ func (context *Context) ImportCertificates(key string) error {
 				return err
 			}
 
-			importedKeys.GeneratePemBundle(static.SMR_SSH_HOME, "root", importedKeys.Clients[user])
+			importedKeys.GeneratePemBundle(static.SMR_SSH_HOME, user, importedKeys.Clients[user])
 		}
 
 		return nil
