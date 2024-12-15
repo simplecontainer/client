@@ -43,12 +43,6 @@ func (context *Context) ImportCertificates(key string) error {
 			return err
 		}
 
-		err = importedKeys.Server.Write("/home/qdnqn/.ssh/simplecontainer")
-
-		if err != nil {
-			return err
-		}
-
 		for user, client := range importedKeys.Clients {
 			err = client.Write(fmt.Sprintf("%s/.ssh/simplecontainer", os.Getenv("HOME")), user)
 			if err != nil {
