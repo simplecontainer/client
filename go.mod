@@ -4,8 +4,6 @@ go 1.23
 
 toolchain go1.23.1
 
-replace github.com/simplecontainer/smr => /home/qdnqn/projects/smr/smr
-
 require (
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/docker/docker v27.3.1+incompatible
