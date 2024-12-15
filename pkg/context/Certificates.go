@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/simplecontainer/client/pkg/network"
 	"github.com/simplecontainer/smr/pkg/keys"
-	"github.com/simplecontainer/smr/pkg/static"
 	"net/http"
 	"os"
 )
@@ -49,7 +48,11 @@ func (context *Context) ImportCertificates(key string) error {
 				return err
 			}
 
-			importedKeys.GeneratePemBundle(static.SMR_SSH_HOME, user, importedKeys.Clients[user])
+			err = importedKeys.GeneratePemBundle(fmt.Sprintf("%s/.ssh", os.Getenv("HOME")), user, importedKeys.Clients[user])
+
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
 
 		return nil
