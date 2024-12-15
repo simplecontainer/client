@@ -48,7 +48,7 @@ func (context *Context) ImportCertificates(key string) error {
 				return err
 			}
 
-			err = importedKeys.GeneratePemBundle(fmt.Sprintf("%s/.ssh", os.Getenv("HOME")), user, importedKeys.Clients[user])
+			err = importedKeys.GeneratePemBundle(fmt.Sprintf("%s/.ssh/simplecontainer", os.Getenv("HOME")), user, importedKeys.Clients[user])
 
 			if err != nil {
 				fmt.Println(err)
