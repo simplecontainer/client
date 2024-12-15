@@ -1,8 +1,8 @@
 ![simplecontainer manager](.github/resources/repository.jpg)
 
 # Simplecontainer client
-> [!WARNING]
-> The project is not stable yet. Use it on your own responsibility.
+> [!IMPORTANT]
+> The project is not stable yet. Releases and major changes are introduced often.
 
 Simplecontainer is based on the server-client architecture. You can interact with the remote/local client via mTLS.
 
