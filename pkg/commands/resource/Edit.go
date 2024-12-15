@@ -7,16 +7,11 @@ import (
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/client/pkg/network"
+	"net/http"
 )
 
 func Edit(context *context.Context, group string, identifier string) {
-	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/resource/Get", context.ApiURL),
-		map[string]any{
-			"group":      group,
-			"identifier": identifier,
-		},
-	)
-
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/resource/get/%s/%s", context.ApiURL, group, identifier), http.MethodGet, nil)
 	bytes, err := json.MarshalIndent(response.Data, "", "  ")
 
 	if err != nil {

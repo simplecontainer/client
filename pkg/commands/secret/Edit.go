@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/network"
+	"net/http"
 )
 
 func Edit(context *context.Context, identifier string, value string) {
-	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/secrets/create/%s", context.ApiURL, identifier),
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/secrets/create/%s", context.ApiURL, identifier), http.MethodPut,
 		map[string]any{
 			"value": value,
 		},

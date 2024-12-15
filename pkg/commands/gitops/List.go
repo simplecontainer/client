@@ -9,10 +9,11 @@ import (
 	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/client/pkg/network"
 	gitopsBase "github.com/simplecontainer/smr/pkg/kinds/gitops/implementation"
+	"net/http"
 )
 
 func List(context *context.Context) {
-	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/gitops/List", context.ApiURL), nil)
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/gitops/list/empty/empty", context.ApiURL), http.MethodGet, nil)
 
 	gitopsObj := make(map[string]*gitopsBase.Gitops)
 

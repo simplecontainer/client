@@ -1,4 +1,4 @@
-package container
+package secret
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 	"net/http"
 )
 
-func Restart(context *context.Context, group string, identifier string) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/container/Restart", context.ApiURL), http.MethodGet, nil)
+func Delete(context *context.Context, identifier string) {
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/secrets/delete/%s", context.ApiURL, identifier), http.MethodDelete, nil)
 
 	if response.Explanation != "" {
 		fmt.Println(response.Explanation)

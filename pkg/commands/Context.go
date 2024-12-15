@@ -1,6 +1,10 @@
 package commands
 
 import (
+	"crypto/ecdsa"
+	"crypto/x509"
+	"encoding/hex"
+	"encoding/pem"
 	"fmt"
 	"github.com/simplecontainer/client/pkg/commands/context"
 	"github.com/simplecontainer/client/pkg/manager"
@@ -68,6 +72,27 @@ func Context() {
 						}
 
 						context.Import(encrypted, mgr.Context, mgr.Configuration.Environment.ROOTDIR, key)
+					case "fetch":
+						block, _ := pem.Decode(mgr.Context.PrivateKey.Bytes())
+						PrivateKeyTmp, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+
+						if err != nil {
+							fmt.Println(err)
+							os.Exit(1)
+						}
+
+						PrivateKey := PrivateKeyTmp.(*ecdsa.PrivateKey)
+
+						var bytes []byte
+						bytes, err = x509.MarshalPKCS8PrivateKey(PrivateKey)
+
+						if err != nil {
+							fmt.Println(err)
+							os.Exit(1)
+						}
+
+						key := hex.EncodeToString(bytes[:32])
+						context.ImportCertificates(mgr.Context, mgr.Configuration.Environment.ROOTDIR, key)
 					default:
 						fmt.Println("Available commands are: connect, switch")
 					}

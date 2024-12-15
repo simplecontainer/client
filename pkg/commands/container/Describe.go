@@ -4,16 +4,10 @@ import (
 	"fmt"
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/network"
+	"net/http"
 )
 
 func Describe(context *context.Context) {
-	response := network.SendOperator(context.Client, fmt.Sprintf("%s/api/v1/operators/container", context.ApiURL), nil)
-
-	if !response.Error && len(response.Data) > 0 {
-		for _, x := range response.Data["SupportedOperations"].([]interface{}) {
-			fmt.Println(x.(string))
-		}
-	} else {
-		fmt.Println(response.Explanation)
-	}
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/container", context.ApiURL), http.MethodGet, nil)
+	fmt.Println(response.Data)
 }
