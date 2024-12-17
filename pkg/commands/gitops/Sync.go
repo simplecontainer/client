@@ -8,7 +8,7 @@ import (
 )
 
 func Sync(context *context.Context, group string, identifier string) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/gitops/sync%s/%s", context.ApiURL, group, identifier), http.MethodGet, nil)
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/gitops/sync/%s/%s", context.ApiURL, group, identifier), http.MethodGet, nil)
 
 	if response.Explanation != "" {
 		fmt.Println(response.Explanation)
