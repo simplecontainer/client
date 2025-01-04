@@ -8,14 +8,14 @@ import (
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/client/pkg/network"
-	gitopsBase "github.com/simplecontainer/smr/pkg/kinds/gitops/implementation"
+	"github.com/simplecontainer/smr/pkg/kinds/gitops/implementation"
 	"net/http"
 )
 
 func List(context *context.Context) {
 	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/gitops/list/empty/empty", context.ApiURL), http.MethodGet, nil)
 
-	gitopsObj := make(map[string]*gitopsBase.Gitops)
+	gitopsObj := make(map[string]*implementation.Gitops)
 
 	bytes, err := json.Marshal(response.Data)
 
@@ -34,11 +34,8 @@ func List(context *context.Context) {
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 	columnFmt := color.New(color.FgYellow).SprintfFunc()
 
-	tbl := table.New("GROUP", "NAME", "REPOSITORY", "REVISION", "SYNCED", "AUTO", "STATE")
+	tbl := table.New("GROUP", "NAME", "REPOSITORY", "REVISION", "SYNCED", "AUTO", "STATE", "STATUS")
 	tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
-
-	fmt.Println(response)
-	fmt.Println(gitopsObj)
 
 	for _, g := range gitopsObj {
 		certRef := fmt.Sprintf("%s.%s", g.Auth.CertKeyRef.Group, g.Auth.CertKeyRef.Name)
@@ -56,14 +53,27 @@ func List(context *context.Context) {
 			continue
 		}
 
-		tbl.AddRow(g.Definition.Meta.Group,
-			g.Definition.Meta.Name,
-			helpers.CliMask(g.Commit != nil && g.Commit.ID().IsZero(), fmt.Sprintf("%s (Not pulled)", g.RepoURL), fmt.Sprintf("%s (%s)", g.RepoURL, g.Commit.ID().String()[:7])),
-			g.Revision,
-			helpers.CliMask(g.Status.LastSyncedCommit.IsZero(), "Never synced", g.Status.LastSyncedCommit.String()[:7]),
-			g.AutomaticSync,
-			helpers.CliMask(g.Status.InSync, "InSync", "Drifted"),
-		)
+		if g.Commit != nil {
+			tbl.AddRow(g.Definition.Meta.Group,
+				g.Definition.Meta.Name,
+				helpers.CliMask(g.Commit != nil && g.Commit.ID().IsZero(), fmt.Sprintf("%s (Not pulled)", g.RepoURL), fmt.Sprintf("%s (%s)", g.RepoURL, g.Commit.ID().String()[:7])),
+				g.Revision,
+				helpers.CliMask(g.Status.LastSyncedCommit.IsZero(), "Never synced", g.Status.LastSyncedCommit.String()[:7]),
+				g.AutomaticSync,
+				helpers.CliMask(g.Status.InSync, "InSync", "Drifted"),
+				g.Status.State.State,
+			)
+		} else {
+			tbl.AddRow(g.Definition.Meta.Group,
+				g.Definition.Meta.Name,
+				helpers.CliMask(g.Commit != nil && g.Commit.ID().IsZero(), fmt.Sprintf("%s (Not pulled)", g.RepoURL), fmt.Sprintf("%s", g.RepoURL)),
+				g.Revision,
+				helpers.CliMask(g.Status.LastSyncedCommit.IsZero(), "Never synced", g.Status.LastSyncedCommit.String()[:7]),
+				g.AutomaticSync,
+				helpers.CliMask(g.Status.InSync, "InSync", "Drifted"),
+				g.Status.State.State,
+			)
+		}
 	}
 
 	tbl.Print()

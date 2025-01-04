@@ -9,7 +9,7 @@ import (
 )
 
 func Edit(context *context.Context, identifier string, value string) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/secrets/propose/%s", context.ApiURL, identifier), http.MethodPut,
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/secrets/propose/secret/%s", context.ApiURL, identifier), http.MethodPut,
 		map[string]any{
 			"value": value,
 		},

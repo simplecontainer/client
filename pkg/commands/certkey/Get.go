@@ -9,7 +9,7 @@ import (
 )
 
 func Get(context *context.Context, group string, identifier string) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/certkey/Get", context.ApiURL), http.MethodGet,
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/control/certkey/get", context.ApiURL), http.MethodGet,
 		map[string]any{
 			"group":      group,
 			"identifier": identifier,

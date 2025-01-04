@@ -6,10 +6,11 @@ import (
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/network"
 	"net/http"
+	"strings"
 )
 
 func Create(context *context.Context, identifier string, value string) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/secrets/propose/%s", context.ApiURL, identifier), http.MethodPost,
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/secrets/propose/secret/%s", context.ApiURL, identifier), http.MethodPost,
 		value,
 	)
 
@@ -21,7 +22,7 @@ func Create(context *context.Context, identifier string, value string) {
 	}
 
 	if response.Success {
-		fmt.Println(string(bytes))
+		fmt.Println(strings.Trim(string(bytes), "\""))
 	} else {
 		fmt.Println("failed to create a secret")
 	}
