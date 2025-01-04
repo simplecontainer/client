@@ -6,6 +6,7 @@ import (
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/network"
 	"net/http"
+	"strings"
 )
 
 func Get(context *context.Context, identifier string) {
@@ -21,7 +22,7 @@ func Get(context *context.Context, identifier string) {
 	}
 
 	if response.Success {
-		fmt.Println(string(bytes))
+		fmt.Println(strings.Trim(string(bytes), "\""))
 	} else {
 		fmt.Println("failed to get a secret")
 	}

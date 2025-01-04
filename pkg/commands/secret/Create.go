@@ -9,10 +9,8 @@ import (
 )
 
 func Create(context *context.Context, identifier string, value string) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/secrets/create/%s", context.ApiURL, identifier), http.MethodPost,
-		map[string]any{
-			"value": value,
-		},
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/secrets/propose/%s", context.ApiURL, identifier), http.MethodPost,
+		value,
 	)
 
 	bytes, err := json.MarshalIndent(response.Data, "", "  ")

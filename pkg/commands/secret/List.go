@@ -11,7 +11,7 @@ import (
 )
 
 func List(context *context.Context) {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/secrets/keys", context.ApiURL), http.MethodGet, nil)
+	response := network.SendRequest(context.Client, fmt.Sprintf("%s/api/v1/secrets/keys/secret.", context.ApiURL), http.MethodGet, nil)
 
 	objects := make([]string, 0)
 
