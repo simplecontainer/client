@@ -8,6 +8,7 @@ import (
 	"github.com/simplecontainer/smr/pkg/kinds/container/platforms/engines/docker"
 	"github.com/spf13/viper"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -34,22 +35,37 @@ func RunDocker(config *configuration.Configuration, definition *v1.ContainerDefi
 			return
 		}
 
-		fmt.Println("********************************************************************")
-		fmt.Println("Running entrypoint and args")
-		fmt.Println(agent.Entrypoint)
-		fmt.Println(agent.Args)
-		fmt.Println("********************************************************************")
-
-		fmt.Println("The smr agent started with success!")
-		fmt.Println(fmt.Sprintf("Node persistance and configuration location: %s", smrDir))
-		fmt.Println(container.Names)
-		fmt.Println(container.Status)
-		fmt.Println("====================================================================")
+		fmt.Println("Details about starting up node:")
+		fmt.Println(fmt.Sprintf("Entrypoint: %s", agent.Entrypoint))
+		fmt.Println(fmt.Sprintf("Arguments: %s", agent.Args))
 
 		if viper.GetBool("wait") {
 			for c, _ := agent.Get(); c.State != "exited"; c, _ = agent.Get() {
+				fmt.Println("Waiting for the node controller to finish....")
 				time.Sleep(1 * time.Second)
 			}
+
+			agentInspect, err := docker.DockerInspect(agent.DockerID)
+
+			if err != nil {
+				fmt.Println(fmt.Sprintf("failed to inspect container %s", agent.DockerID))
+				os.Exit(1)
+			}
+
+			if agentInspect.State.ExitCode != 0 {
+				fmt.Println("The smr node controller finished with error!")
+				os.Exit(agentInspect.State.ExitCode)
+			} else {
+				fmt.Println("The smr node controller finished with success!")
+			}
+		} else {
+			fmt.Println(fmt.Sprintf("Node persistance and configuration location: %s", smrDir))
+			fmt.Println(fmt.Sprintf("Container name: %s", container.Names))
+			fmt.Println(fmt.Sprintf("Status: %s", container.Status))
+
+			// Implement readiness checking - abort if not ready
 		}
+
+		fmt.Println(strings.Repeat("*", 40))
 	}
 }
