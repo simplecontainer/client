@@ -23,8 +23,6 @@ func List(context *context.Context) {
 		return
 	}
 
-	fmt.Println(string(bytes))
-
 	err = json.Unmarshal(bytes, &objects)
 
 	if err != nil {
