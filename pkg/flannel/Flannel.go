@@ -82,7 +82,9 @@ func flannel(ctx context.Context, config *configuration.Configuration, flannelIf
 	// Create a backend manager then use it to create the backend and register the network with it.
 	bm := backend.NewManager(ctx, sm, extIface)
 
-	be, err := bm.GetBackend(flannelConfig.BackendType)
+	fmt.Println(config.Flannel)
+
+	be, err := bm.GetBackend(config.Flannel.Backend)
 	if err != nil {
 		return errors.Wrap(err, "failed to create the flannel backend")
 	}

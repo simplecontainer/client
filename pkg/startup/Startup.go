@@ -16,6 +16,8 @@ import (
 
 func Load(configObj *configuration.Configuration, projectDir string) {
 	configObj.Environment = GetEnvironmentInfo()
+	ReadFlags(configObj)
+
 	configObj.Flannel = &configuration.Flannel{
 		Backend:            viper.GetString("fbackend"),
 		CIDR:               make([]*net.IPNet, 0),
@@ -29,8 +31,6 @@ func Load(configObj *configuration.Configuration, projectDir string) {
 		Networkv6:        ip.IP6Net{},
 		InterfaceFlannel: nil,
 	}
-
-	ReadFlags(configObj)
 
 	var CIDR *net.IPNet
 	var err error
@@ -76,7 +76,7 @@ func ReadFlags(configObj *configuration.Configuration) {
 
 	flag.String("log", "info", "Log level: debug, info, warn, error, dpanic, panic, fatal")
 
-	flag.String("fbackend", "wireguard", "Flannel backend: vxlan")
+	flag.String("fbackend", "wireguard", "Flannel backend: vxlan, wireguard")
 	flag.String("fcidr", "10.10.0.0/16", "Flannel overlay network CIDR")
 	flag.String("fiface", "", "Network interface for flannel to use, if ommited default gateway will be used")
 

@@ -39,7 +39,7 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 	go func() {
 		err = flannel(ctx, config, config.Flannel.InterfaceSpecified, config.Flannel.IPv6Masq, netMode)
 		if err != nil && !errors.Is(err, context.Canceled) {
-			logger.LogFlannel.Error("flannel exited: %v", zap.Error(err))
+			fmt.Println("flannel exited: %v", zap.Error(err))
 			os.Exit(1)
 		}
 	}()
