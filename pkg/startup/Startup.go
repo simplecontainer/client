@@ -74,6 +74,8 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.String("ips", "127.0.0.1", "Comma separated list of the IPs")
 	flag.String("homedir", HOMEDIR, "Host homedir")
 
+	flag.String("log", "info", "Log level: debug, info, warn, error, dpanic, panic, fatal")
+
 	flag.String("fbackend", "vxlan", "Flannel backend: vxlan")
 	flag.String("fcidr", "10.10.0.0/16", "Flannel overlay network CIDR")
 	flag.String("fiface", "", "Network interface for flannel to use, if ommited default gateway will be used")

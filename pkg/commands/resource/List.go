@@ -23,10 +23,13 @@ func List(context *context.Context) {
 		return
 	}
 
+	fmt.Println(string(bytes))
+
 	err = json.Unmarshal(bytes, &objects)
 
 	if err != nil {
 		fmt.Println("invalid response sent from the smr-agent")
+		fmt.Println(err.Error())
 		return
 	}
 

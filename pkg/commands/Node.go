@@ -42,11 +42,34 @@ func Node() {
 					case "get":
 						node.Get(mgr)
 						break
+					case "restore":
+						node.Restore(mgr)
+						break
 					}
 				case "run":
 					switch viper.GetString("platform") {
 					case static.PLATFORM_DOCKER:
 						node.RunDocker(config, definitions.AgentDefinition())
+						break
+					default:
+						fmt.Println("platform is not supported")
+						return
+					}
+					break
+				case "stop":
+					switch viper.GetString("platform") {
+					case static.PLATFORM_DOCKER:
+						node.StopDocker(config, definitions.AgentDefinition())
+						break
+					default:
+						fmt.Println("platform is not supported")
+						return
+					}
+					break
+				case "inspect":
+					switch viper.GetString("platform") {
+					case static.PLATFORM_DOCKER:
+						node.InspectDocker(config, definitions.AgentDefinition())
 						break
 					default:
 						fmt.Println("platform is not supported")

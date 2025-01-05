@@ -20,9 +20,8 @@ func AgentDefinition() *v1.ContainerDefinition {
 				Image: viper.GetString("image"),
 				Tag:   viper.GetString("tag"),
 				Envs: []string{
-					fmt.Sprintf("DOMAIN=%s", viper.GetString("domains")),
-					fmt.Sprintf("EXTERNALIP=%s", viper.GetString("ips")),
 					fmt.Sprintf("HOMEDIR=%s", os.Getenv("HOME")),
+					fmt.Sprintf("LOG_LEVEL=%s", viper.GetString("log")),
 				},
 				Entrypoint: strings.Split(viper.GetString("entrypoint"), " "),
 				Args:       strings.Split(viper.GetString("args"), " "),

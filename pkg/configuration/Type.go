@@ -9,6 +9,7 @@ import (
 type Configuration struct {
 	Target      string `default:"development" json:"target"`
 	Root        string `json:"root"`
+	Log         string `json:"log"`
 	Environment *Environment
 	Flags       Flags
 	Flannel     *Flannel
