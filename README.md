@@ -1,4 +1,4 @@
-![simplecontainer manager](.github/resources/repository.jpg)
+![simplecontainer manager](.github/resources/promo.png)
 
 # Simplecontainer client
 > [!IMPORTANT]
