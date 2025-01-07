@@ -13,6 +13,7 @@ import (
 )
 
 func RunDocker(config *configuration.Configuration, definition *v1.ContainerDefinition) {
+	// TODO: abstract away
 	agent, err := docker.New(viper.GetString("agent"), config, definition)
 	agent.Delete()
 
@@ -23,7 +24,6 @@ func RunDocker(config *configuration.Configuration, definition *v1.ContainerDefi
 		err = os.MkdirAll(smrDir, 0750)
 
 		if err != nil {
-			fmt.Println(err)
 			return
 		}
 

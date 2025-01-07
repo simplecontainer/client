@@ -44,7 +44,8 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 		}
 	}()
 
-	cli, err := clientv3.New(clientv3.Config{
+	var cli *clientv3.Client
+	cli, err = clientv3.New(clientv3.Config{
 		Endpoints:   []string{"localhost:2379"},
 		DialTimeout: 5 * time.Second,
 	})
@@ -97,7 +98,7 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 				}
 			}
 		case <-ctx.Done():
-			logger.LogFlannel.Error(errors.New("closed watcher channel should not block").Error())
+			logger.LogFlannel.Error(errors.New("closed watcher channel - should not block").Error())
 		}
 	}
 }
