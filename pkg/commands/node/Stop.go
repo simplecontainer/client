@@ -5,6 +5,7 @@ import (
 	"github.com/simplecontainer/smr/pkg/configuration"
 	v1 "github.com/simplecontainer/smr/pkg/definitions/v1"
 	"github.com/simplecontainer/smr/pkg/kinds/container/platforms/engines/docker"
+	"github.com/simplecontainer/smr/pkg/static"
 	"github.com/spf13/viper"
 	"os"
 	"time"
@@ -17,7 +18,7 @@ func StopDocker(config *configuration.Configuration, definition *v1.ContainerDef
 		fmt.Println(err)
 	}
 
-	agent.Stop()
+	agent.Stop(static.SIGTERM)
 	err = agent.Rename(fmt.Sprintf("%s-%s", agent.Name, agent.DockerID))
 
 	if err != nil {

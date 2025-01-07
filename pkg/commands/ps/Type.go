@@ -17,5 +17,6 @@ type ContainerInformation struct {
 	SmrState      string
 	NodeName      string
 	NodeIP        string
+	Recreated     bool
 	LastUpdate    time.Duration
 }

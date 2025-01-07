@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"sort"
 	"time"
 )
 
@@ -35,6 +36,7 @@ func Ps(context *context.Context, watch bool) {
 		}
 
 		var display = make(map[string][]ContainerInformation)
+		var keys = make([]string, 0)
 		var states = make(map[string]map[string]any)
 
 		if response.Data != nil {
@@ -54,6 +56,7 @@ func Ps(context *context.Context, watch bool) {
 		}
 
 		for groupName, group := range states {
+			keys = append(keys, groupName)
 			for _, state := range group {
 				var container = make(map[string]interface{})
 
@@ -97,6 +100,7 @@ func Ps(context *context.Context, watch bool) {
 						Ports:         "",
 						Dependencies:  "",
 						DockerState:   "",
+						Recreated:     ghost.General.Status.Recreated,
 						SmrState:      ghost.General.Status.State.State,
 					}
 
@@ -126,7 +130,11 @@ func Ps(context *context.Context, watch bool) {
 						info.Dependencies = "-"
 					}
 
-					info.DockerState = fmt.Sprintf("%s (%s)", ghost.Platform.(*docker.Docker).DockerState, static.PLATFORM_DOCKER)
+					if ghost.Platform.(*docker.Docker).DockerState != "" {
+						info.DockerState = fmt.Sprintf("%s (%s)", ghost.Platform.(*docker.Docker).DockerState, static.PLATFORM_DOCKER)
+					} else {
+						info.DockerState = "-"
+					}
 
 					info.LastUpdate = time.Since(ghost.GetStatus().LastUpdate).Round(time.Second)
 
@@ -144,8 +152,10 @@ func Ps(context *context.Context, watch bool) {
 		tbl := table.New("NODE", "GROUP", "NAME", "DOCKER NAME", "IMAGE", "IP", "PORTS", "DEPS", "ENGINE STATE", "SMR STATE")
 		tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
-		for _, group := range display {
-			for _, container := range group {
+		sort.Strings(keys)
+
+		for _, key := range keys {
+			for _, container := range display[key] {
 				tbl.AddRow(
 					fmt.Sprintf("%s (%s)", container.NodeName, container.NodeIP),
 					helpers.CliRemoveComa(container.Group),
@@ -156,7 +166,7 @@ func Ps(context *context.Context, watch bool) {
 					helpers.CliRemoveComa(container.Ports),
 					helpers.CliRemoveComa(container.Dependencies),
 					container.DockerState,
-					fmt.Sprintf("%s (%s)", container.SmrState, container.LastUpdate),
+					fmt.Sprintf("%s%s (%s)", container.SmrState, helpers.CliMask(container.Recreated, " (*)", ""), container.LastUpdate),
 				)
 			}
 		}
