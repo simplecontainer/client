@@ -35,8 +35,9 @@ func Ps(context *context.Context, watch bool) {
 			return
 		}
 
-		var display = make(map[string][]ContainerInformation)
-		var keys = make([]string, 0)
+		var display = make(map[string]map[string]ContainerInformation)
+		var sortedGroups = make([]string, 0)
+		var sortedContainers = make(map[string][]string)
 		var states = make(map[string]map[string]any)
 
 		if response.Data != nil {
@@ -56,9 +57,12 @@ func Ps(context *context.Context, watch bool) {
 		}
 
 		for groupName, group := range states {
-			keys = append(keys, groupName)
-			for _, state := range group {
+			sortedGroups = append(sortedGroups, groupName)
+
+			for containerName, state := range group {
 				var container = make(map[string]interface{})
+
+				sortedContainers[groupName] = append(sortedContainers[groupName], containerName)
 
 				var bytes []byte
 				var err error
@@ -141,7 +145,11 @@ func Ps(context *context.Context, watch bool) {
 					info.NodeIP = ghost.General.Runtime.NodeIP
 					info.NodeName = ghost.General.Runtime.Agent
 
-					display[groupName] = append(display[groupName], info)
+					if display[groupName] == nil {
+						display[groupName] = make(map[string]ContainerInformation)
+					}
+
+					display[groupName][info.GeneratedName] = info
 				}
 			}
 		}
@@ -152,10 +160,12 @@ func Ps(context *context.Context, watch bool) {
 		tbl := table.New("NODE", "GROUP", "NAME", "DOCKER NAME", "IMAGE", "IP", "PORTS", "DEPS", "ENGINE STATE", "SMR STATE")
 		tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
-		sort.Strings(keys)
+		sort.Strings(sortedGroups)
 
-		for _, key := range keys {
-			for _, container := range display[key] {
+		for _, key := range sortedGroups {
+			for _, containerName := range sortedContainers[key] {
+				container := display[key][containerName]
+
 				tbl.AddRow(
 					fmt.Sprintf("%s (%s)", container.NodeName, container.NodeIP),
 					helpers.CliRemoveComa(container.Group),

@@ -71,12 +71,27 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 							break
 						}
 
-						if config.Flannel.InterfaceFlannel.ExtAddr.String() == subnet.PublicIP || config.Flannel.InterfaceFlannel.ExtV6Addr.String() == subnet.PublicIPv6 {
-							split := strings.Split(string(event.Kv.Key), "/")
-							CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
+						switch netMode {
+						case ipv4:
+							if config.Flannel.InterfaceFlannel.ExtAddr.String() == subnet.PublicIP {
+								split := strings.Split(string(event.Kv.Key), "/")
+								CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
 
-							NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJsonStringWithKind()
-							apply.Apply(smrCtx, NetworkDefinition)
+								NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJsonStringWithKind()
+								apply.Apply(smrCtx, NetworkDefinition)
+							}
+							break
+						case ipv6:
+							if config.Flannel.InterfaceFlannel.ExtV6Addr.String() == subnet.PublicIPv6 {
+								split := strings.Split(string(event.Kv.Key), "/")
+								CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
+
+								NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJsonStringWithKind()
+								apply.Apply(smrCtx, NetworkDefinition)
+							}
+							break
+						case ipv4 | ipv6:
+							break
 						}
 					}
 				}
