@@ -13,7 +13,6 @@ import (
 )
 
 func RunDocker(config *configuration.Configuration, definition *v1.ContainerDefinition) {
-	// TODO: abstract away
 	agent, err := docker.New(viper.GetString("agent"), config, definition)
 	agent.Delete()
 
@@ -63,7 +62,7 @@ func RunDocker(config *configuration.Configuration, definition *v1.ContainerDefi
 			fmt.Println(fmt.Sprintf("Container name: %s", container.Names))
 			fmt.Println(fmt.Sprintf("Status: %s", container.Status))
 
-			// Implement readiness checking - abort if not ready
+			// TODO: Implement readiness checking - abort if not ready
 		}
 
 		fmt.Println(strings.Repeat("*", 40))

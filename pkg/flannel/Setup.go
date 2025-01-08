@@ -68,8 +68,7 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 						err = json.Unmarshal(event.Kv.Value, &subnet)
 
 						if err != nil {
-							logger.LogFlannel.Error(err.Error())
-							break
+							return err
 						}
 
 						switch netMode {
@@ -98,7 +97,7 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 				}
 			}
 		case <-ctx.Done():
-			logger.LogFlannel.Error(errors.New("closed watcher channel - should not block").Error())
+			return errors.New("closed watcher channel - should not block")
 		}
 	}
 }
