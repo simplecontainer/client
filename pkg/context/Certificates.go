@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/simplecontainer/client/pkg/network"
 	"github.com/simplecontainer/smr/pkg/keys"
+	"github.com/simplecontainer/smr/pkg/network"
 	"net/http"
 	"os"
 )
 
 func (context *Context) ImportCertificates(key string) error {
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/ca", context.ApiURL), http.MethodGet, nil)
+	response := network.Send(context.Client, fmt.Sprintf("%s/ca", context.ApiURL), http.MethodGet, nil)
 
 	if response.Success {
 		keysEncrypted := keys.Encrypted{}

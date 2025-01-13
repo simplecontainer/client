@@ -6,7 +6,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/simplecontainer/client/pkg/network"
+	"github.com/simplecontainer/smr/pkg/network"
 	"net/http"
 	"os"
 )
@@ -69,7 +69,7 @@ func (context *Context) ConnectionTest() bool {
 		os.Exit(1)
 	}
 
-	response := network.SendRequest(context.Client, fmt.Sprintf("%s/connect", context.ApiURL), http.MethodGet, nil)
+	response := network.Send(context.Client, fmt.Sprintf("%s/connect", context.ApiURL), http.MethodGet, nil)
 
 	if response != nil && response.HttpStatus == http.StatusOK {
 		return true

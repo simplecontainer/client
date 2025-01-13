@@ -75,6 +75,7 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.String("homedir", HOMEDIR, "Host homedir")
 
 	flag.String("log", "info", "Log level: debug, info, warn, error, dpanic, panic, fatal")
+	flag.Bool("f", false, "Follow logs")
 
 	flag.String("fbackend", "wireguard", "Flannel backend: vxlan, wireguard")
 	flag.String("fcidr", "10.10.0.0/16", "Flannel overlay network CIDR")

@@ -1,8 +1,10 @@
 module github.com/simplecontainer/client
 
-go 1.23
+go 1.23.0
 
 toolchain go1.23.1
+
+replace github.com/simplecontainer/smr => ../smr
 
 require (
 	github.com/cenkalti/backoff/v4 v4.3.0
