@@ -24,6 +24,7 @@ func Set(context *context.Context, identifier string, value []byte) {
 	if response.Success {
 		fmt.Println(strings.Trim(string(bytes), "\""))
 	} else {
+		fmt.Println(response)
 		fmt.Println("failed to create a secret")
 	}
 }
