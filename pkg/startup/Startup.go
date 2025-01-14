@@ -75,12 +75,13 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.String("homedir", HOMEDIR, "Host homedir")
 
 	flag.String("log", "info", "Log level: debug, info, warn, error, dpanic, panic, fatal")
+	flag.Bool("f", false, "Follow logs")
 
 	flag.String("fbackend", "wireguard", "Flannel backend: vxlan, wireguard")
 	flag.String("fcidr", "10.10.0.0/16", "Flannel overlay network CIDR")
 	flag.String("fiface", "", "Network interface for flannel to use, if ommited default gateway will be used")
 
-	flag.String("image", "simplecontainermanager/smr", "The smr image repo")
+	flag.String("image", "quay.io/simplecontainer/smr", "The smr image repo")
 	flag.String("tag", "latest", "The smr image tag")
 	flag.String("entrypoint", "/opt/smr/smr", "Entrypoint for the smr")
 	flag.String("args", "create smr --agent smr-agent", "args")

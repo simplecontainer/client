@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/simplecontainer/client/pkg/commands/apply"
+	"github.com/simplecontainer/client/pkg/commands/objects/apply"
 	"github.com/simplecontainer/client/pkg/configuration"
 	smrContext "github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/definitions"
@@ -12,13 +12,11 @@ import (
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
-	"net"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/pkg/errors"
-	utilsnet "k8s.io/utils/net"
 )
 
 const (
@@ -38,7 +36,7 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 
 	go func() {
 		err = flannel(ctx, config, config.Flannel.InterfaceSpecified, config.Flannel.IPv6Masq, netMode)
-		if err != nil && !errors.Is(err, context.Canceled) {
+		if err != nil {
 			fmt.Println("flannel exited: %v", zap.Error(err))
 			os.Exit(1)
 		}
@@ -77,7 +75,7 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 								split := strings.Split(string(event.Kv.Key), "/")
 								CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
 
-								NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJsonStringWithKind()
+								NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJsonWithKind()
 								apply.Apply(smrCtx, NetworkDefinition)
 							}
 							break
@@ -86,7 +84,7 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 								split := strings.Split(string(event.Kv.Key), "/")
 								CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
 
-								NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJsonStringWithKind()
+								NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJsonWithKind()
 								apply.Apply(smrCtx, NetworkDefinition)
 							}
 							break
@@ -100,24 +98,4 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 			return errors.New("closed watcher channel - should not block")
 		}
 	}
-}
-
-func findNetMode(cidrs []*net.IPNet) (int, error) {
-	dualStack, err := utilsnet.IsDualStackCIDRs(cidrs)
-	if err != nil {
-		return 0, err
-	}
-	if dualStack {
-		return ipv4 + ipv6, nil
-	}
-
-	for _, cidr := range cidrs {
-		if utilsnet.IsIPv4CIDR(cidr) {
-			return ipv4, nil
-		}
-		if utilsnet.IsIPv6CIDR(cidr) {
-			return ipv6, nil
-		}
-	}
-	return 0, errors.New("Failed checking netMode")
 }

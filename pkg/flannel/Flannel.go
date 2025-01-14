@@ -82,8 +82,6 @@ func flannel(ctx context.Context, config *configuration.Configuration, flannelIf
 	// Create a backend manager then use it to create the backend and register the network with it.
 	bm := backend.NewManager(ctx, sm, extIface)
 
-	fmt.Println(config.Flannel)
-
 	be, err := bm.GetBackend(config.Flannel.Backend)
 	if err != nil {
 		return errors.Wrap(err, "failed to create the flannel backend")
@@ -165,14 +163,14 @@ func LookupExtInterface(iface *net.Interface, netMode int) (*backend.ExternalInt
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to find IPv4 address for interface")
 		}
-		logger.LogFlannel.Info("The interface %s with ipv4 address %s will be used by flannel", zap.String("iface", iface.Name), zap.String("ifaceAddr", ifaceAddr[0].String()))
+		logger.LogFlannel.Info("The interface is selected for usage by flannel", zap.String("iface", iface.Name), zap.String("ifaceAddr", ifaceAddr[0].String()))
 		ifacev6Addr = append(ifacev6Addr, nil)
 	case ipv6:
 		ifacev6Addr, err = ip.GetInterfaceIP6Addrs(iface)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to find IPv6 address for interface")
 		}
-		logger.LogFlannel.Info("The interface %s with ipv6 address %s will be used by flannel", zap.String("iface", iface.Name), zap.String("ifacev6Addr", ifacev6Addr[0].String()))
+		logger.LogFlannel.Info("The interface is selected for usage by flannel", zap.String("iface", iface.Name), zap.String("ifacev6Addr", ifacev6Addr[0].String()))
 		ifaceAddr = append(ifaceAddr, nil)
 	case (ipv4 + ipv6):
 		ifaceAddr, err = ip.GetInterfaceIP4Addrs(iface)

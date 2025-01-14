@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/simplecontainer/client/pkg/bootstrap"
 	"github.com/simplecontainer/client/pkg/commands"
 	_ "github.com/simplecontainer/client/pkg/commands"
@@ -10,6 +11,7 @@ import (
 	"github.com/simplecontainer/client/pkg/manager"
 	"github.com/simplecontainer/client/pkg/startup"
 	"github.com/simplecontainer/smr/pkg/static"
+	"log"
 	"os"
 )
 
@@ -30,6 +32,15 @@ func main() {
 
 	logger.Log = logger.NewLogger(config.Environment.LOGDIR, logLevel)
 	logger.LogFlannel = logger.NewLoggerFlannel(config.Environment.LOGDIR, logLevel)
+
+	f, err := os.OpenFile(fmt.Sprintf("%s/flannel.log", config.Environment.LOGDIR), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+
+	log.SetOutput(f)
 
 	managerObj.Context = context.NewContext(managerObj.Configuration.Environment.ROOTDIR)
 	managerObj.Context.LoadContext()

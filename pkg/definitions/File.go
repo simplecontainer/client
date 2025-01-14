@@ -11,38 +11,38 @@ import (
 	"os"
 )
 
-func ReadFile(filePath string) (string, error) {
-	var jsonData []byte = nil
+func ReadFile(filePath string) ([]byte, error) {
+	var bytes []byte = nil
 
 	if filePath != "" {
 		YAML, err := os.ReadFile(filePath)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
 
 		var body interface{}
 		if err = yaml.Unmarshal([]byte(YAML), &body); err != nil {
-			return "", err
+			return nil, err
 		}
 
 		body = convert(body)
 
-		if jsonData, err = json.Marshal(body); err != nil {
-			return "", err
+		if bytes, err = json.Marshal(body); err != nil {
+			return nil, err
 		}
 	}
 
-	return string(jsonData), nil
+	return bytes, nil
 }
 
-func DownloadFile(URL *url.URL) (string, error) {
+func DownloadFile(URL *url.URL) ([]byte, error) {
 	path := fmt.Sprintf("/tmp/%s", b64.StdEncoding.EncodeToString([]byte(URL.String())))
 
 	out, err := os.Create(path)
 	defer out.Close()
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	resp, err := http.Get(URL.String())
@@ -51,7 +51,7 @@ func DownloadFile(URL *url.URL) (string, error) {
 	_, err = io.Copy(out, resp.Body)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if resp.StatusCode != http.StatusOK {
