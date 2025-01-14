@@ -11,7 +11,7 @@ import (
 )
 
 func (context *Context) ImportCertificates(key string) error {
-	response := network.Send(context.Client, fmt.Sprintf("%s/ca", context.ApiURL), http.MethodGet, nil)
+	response := network.Send(context.Client, fmt.Sprintf("%s/fetch/certs", context.ApiURL), http.MethodGet, nil)
 
 	if response.Success {
 		keysEncrypted := keys.Encrypted{}
