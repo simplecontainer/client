@@ -8,7 +8,7 @@ import (
 )
 
 func Apply(context *context.Context, jsonData []byte) {
-	response := network.Send(context.Client, fmt.Sprintf("%s/api/v1/apply", context.ApiURL), http.MethodPost, jsonData)
+	response := network.Send(context.Client, fmt.Sprintf("%s/api/v1/propose/apply", context.ApiURL), http.MethodPost, jsonData)
 
 	if response.Explanation != "" {
 		fmt.Println(response.Explanation)
