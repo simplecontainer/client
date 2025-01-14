@@ -1,12 +1,10 @@
 package secret
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/smr/pkg/network"
 	"net/http"
-	"strings"
 )
 
 func Set(context *context.Context, identifier string, value []byte) {
@@ -14,17 +12,9 @@ func Set(context *context.Context, identifier string, value []byte) {
 		value,
 	)
 
-	bytes, err := json.MarshalIndent(response.Data, "", "  ")
-
-	if err != nil {
-		fmt.Println("invalid response sent from the smr-agent")
-		return
-	}
-
 	if response.Success {
-		fmt.Println(strings.Trim(string(bytes), "\""))
+		fmt.Println("secret is stored")
 	} else {
-		fmt.Println(response)
 		fmt.Println("failed to create a secret")
 	}
 }

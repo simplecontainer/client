@@ -292,8 +292,8 @@ github.com/sagikazarmark/slog-shim v0.1.0 h1:diDBnUNK9N/354PgrxMywXnAwEr1QZcOr6g
 github.com/sagikazarmark/slog-shim v0.1.0/go.mod h1:SrcSrq8aKtyuqEI1uvTDTK1arOWRIczQRv+GVI1AkeQ=
 github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 h1:n661drycOFuPLCN3Uc8sB6B/s6Z4t2xvBgU1htSHuq8=
 github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3/go.mod h1:A0bzQcvG0E7Rwjx0REVgAGH58e96+X0MeOfepqsbeW4=
-github.com/simplecontainer/smr v0.0.114 h1:Z9gHbgVkgQmecanNSprINB1IHt0jPoFm1HwmpGEfe0w=
-github.com/simplecontainer/smr v0.0.114/go.mod h1:g/N2lho+1ygvapRrnmWGwGACs3fFpLnauS3zFsDENqQ=
+github.com/simplecontainer/smr v0.0.117 h1:c1XnVIsD9qsht2RwrYhZdUlq6OZ1QsIVZMsZpdQ6BtM=
+github.com/simplecontainer/smr v0.0.117/go.mod h1:g/N2lho+1ygvapRrnmWGwGACs3fFpLnauS3zFsDENqQ=
 github.com/sirupsen/logrus v1.7.0/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=
 github.com/sirupsen/logrus v1.9.3 h1:dueUQJ1C2q9oE3F7wvmSGAaVtTmUizReu6fjN8uqzbQ=
 github.com/sirupsen/logrus v1.9.3/go.mod h1:naHLuLoDiP4jHNo9R0sCBMtWGeIprob74mVsIT4qYEQ=
