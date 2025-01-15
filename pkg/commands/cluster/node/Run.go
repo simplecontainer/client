@@ -23,7 +23,7 @@ func Run(config *configuration.Configuration, definition *v1.ContainerDefinition
 
 	switch platform {
 	case static.PLATFORM_DOCKER:
-		agent, err = docker.New(viper.GetString("agent"), config, definition)
+		agent, err = docker.New(viper.GetString("name"), config, definition)
 		break
 	default:
 		fmt.Println("unsupported platform selected")
@@ -35,7 +35,7 @@ func Run(config *configuration.Configuration, definition *v1.ContainerDefinition
 		fmt.Println(err.Error())
 		os.Exit(1)
 	} else {
-		smrDir := fmt.Sprintf("%s/.%s", config.Environment.HOMEDIR, viper.GetString("agent"))
+		smrDir := fmt.Sprintf("%s/.%s", config.Environment.HOMEDIR, viper.GetString("name"))
 		err = os.MkdirAll(smrDir, 0750)
 
 		if err != nil {

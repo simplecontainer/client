@@ -18,7 +18,7 @@ func Inspect(config *configuration.Configuration, definition *v1.ContainerDefini
 
 	switch platform {
 	case static.PLATFORM_DOCKER:
-		agent, err = docker.New(viper.GetString("agent"), config, definition)
+		agent, err = docker.New(viper.GetString("name"), config, definition)
 
 		if err != nil {
 			fmt.Println(err.Error())

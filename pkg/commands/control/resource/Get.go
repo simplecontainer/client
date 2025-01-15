@@ -10,6 +10,7 @@ import (
 
 func Get(context *context.Context, group string, identifier string) {
 	response := network.Send(context.Client, fmt.Sprintf("%s/api/v1/control/resource/get/%s/%s", context.ApiURL, group, identifier), http.MethodGet, nil)
+
 	bytes, err := json.MarshalIndent(response.Data, "", "  ")
 
 	if err != nil {

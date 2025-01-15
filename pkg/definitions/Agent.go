@@ -11,7 +11,7 @@ import (
 func AgentDefinition() *v1.ContainerDefinition {
 	return &v1.ContainerDefinition{
 		Meta: v1.ContainerMeta{
-			Name:   viper.GetString("agent"),
+			Name:   viper.GetString("name"),
 			Group:  "smr",
 			Labels: nil,
 		},
@@ -49,7 +49,7 @@ func AgentDefinition() *v1.ContainerDefinition {
 					{
 						Name:       "smr",
 						Type:       "bind",
-						HostPath:   fmt.Sprintf("~/.%s", viper.GetString("agent")),
+						HostPath:   fmt.Sprintf("~/.%s", viper.GetString("name")),
 						MountPoint: "/home/smr-agent/smr",
 					},
 					{

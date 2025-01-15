@@ -12,7 +12,7 @@ import (
 )
 
 func List(context *context.Context) {
-	response := network.Send(context.Client, fmt.Sprintf("%s/api/v1/control/configuration/List", context.ApiURL), http.MethodGet, nil)
+	response := network.Send(context.Client, fmt.Sprintf("%s/api/v1/control/configuration/list", context.ApiURL), http.MethodGet, nil)
 
 	objects := make(map[string]*v1.ConfigurationDefinition)
 

@@ -16,7 +16,7 @@ type ContainerInformation struct {
 	DockerState   string
 	SmrState      string
 	NodeName      string
-	NodeIP        string
+	NodeURL       string
 	Recreated     bool
 	LastUpdate    time.Duration
 }

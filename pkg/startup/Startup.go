@@ -89,7 +89,7 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.String("overlayport", "", "Expose overlay on port")
 
 	flag.String("platform", static.PLATFORM_DOCKER, "Container engine name. Supported: [docker]")
-	flag.String("agent", "smr-agent", "Name of the smr agent container")
+	flag.String("name", "smr-agent", "Name of the smr agent container")
 
 	flag.String("node", "", "Reachable Node https://URL:PORT URL")
 	flag.String("join", "", "Reachable URL of one member of the cluster")

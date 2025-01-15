@@ -18,7 +18,7 @@ func Stop(config *configuration.Configuration, definition *v1.ContainerDefinitio
 
 	switch platform {
 	case static.PLATFORM_DOCKER:
-		agent, err = docker.New(viper.GetString("agent"), config, definition)
+		agent, err = docker.New(viper.GetString("name"), config, definition)
 		break
 	default:
 		fmt.Println("unsupported platform selected")

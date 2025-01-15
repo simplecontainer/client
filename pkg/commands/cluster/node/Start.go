@@ -48,7 +48,7 @@ func Start(mgr *manager.Manager) {
 		if response.Success {
 			for {
 				ctx := context.Background()
-				err = flannel.Run(ctx, mgr.Context, mgr.Configuration, data["agent"])
+				err = flannel.Run(ctx, mgr.Context, mgr.Configuration, data["name"])
 
 				if err != nil {
 					fmt.Println(err)

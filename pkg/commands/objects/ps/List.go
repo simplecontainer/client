@@ -142,8 +142,8 @@ func Ps(context *context.Context, watch bool) {
 
 					info.LastUpdate = time.Since(ghost.GetStatus().LastUpdate).Round(time.Second)
 
-					info.NodeIP = ghost.General.Runtime.NodeIP
-					info.NodeName = ghost.General.Runtime.Agent
+					info.NodeURL = ghost.General.Runtime.NodeURL
+					info.NodeName = ghost.General.Runtime.NodeName
 
 					if display[groupName] == nil {
 						display[groupName] = make(map[string]ContainerInformation)
@@ -167,7 +167,7 @@ func Ps(context *context.Context, watch bool) {
 				container := display[key][containerName]
 
 				tbl.AddRow(
-					fmt.Sprintf("%s (%s)", container.NodeName, container.NodeIP),
+					fmt.Sprintf("%s (%s)", container.NodeName, container.NodeURL),
 					helpers.CliRemoveComa(container.Group),
 					helpers.CliRemoveComa(container.Name),
 					helpers.CliRemoveComa(container.GeneratedName),
