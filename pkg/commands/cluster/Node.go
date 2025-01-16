@@ -47,10 +47,10 @@ func Node() contracts.Command {
 						break
 					}
 				case "run":
-					node.Run(config, definitions.AgentDefinition(), viper.GetString("platform"))
+					node.Run(config, definitions.NodeDefinition(), viper.GetString("platform"))
 					break
 				case "stop":
-					node.Stop(config, definitions.AgentDefinition(), viper.GetString("platform"))
+					node.Stop(config, definitions.NodeDefinition(), viper.GetString("platform"))
 					break
 				}
 			},

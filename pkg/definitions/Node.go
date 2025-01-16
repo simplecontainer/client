@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-func AgentDefinition() *v1.ContainerDefinition {
-	return &v1.ContainerDefinition{
+func NodeDefinition() *v1.ContainerDefinition {
+	container := &v1.ContainerDefinition{
 		Meta: v1.ContainerMeta{
 			Name:   viper.GetString("name"),
 			Group:  "smr",
@@ -66,8 +66,10 @@ func AgentDefinition() *v1.ContainerDefinition {
 					},
 				},
 				Replicas: 1,
-				Dns:      []string{"127.0.0.1"},
+				Dns:      []string{},
 			},
 		},
 	}
+
+	return container
 }

@@ -29,7 +29,7 @@ func Platform() contracts.Command {
 
 				switch os.Args[2] {
 				case "inspect":
-					platform.Inspect(config, definitions.AgentDefinition(), viper.GetString("platform"))
+					platform.Inspect(config, definitions.NodeDefinition(), viper.GetString("platform"))
 					break
 				}
 			},
