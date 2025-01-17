@@ -12,7 +12,6 @@ import (
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
-	"os"
 	"strings"
 	"time"
 
@@ -38,7 +37,6 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 		err = flannel(ctx, config, config.Flannel.InterfaceSpecified, config.Flannel.IPv6Masq, netMode)
 		if err != nil {
 			fmt.Println("flannel exited: %v", zap.Error(err))
-			os.Exit(1)
 		}
 	}()
 
@@ -62,34 +60,57 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 				for _, event := range watchResp.Events {
 					switch event.Type {
 					case mvccpb.PUT:
-						var subnet = Subnet{}
-						err = json.Unmarshal(event.Kv.Value, &subnet)
+						if strings.Contains(string(event.Kv.Key), "subnet") {
+							// Handle only case when it has lease because request came from local flannel
+							if event.Kv.Lease != 0 {
+								var subnet = Subnet{}
+								err = json.Unmarshal(event.Kv.Value, &subnet)
 
-						if err != nil {
-							return err
-						}
+								if err != nil {
+									return err
+								}
 
-						switch netMode {
-						case ipv4:
-							if config.Flannel.InterfaceFlannel.ExtAddr.String() == subnet.PublicIP {
-								split := strings.Split(string(event.Kv.Key), "/")
-								CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
+								go func() {
+									var kach <-chan *clientv3.LeaseKeepAliveResponse
+									kach, err = cli.KeepAlive(ctx, clientv3.LeaseID(event.Kv.Lease))
 
-								NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJsonWithKind()
-								apply.Apply(smrCtx, NetworkDefinition)
+									for {
+										select {
+										case data, ok := <-kach:
+											if ok {
+												fmt.Println(fmt.Sprintf("keep alived: %s", data.String()))
+												break
+											} else {
+												fmt.Println(fmt.Sprintf("closed keep alive channel for lease: %s", event.Kv.Lease))
+												return
+											}
+										}
+									}
+								}()
+
+								switch netMode {
+								case ipv4:
+									if config.Flannel.InterfaceFlannel.ExtAddr.String() == subnet.PublicIP {
+										split := strings.Split(string(event.Kv.Key), "/")
+										CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
+
+										NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJsonWithKind()
+										apply.Apply(smrCtx, NetworkDefinition)
+									}
+									break
+								case ipv6:
+									if config.Flannel.InterfaceFlannel.ExtV6Addr.String() == subnet.PublicIPv6 {
+										split := strings.Split(string(event.Kv.Key), "/")
+										CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
+
+										NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJsonWithKind()
+										apply.Apply(smrCtx, NetworkDefinition)
+									}
+									break
+								case ipv4 | ipv6:
+									break
+								}
 							}
-							break
-						case ipv6:
-							if config.Flannel.InterfaceFlannel.ExtV6Addr.String() == subnet.PublicIPv6 {
-								split := strings.Split(string(event.Kv.Key), "/")
-								CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
-
-								NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJsonWithKind()
-								apply.Apply(smrCtx, NetworkDefinition)
-							}
-							break
-						case ipv4 | ipv6:
-							break
 						}
 					}
 				}

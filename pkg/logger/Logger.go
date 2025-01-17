@@ -54,8 +54,8 @@ func NewLoggerFlannel(logDir string, logLevel string) *zap.Logger {
 		os.Exit(1)
 	}
 
-	flannelStdout := fmt.Sprintf("%s/flannel.log", logDir)
-	flannelStderr := fmt.Sprintf("%s/flannel.log", logDir)
+	flannelStdout := fmt.Sprintf("stdout")
+	flannelStderr := fmt.Sprintf("stderr")
 
 	_, err = os.Create(flannelStdout)
 	if err != nil {
