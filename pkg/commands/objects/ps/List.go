@@ -167,7 +167,7 @@ func Ps(context *context.Context, watch bool) {
 				container := display[key][containerName]
 
 				tbl.AddRow(
-					fmt.Sprintf("%s (%s)", container.NodeName, container.NodeURL),
+					fmt.Sprintf("%s (%s)", container.NodeName, container.NodeName),
 					helpers.CliRemoveComa(container.Group),
 					helpers.CliRemoveComa(container.Name),
 					helpers.CliRemoveComa(container.GeneratedName),

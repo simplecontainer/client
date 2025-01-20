@@ -14,10 +14,11 @@ import (
 
 func Start(mgr *manager.Manager) {
 	data, err := json.Marshal(map[string]any{
-		"join":    viper.GetString("join"),
-		"node":    viper.GetString("node"),
-		"overlay": viper.GetString("fcidr"),
-		"backend": viper.GetString("fbackend"),
+		"join":     viper.GetString("join"),
+		"node":     viper.GetString("node"),
+		"nodeName": viper.GetString(""),
+		"overlay":  viper.GetString("fcidr"),
+		"backend":  viper.GetString("fbackend"),
 	})
 
 	if err != nil {
