@@ -45,7 +45,6 @@ func Debug() contracts.Command {
 								os.Exit(1)
 							}
 
-							fmt.Println("server closed connection")
 							break
 						}
 
