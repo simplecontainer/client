@@ -8,7 +8,7 @@ import (
 )
 
 func CreateDirectoryTree(projectDir string) {
-	for _, path := range static.CLIENT_STRUCTURE {
+	for _, path := range static.ClientStructure {
 		dir := fmt.Sprintf("%s/%s", projectDir, path)
 
 		err := os.MkdirAll(dir, 0750)

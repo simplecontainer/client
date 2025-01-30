@@ -27,7 +27,6 @@ func PreloadCommands() {
 	Commands = append(Commands, objects.Logs())
 
 	Commands = append(Commands, cluster.Node())
-	Commands = append(Commands, cluster.Restore())
 
 	Commands = append(Commands, control.Secret())
 	Commands = append(Commands, control.Container())

@@ -1,4 +1,4 @@
-package node
+package nodes
 
 import (
 	"encoding/json"
@@ -6,19 +6,18 @@ import (
 	"github.com/simplecontainer/client/pkg/flannel"
 	"github.com/simplecontainer/client/pkg/manager"
 	"github.com/simplecontainer/smr/pkg/network"
-	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 	"net/http"
 	"os"
 )
 
-func Start(mgr *manager.Manager) {
+func Join(mgr *manager.Manager) {
 	data, err := json.Marshal(map[string]any{
-		"join":     viper.GetString("join"),
-		"node":     viper.GetString("node"),
-		"nodeName": viper.GetString(""),
-		"overlay":  viper.GetString("fcidr"),
-		"backend":  viper.GetString("fbackend"),
+		"join":     mgr.Configuration.Startup.Join,
+		"node":     mgr.Configuration.Startup.Node,
+		"nodeName": mgr.Configuration.Startup.Name,
+		"overlay":  mgr.Configuration.Startup.FlannelCIDR,
+		"backend":  mgr.Configuration.Startup.FlannelBackend,
 	})
 
 	if err != nil {

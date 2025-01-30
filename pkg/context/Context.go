@@ -12,7 +12,7 @@ func NewContext(projectDir string) *Context {
 	return &Context{
 		ApiURL:        "",
 		Name:          "",
-		Directory:     fmt.Sprintf("%s/%s", projectDir, static.CLIENT_CONTEXT_DIR),
+		Directory:     fmt.Sprintf("%s/%s", projectDir, static.ClientContextDir),
 		CertBundle:    "",
 		ActiveContext: "",
 		PrivateKey:    &bytes.Buffer{},

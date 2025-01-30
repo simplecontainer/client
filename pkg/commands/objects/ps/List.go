@@ -23,10 +23,11 @@ func Ps(context *context.Context) {
 		return
 	}
 
-	var display = make(map[string]map[string]ContainerInformation)
-	var sortedGroups = make([]string, 0)
-	var sortedContainers = make(map[string][]string)
 	var states = make(map[string]map[string]any)
+	var display = make([]ContainerInformation, 0)
+
+	var groupKeys = make([]string, 0)
+	var containerKeys = make(map[string][]string)
 
 	if response.Data != nil {
 		bytes, err := response.Data.MarshalJSON()
@@ -45,17 +46,22 @@ func Ps(context *context.Context) {
 	}
 
 	for groupName, group := range states {
-		sortedGroups = append(sortedGroups, groupName)
+		groupKeys = append(groupKeys, groupName)
 
-		for containerName, state := range group {
-			var container = make(map[string]interface{})
+		for containerName, _ := range group {
+			containerKeys[groupName] = append(containerKeys[groupName], containerName)
+		}
 
-			sortedContainers[groupName] = append(sortedContainers[groupName], containerName)
+		sort.Strings(containerKeys[groupName])
+	}
 
+	for _, groupKey := range groupKeys {
+		for _, containerKey := range containerKeys[groupKey] {
 			var bytes []byte
 			var err error
 
-			bytes, err = json.Marshal(state)
+			var container = make(map[string]interface{})
+			bytes, err = json.Marshal(states[groupKey][containerKey])
 
 			if err != nil {
 				continue
@@ -133,11 +139,7 @@ func Ps(context *context.Context) {
 				info.NodeURL = ghost.General.Runtime.NodeURL
 				info.NodeName = ghost.General.Runtime.NodeName
 
-				if display[groupName] == nil {
-					display[groupName] = make(map[string]ContainerInformation)
-				}
-
-				display[groupName][info.GeneratedName] = info
+				display = append(display, info)
 			}
 		}
 	}
@@ -150,25 +152,19 @@ func Ps(context *context.Context) {
 		tbl := table.New("NODE", "GROUP", "NAME", "DOCKER NAME", "IMAGE", "IP", "PORTS", "DEPS", "ENGINE STATE", "SMR STATE")
 		tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
-		sort.Strings(sortedGroups)
-
-		for _, key := range sortedGroups {
-			for _, containerName := range sortedContainers[key] {
-				container := display[key][containerName]
-
-				tbl.AddRow(
-					fmt.Sprintf("%s", container.NodeName),
-					helpers.CliRemoveComa(container.Group),
-					helpers.CliRemoveComa(container.Name),
-					helpers.CliRemoveComa(container.GeneratedName),
-					fmt.Sprintf("%s:%s", container.Image, container.Tag),
-					helpers.CliRemoveComa(container.IPs),
-					helpers.CliRemoveComa(container.Ports),
-					helpers.CliRemoveComa(container.Dependencies),
-					container.DockerState,
-					fmt.Sprintf("%s%s (%s)", container.SmrState, helpers.CliMask(container.Recreated, " (*)", ""), container.LastUpdate),
-				)
-			}
+		for _, container := range display {
+			tbl.AddRow(
+				fmt.Sprintf("%s", container.NodeName),
+				helpers.CliRemoveComa(container.Group),
+				helpers.CliRemoveComa(container.Name),
+				helpers.CliRemoveComa(container.GeneratedName),
+				fmt.Sprintf("%s:%s", container.Image, container.Tag),
+				helpers.CliRemoveComa(container.IPs),
+				helpers.CliRemoveComa(container.Ports),
+				helpers.CliRemoveComa(container.Dependencies),
+				container.DockerState,
+				fmt.Sprintf("%s%s (%s)", container.SmrState, helpers.CliMask(container.Recreated, " (*)", ""), container.LastUpdate),
+			)
 		}
 
 		tbl.Print()
@@ -177,20 +173,14 @@ func Ps(context *context.Context) {
 		tbl := table.New("NODE", "GROUP", "DOCKER NAME", "ENGINE STATE", "SMR STATE")
 		tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
-		sort.Strings(sortedGroups)
-
-		for _, key := range sortedGroups {
-			for _, containerName := range sortedContainers[key] {
-				container := display[key][containerName]
-
-				tbl.AddRow(
-					fmt.Sprintf("%s", container.NodeName),
-					helpers.CliRemoveComa(container.Group),
-					helpers.CliRemoveComa(container.GeneratedName),
-					container.DockerState,
-					fmt.Sprintf("%s%s (%s)", container.SmrState, helpers.CliMask(container.Recreated, " (*)", ""), container.LastUpdate),
-				)
-			}
+		for _, container := range display {
+			tbl.AddRow(
+				fmt.Sprintf("%s", container.NodeName),
+				helpers.CliRemoveComa(container.Group),
+				helpers.CliRemoveComa(container.GeneratedName),
+				container.DockerState,
+				fmt.Sprintf("%s%s (%s)", container.SmrState, helpers.CliMask(container.Recreated, " (*)", ""), container.LastUpdate),
+			)
 		}
 
 		tbl.Print()
