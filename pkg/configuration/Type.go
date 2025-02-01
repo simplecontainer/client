@@ -64,7 +64,7 @@ type Startup struct {
 	Node string
 	Join string
 
-	FlannelBackend   string
-	FlannelCIDR      string
-	FlannelInterface string
+	Fbackend   string
+	Fcidr      string
+	Finterface string
 }

@@ -11,8 +11,8 @@ import (
 	"net/http"
 )
 
-func Edit(context *context.Context, prefix string, category string, kind string, group string, name string) (json.RawMessage, error) {
-	response := network.Send(context.Client, fmt.Sprintf("%s/api/v1/kind/%s/%s/%s/%s/%s", context.ApiURL, prefix, category, kind, group, name), http.MethodGet, nil)
+func Edit(context *context.Context, prefix string, version string, category string, kind string, group string, name string) (json.RawMessage, error) {
+	response := network.Send(context.Client, fmt.Sprintf("%s/api/v1/kind/%s/%s/%s/%s/%s/%s", context.ApiURL, prefix, version, category, kind, group, name), http.MethodGet, nil)
 
 	object := json.RawMessage{}
 

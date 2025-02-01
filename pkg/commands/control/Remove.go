@@ -26,7 +26,7 @@ func Remove() contracts.Command {
 					os.Exit(1)
 				}
 
-				err = control.Remove(mgr.Context, format.GetPrefix(), format.GetCategory(), format.GetKind(), format.GetGroup(), format.GetName())
+				err = control.Remove(mgr.Context, format.GetPrefix(), format.GetVersion(), format.GetCategory(), format.GetKind(), format.GetGroup(), format.GetName())
 
 				if err != nil {
 					fmt.Println(err)

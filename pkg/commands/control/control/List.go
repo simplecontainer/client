@@ -8,8 +8,8 @@ import (
 	"net/http"
 )
 
-func ListKind(context *context.Context, prefix string, category string, kind string) ([]json.RawMessage, error) {
-	response := network.Send(context.Client, fmt.Sprintf("%s/api/v1/kind/%s/%s/%s", context.ApiURL, prefix, category, kind), http.MethodGet, nil)
+func ListKind(context *context.Context, prefix string, version string, category string, kind string) ([]json.RawMessage, error) {
+	response := network.Send(context.Client, fmt.Sprintf("%s/api/v1/kind/%s/%s/%s/%s", context.ApiURL, prefix, version, category, kind), http.MethodGet, nil)
 
 	objects := make([]json.RawMessage, 0)
 
@@ -22,8 +22,8 @@ func ListKind(context *context.Context, prefix string, category string, kind str
 	return objects, nil
 }
 
-func ListKindGroup(context *context.Context, prefix string, category string, kind string, group string) ([]json.RawMessage, error) {
-	response := network.Send(context.Client, fmt.Sprintf("%s/api/v1/kind/%s/%s/%s/%s", context.ApiURL, prefix, category, kind, group), http.MethodGet, nil)
+func ListKindGroup(context *context.Context, prefix string, version string, category string, kind string, group string) ([]json.RawMessage, error) {
+	response := network.Send(context.Client, fmt.Sprintf("%s/api/v1/kind/%s/%s/%s/%s/%s", context.ApiURL, prefix, version, category, kind, group), http.MethodGet, nil)
 
 	objects := make([]json.RawMessage, 0)
 

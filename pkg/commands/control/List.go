@@ -34,15 +34,15 @@ func List() contracts.Command {
 
 				switch format.GetKind() {
 				case static.KIND_GITOPS:
-					objects, err = control.ListKind(mgr.Context, format.GetPrefix(), static.CATEGORY_STATE, format.GetKind())
+					objects, err = control.ListKind(mgr.Context, format.GetPrefix(), format.GetVersion(), static.CATEGORY_STATE, format.GetKind())
 					formaters.Gitops(objects)
 					break
 				case static.KIND_CONTAINER:
-					objects, err = control.ListKind(mgr.Context, format.GetPrefix(), static.CATEGORY_STATE, format.GetKind())
+					objects, err = control.ListKind(mgr.Context, format.GetPrefix(), format.GetVersion(), static.CATEGORY_STATE, format.GetKind())
 					formaters.Container(objects)
 					break
 				default:
-					objects, err = control.ListKind(mgr.Context, format.GetPrefix(), static.CATEGORY_KIND, format.GetKind())
+					objects, err = control.ListKind(mgr.Context, format.GetPrefix(), format.GetVersion(), static.CATEGORY_KIND, format.GetKind())
 					formaters.Default(objects)
 					break
 				}

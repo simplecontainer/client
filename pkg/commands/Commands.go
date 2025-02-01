@@ -7,7 +7,9 @@ import (
 	"github.com/simplecontainer/client/pkg/commands/cli"
 	"github.com/simplecontainer/client/pkg/commands/cluster"
 	"github.com/simplecontainer/client/pkg/commands/control"
+	"github.com/simplecontainer/client/pkg/commands/events"
 	"github.com/simplecontainer/client/pkg/commands/objects"
+	"github.com/simplecontainer/client/pkg/commands/streams"
 	"github.com/simplecontainer/client/pkg/contracts"
 	"github.com/simplecontainer/client/pkg/manager"
 	"os"
@@ -19,12 +21,11 @@ func PreloadCommands() {
 	Commands = append(Commands, cli.Context())
 	Commands = append(Commands, cli.Users())
 	Commands = append(Commands, cli.Version())
-	Commands = append(Commands, cli.Platform())
 
 	Commands = append(Commands, objects.Apply())
 	Commands = append(Commands, objects.Remove())
-	Commands = append(Commands, objects.Debug())
-	Commands = append(Commands, objects.Logs())
+	Commands = append(Commands, streams.Debug())
+	Commands = append(Commands, streams.Logs())
 
 	Commands = append(Commands, cluster.Node())
 
@@ -34,6 +35,10 @@ func PreloadCommands() {
 	Commands = append(Commands, control.Remove())
 
 	Commands = append(Commands, alias.Ps())
+
+	Commands = append(Commands, events.Refresh())
+	Commands = append(Commands, events.Sync())
+	Commands = append(Commands, events.Restart())
 }
 
 func Run(mgr *manager.Manager) {

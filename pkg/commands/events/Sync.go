@@ -1,4 +1,4 @@
-package control
+package events
 
 import (
 	"fmt"
@@ -7,12 +7,14 @@ import (
 	"github.com/simplecontainer/client/pkg/contracts"
 	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/client/pkg/manager"
+	"github.com/simplecontainer/smr/pkg/events/events"
+	"github.com/simplecontainer/smr/pkg/static"
 	"os"
 )
 
-func Get() contracts.Command {
+func Sync() contracts.Command {
 	return command.Command{
-		Name: "get",
+		Name: "sync",
 		Condition: func(mgr *manager.Manager) bool {
 			return mgr.Context.ConnectionTest()
 		},
@@ -25,13 +27,12 @@ func Get() contracts.Command {
 					os.Exit(1)
 				}
 
-				get, err := control.Get(mgr.Context, format.GetPrefix(), format.GetVersion(), format.GetCategory(), format.GetKind(), format.GetGroup(), format.GetName())
+				event := events.New(events.EVENT_SYNC, static.KIND_GITOPS, static.KIND_GITOPS, format.GetGroup(), format.GetName(), nil)
 
-				if err != nil {
-					fmt.Println(err)
-				} else {
-					fmt.Println(string(get))
-				}
+				var bytes []byte
+				bytes, err = event.ToJson()
+
+				control.Event(mgr.Context, format.GetPrefix(), format.GetVersion(), static.CATEGORY_EVENT, format.GetKind(), format.GetGroup(), format.GetName(), bytes)
 			},
 		},
 		DependsOn: []func(*manager.Manager, []string){

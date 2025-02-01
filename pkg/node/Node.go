@@ -137,7 +137,7 @@ func (node *Node) Check(desired string, ch chan bool) {
 	for {
 		state, _ := node.Container.GetContainerState()
 
-		if desired == state {
+		if desired == state.State {
 			ch <- true
 			return
 		}

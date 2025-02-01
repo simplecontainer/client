@@ -25,7 +25,7 @@ func Edit() contracts.Command {
 					os.Exit(1)
 				}
 
-				get, err := control.Edit(mgr.Context, format.GetPrefix(), format.GetCategory(), format.GetKind(), format.GetGroup(), format.GetName())
+				get, err := control.Edit(mgr.Context, format.GetPrefix(), format.GetVersion(), format.GetCategory(), format.GetKind(), format.GetGroup(), format.GetName())
 
 				if err != nil {
 					fmt.Println(err)

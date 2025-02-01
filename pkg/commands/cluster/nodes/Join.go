@@ -16,8 +16,8 @@ func Join(mgr *manager.Manager) {
 		"join":     mgr.Configuration.Startup.Join,
 		"node":     mgr.Configuration.Startup.Node,
 		"nodeName": mgr.Configuration.Startup.Name,
-		"overlay":  mgr.Configuration.Startup.FlannelCIDR,
-		"backend":  mgr.Configuration.Startup.FlannelBackend,
+		"overlay":  mgr.Configuration.Startup.Fcidr,
+		"backend":  mgr.Configuration.Startup.Fbackend,
 	})
 
 	if err != nil {
