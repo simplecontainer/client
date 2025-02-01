@@ -1,10 +1,13 @@
 package definitions
 
-import v1 "github.com/simplecontainer/smr/pkg/definitions/v1"
+import (
+	"github.com/simplecontainer/smr/pkg/definitions/commonv1"
+	v1 "github.com/simplecontainer/smr/pkg/definitions/v1"
+)
 
 func FlannelDefinition(subnetCIDR string) *v1.NetworkDefinition {
 	return &v1.NetworkDefinition{
-		Meta: v1.NetworkMeta{
+		Meta: commonv1.Meta{
 			Group: "internal",
 			Name:  "cluster",
 		},

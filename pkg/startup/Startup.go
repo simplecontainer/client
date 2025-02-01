@@ -72,6 +72,7 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.Bool("f", false, "Follow logs")
 	flag.String("o", "d", "Output type: d(efault),s(hort)")
 	flag.Bool("y", false, "Say yes to everything")
+	flag.String("g", "default", "Group")
 
 	// Node flags
 	flag.String("image", "quay.io/simplecontainer/smr", "The smr image repo")

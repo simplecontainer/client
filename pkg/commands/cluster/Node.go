@@ -42,6 +42,14 @@ func Node() contracts.Command {
 						helpers.ExitWithErr(err)
 					}
 
+					if mgr.Configuration.Startup.W != "" {
+						err = n.Wait(mgr.Configuration.Startup.W)
+
+						if err != nil {
+							helpers.ExitWithErr(err)
+						}
+					}
+
 					fmt.Println(n.Container.GetId())
 					break
 				case "rename":
@@ -51,6 +59,14 @@ func Node() contracts.Command {
 						helpers.ExitWithErr(err)
 					}
 
+					if mgr.Configuration.Startup.W != "" {
+						err = n.Wait(mgr.Configuration.Startup.W)
+
+						if err != nil {
+							helpers.ExitWithErr(err)
+						}
+					}
+
 					fmt.Println("node renamed")
 					break
 				case "restart":
@@ -58,6 +74,14 @@ func Node() contracts.Command {
 
 					if err != nil {
 						helpers.ExitWithErr(err)
+					}
+
+					if mgr.Configuration.Startup.W != "" {
+						err = n.Wait(mgr.Configuration.Startup.W)
+
+						if err != nil {
+							helpers.ExitWithErr(err)
+						}
 					}
 
 					fmt.Println("node restarted")
@@ -75,8 +99,6 @@ func Node() contracts.Command {
 						if err != nil {
 							helpers.ExitWithErr(err)
 						}
-
-						fmt.Println(fmt.Sprintf("container is in desired state: %s", mgr.Configuration.Startup.W))
 					}
 
 					fmt.Println("node stopped")

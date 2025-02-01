@@ -5,6 +5,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/simplecontainer/client/pkg/configuration"
 	"github.com/simplecontainer/client/pkg/helpers"
+	"github.com/simplecontainer/smr/pkg/definitions/commonv1"
 	v1 "github.com/simplecontainer/smr/pkg/definitions/v1"
 	"github.com/simplecontainer/smr/pkg/kinds/container/platforms/engines/docker"
 	"github.com/simplecontainer/smr/pkg/static"
@@ -45,7 +46,7 @@ func New(name string, config *configuration.Configuration) (*Node, error) {
 
 func Definition(name string, config *configuration.Configuration) *v1.ContainerDefinition {
 	container := &v1.ContainerDefinition{
-		Meta: v1.ContainerMeta{
+		Meta: commonv1.Meta{
 			Name:   name,
 			Group:  "internal",
 			Labels: nil,
@@ -122,11 +123,13 @@ func (node *Node) Wait(desired string) error {
 
 	go node.Check(desired, ch)
 
-	select {
-	case <-ctx.Done():
-		return errors.New("timed out waiting for the desired state")
-	case <-ch:
-		return nil
+	for {
+		select {
+		case <-ctx.Done():
+			return errors.New("timed out waiting for the desired state")
+		case <-ch:
+			return nil
+		}
 	}
 }
 

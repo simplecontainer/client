@@ -50,6 +50,7 @@ type Startup struct {
 	F bool
 	O string
 	W string
+	G string
 
 	Image      string
 	Tag        string

@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"github.com/rodaine/table"
+	"github.com/simplecontainer/client/pkg/commands/alias"
 	"github.com/simplecontainer/client/pkg/commands/cli"
 	"github.com/simplecontainer/client/pkg/commands/cluster"
 	"github.com/simplecontainer/client/pkg/commands/control"
@@ -22,20 +23,17 @@ func PreloadCommands() {
 
 	Commands = append(Commands, objects.Apply())
 	Commands = append(Commands, objects.Remove())
-	Commands = append(Commands, objects.Ps())
 	Commands = append(Commands, objects.Debug())
 	Commands = append(Commands, objects.Logs())
 
 	Commands = append(Commands, cluster.Node())
 
-	Commands = append(Commands, control.Secret())
-	Commands = append(Commands, control.Container())
-	Commands = append(Commands, control.Containers())
-	Commands = append(Commands, control.Gitops())
-	Commands = append(Commands, control.Configuration())
-	Commands = append(Commands, control.Resource())
-	Commands = append(Commands, control.CertKey())
-	Commands = append(Commands, control.HttpAuth())
+	Commands = append(Commands, control.Get())
+	Commands = append(Commands, control.List())
+	Commands = append(Commands, control.Edit())
+	Commands = append(Commands, control.Remove())
+
+	Commands = append(Commands, alias.Ps())
 }
 
 func Run(mgr *manager.Manager) {
