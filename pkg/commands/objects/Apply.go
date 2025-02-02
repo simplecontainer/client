@@ -38,7 +38,13 @@ func Apply() contracts.Command {
 					fmt.Println(err)
 				} else {
 					if definition != nil {
-						apply.Apply(mgr.Context, definition)
+						response := apply.Apply(mgr.Context, definition)
+
+						if response.Success {
+							fmt.Println(response.Explanation)
+						} else {
+							fmt.Println(response.ErrorExplanation)
+						}
 					} else {
 						fmt.Println("specified file/url is not valid definition")
 					}
