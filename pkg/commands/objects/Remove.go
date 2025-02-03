@@ -1,13 +1,17 @@
 package objects
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/simplecontainer/client/pkg/command"
+	"github.com/simplecontainer/client/pkg/commands/control/control"
 	"github.com/simplecontainer/client/pkg/commands/objects/remove"
 	"github.com/simplecontainer/client/pkg/contracts"
-	"github.com/simplecontainer/client/pkg/definitions"
+	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/client/pkg/manager"
-	"net/url"
+	v1 "github.com/simplecontainer/smr/pkg/definitions/v1"
+	common "github.com/simplecontainer/smr/pkg/kinds/common"
+	"github.com/simplecontainer/smr/pkg/static"
 	"os"
 )
 
@@ -19,29 +23,47 @@ func Remove() contracts.Command {
 		},
 		Functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				if len(os.Args) < 2 {
-					fmt.Println("try to specify a file")
-					return
+				format, err := helpers.BuildFormat(helpers.GrabArg(2), mgr.Configuration.Startup.G)
+
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
 				}
 
-				u, err := url.ParseRequestURI(args[2])
+				get, err := control.Get(mgr.Context, format.GetPrefix(), format.GetVersion(), format.GetCategory(), format.GetKind(), format.GetGroup(), format.GetName())
 
-				var definition []byte
+				fmt.Println(string(get))
 
-				if err != nil || !u.IsAbs() {
-					definition, err = definitions.ReadFile(args[2])
-				} else {
-					definition, err = definitions.DownloadFile(u)
+				c := v1.CommonDefinition{}
+
+				err = json.Unmarshal(get, &c)
+
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
 				}
+
+				request, err := common.NewRequest(c.GetKind())
+
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+
+				err = request.Definition.FromJson(get)
 
 				if err != nil {
 					fmt.Println(err)
 				} else {
-					if definition != nil {
-						remove.Remove(mgr.Context, definition)
-					} else {
-						fmt.Println("specified file/url is not valid definition")
+					request.Definition.GetState().AddOpt("action", static.REMOVE_KIND)
+					bytes, err := request.Definition.ToJsonForUser()
+
+					if err != nil {
+						fmt.Println(err)
+						os.Exit(1)
 					}
+
+					remove.Remove(mgr.Context, bytes)
 				}
 			},
 		},
