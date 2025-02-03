@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/simplecontainer/client/pkg/command"
 	"github.com/simplecontainer/client/pkg/contracts"
+	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/client/pkg/manager"
 	"github.com/simplecontainer/smr/pkg/network"
 	"github.com/spf13/viper"
-	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -23,47 +23,25 @@ func Logs() contracts.Command {
 		},
 		Functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				if len(os.Args) > 3 {
-					resp, err := network.Raw(mgr.Context.Client, fmt.Sprintf("%s/api/v1/logs/%s/%s/%s", mgr.Context.ApiURL, os.Args[2], os.Args[3], strconv.FormatBool(viper.GetBool("f"))), http.MethodGet, nil)
+				format, err := helpers.BuildFormat(helpers.GrabArg(2), mgr.Configuration.Startup.G)
 
-					if err != nil {
-						fmt.Println(err)
-						os.Exit(1)
-					}
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
 
-					var bytes int
-					buff := make([]byte, 512)
+				resp, err := network.Raw(mgr.Context.Client, fmt.Sprintf("%s/api/v1/logs/%s/%s", mgr.Context.ApiURL, format.ToString(), strconv.FormatBool(viper.GetBool("f"))), http.MethodGet, nil)
 
-					for {
-						bytes, err = resp.Body.Read(buff)
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
 
-						if err == io.EOF {
-							err = resp.Body.Close()
+				err = helpers.PrintBytes(resp.Body)
 
-							if err != nil {
-								fmt.Println(err)
-								os.Exit(1)
-							}
-							break
-						}
-
-						if bytes == 0 {
-							err = resp.Body.Close()
-
-							if err != nil {
-								fmt.Println(err)
-								os.Exit(1)
-							}
-
-							break
-						}
-
-						fmt.Print(string(buff[:bytes]))
-					}
-
-					fmt.Print(string(buff[:bytes]))
-				} else {
-					fmt.Println(HelpLogs)
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
 				}
 			},
 		},
