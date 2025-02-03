@@ -4,8 +4,6 @@ go 1.23.0
 
 toolchain go1.23.1
 
-replace github.com/simplecontainer/smr => ../smr
-
 require (
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/fatih/color v1.17.0
@@ -14,7 +12,7 @@ require (
 	github.com/manifoldco/promptui v0.9.0
 	github.com/pkg/errors v0.9.1
 	github.com/rodaine/table v1.3.0
-	github.com/simplecontainer/smr v0.0.127
+	github.com/simplecontainer/smr v0.1.2
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
