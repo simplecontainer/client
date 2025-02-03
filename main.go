@@ -17,7 +17,7 @@ import (
 
 func main() {
 	config := configuration.NewConfig()
-	startup.Load(config, config.Root)
+	startup.Load(config)
 
 	logLevel := os.Getenv("LOG_LEVEL")
 	if logLevel == "" {
@@ -28,12 +28,12 @@ func main() {
 	managerObj.VersionClient = SMR_VERSION
 	managerObj.Configuration = config
 
-	bootstrap.CreateDirectoryTree(managerObj.Configuration.Environment.ROOTDIR)
+	bootstrap.CreateDirectoryTree(managerObj.Configuration.Environment.ClientDirectory)
 
-	logger.Log = logger.NewLogger(config.Environment.LOGDIR, logLevel)
-	logger.LogFlannel = logger.NewLoggerFlannel(config.Environment.LOGDIR, logLevel)
+	logger.Log = logger.NewLogger(config.Environment.LogsDirectory, logLevel)
+	logger.LogFlannel = logger.NewLoggerFlannel(config.Environment.LogsDirectory, logLevel)
 
-	f, err := os.OpenFile(fmt.Sprintf("%s/flannel.log", config.Environment.LOGDIR), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile(fmt.Sprintf("%s/flannel.log", config.Environment.LogsDirectory), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
@@ -42,7 +42,7 @@ func main() {
 
 	log.SetOutput(f)
 
-	managerObj.Context = context.NewContext(managerObj.Configuration.Environment.ROOTDIR)
+	managerObj.Context = context.NewContext(managerObj.Configuration.Environment.ClientDirectory)
 	managerObj.Context.LoadContext()
 
 	commands.PreloadCommands()

@@ -11,12 +11,17 @@ import (
 	"go.uber.org/zap"
 	"net"
 	"os"
-	"runtime"
 )
 
-func Load(configObj *configuration.Configuration, projectDir string) {
+func Load(configObj *configuration.Configuration) {
 	configObj.Environment = GetEnvironmentInfo()
 	ReadFlags(configObj)
+
+	err := viper.Unmarshal(&configObj.Startup)
+
+	if err != nil {
+		panic(err)
+	}
 
 	configObj.Flannel = &configuration.Flannel{
 		Backend:            viper.GetString("fbackend"),
@@ -33,7 +38,6 @@ func Load(configObj *configuration.Configuration, projectDir string) {
 	}
 
 	var CIDR *net.IPNet
-	var err error
 	_, CIDR, err = net.ParseCIDR(viper.GetString("fcidr"))
 
 	if err != nil {
@@ -44,19 +48,17 @@ func Load(configObj *configuration.Configuration, projectDir string) {
 	configObj.Flannel.CIDR = []*net.IPNet{CIDR}
 	configObj.Flannel.InterfaceSpecified, _ = net.InterfaceByName(viper.GetString("finterface"))
 
-	if runtime.GOOS != "windows" {
-		if viper.GetBool("fenableIPv4") {
-			if _, err = os.Stat("/proc/sys/net/bridge/bridge-nf-call-iptables"); os.IsNotExist(err) {
-				fmt.Println("Failed to check br_netfilter: ", zap.Error(err))
-				os.Exit(1)
-			}
+	if viper.GetBool("fenableIPv4") {
+		if _, err = os.Stat("/proc/sys/net/bridge/bridge-nf-call-iptables"); os.IsNotExist(err) {
+			fmt.Println("Failed to check br_netfilter: ", zap.Error(err))
+			os.Exit(1)
 		}
+	}
 
-		if viper.GetBool("fenableIPv6") {
-			if _, err = os.Stat("/proc/sys/net/bridge/bridge-nf-call-ip6tables"); os.IsNotExist(err) {
-				fmt.Println("Failed to check br_netfilter: ", zap.Error(err))
-				os.Exit(1)
-			}
+	if viper.GetBool("fenableIPv6") {
+		if _, err = os.Stat("/proc/sys/net/bridge/bridge-nf-call-ip6tables"); os.IsNotExist(err) {
+			fmt.Println("Failed to check br_netfilter: ", zap.Error(err))
+			os.Exit(1)
 		}
 	}
 }
@@ -64,14 +66,13 @@ func Load(configObj *configuration.Configuration, projectDir string) {
 func ReadFlags(configObj *configuration.Configuration) {
 	/* Operation mode */
 	flag.String("context", "", "Context name")
-	flag.Bool("y", false, "Say yes to everything")
-
-	HOMEDIR, _ := os.UserHomeDir()
 
 	// Cli flags
-	flag.Bool("wait", false, "Wait for container to exit")
+	flag.String("w", "exited", "Wait for container to be in defined state")
 	flag.Bool("f", false, "Follow logs")
 	flag.String("o", "d", "Output type: d(efault),s(hort)")
+	flag.Bool("y", false, "Say yes to everything")
+	flag.String("g", "default", "Group")
 
 	// Node flags
 	flag.String("image", "quay.io/simplecontainer/smr", "The smr image repo")
@@ -85,7 +86,6 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.String("log", "info", "Log level: debug, info, warn, error, dpanic, panic, fatal")
 	flag.String("domains", "localhost", "Comma separated list of the domains to add to the certs")
 	flag.String("ips", "127.0.0.1", "Comma separated list of the IPs to add to the certs")
-	flag.String("homedir", HOMEDIR, "Host homedir")
 
 	// Flannel configuration
 	flag.String("fbackend", "wireguard", "Flannel backend: vxlan, wireguard")
@@ -103,7 +103,4 @@ func ReadFlags(configObj *configuration.Configuration) {
 	pflag.Parse()
 
 	viper.BindPFlags(pflag.CommandLine)
-
-	configObj.Flags.Context = viper.GetString("context")
-	configObj.Flags.Y = viper.GetBool("y")
 }

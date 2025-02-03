@@ -1,23 +1,18 @@
-package objects
+package control
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/simplecontainer/client/pkg/command"
 	"github.com/simplecontainer/client/pkg/commands/control/control"
-	"github.com/simplecontainer/client/pkg/commands/objects/remove"
 	"github.com/simplecontainer/client/pkg/contracts"
 	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/client/pkg/manager"
-	v1 "github.com/simplecontainer/smr/pkg/definitions/v1"
-	common "github.com/simplecontainer/smr/pkg/kinds/common"
-	"github.com/simplecontainer/smr/pkg/static"
 	"os"
 )
 
-func Remove() contracts.Command {
+func Get() contracts.Command {
 	return command.Command{
-		Name: "remove",
+		Name: "get",
 		Condition: func(mgr *manager.Manager) bool {
 			return mgr.Context.ConnectionTest()
 		},
@@ -32,38 +27,10 @@ func Remove() contracts.Command {
 
 				get, err := control.Get(mgr.Context, format.GetPrefix(), format.GetVersion(), format.GetCategory(), format.GetKind(), format.GetGroup(), format.GetName())
 
-				fmt.Println(string(get))
-
-				c := v1.CommonDefinition{}
-
-				err = json.Unmarshal(get, &c)
-
-				if err != nil {
-					fmt.Println(err)
-					os.Exit(1)
-				}
-
-				request, err := common.NewRequest(c.GetKind())
-
-				if err != nil {
-					fmt.Println(err)
-					os.Exit(1)
-				}
-
-				err = request.Definition.FromJson(get)
-
 				if err != nil {
 					fmt.Println(err)
 				} else {
-					request.Definition.GetState().AddOpt("action", static.REMOVE_KIND)
-					bytes, err := request.Definition.ToJsonForUser()
-
-					if err != nil {
-						fmt.Println(err)
-						os.Exit(1)
-					}
-
-					remove.Remove(mgr.Context, bytes)
+					fmt.Println(string(get))
 				}
 			},
 		},

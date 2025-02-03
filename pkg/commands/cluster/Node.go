@@ -1,13 +1,13 @@
 package cluster
 
 import (
+	"fmt"
 	"github.com/simplecontainer/client/pkg/command"
-	"github.com/simplecontainer/client/pkg/commands/cluster/node"
+	"github.com/simplecontainer/client/pkg/commands/cluster/nodes"
 	"github.com/simplecontainer/client/pkg/contracts"
-	"github.com/simplecontainer/client/pkg/definitions"
+	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/client/pkg/manager"
-	"github.com/simplecontainer/smr/pkg/configuration"
-	"github.com/spf13/viper"
+	"github.com/simplecontainer/client/pkg/node"
 	"os"
 )
 
@@ -19,38 +19,89 @@ func Node() contracts.Command {
 		},
 		Functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				config := &configuration.Configuration{
-					HostHome: viper.GetString("homedir"),
-					Environment: &configuration.Environment{
-						HOMEDIR: viper.GetString("homedir"),
-						AGENTIP: "",
-					},
+				n, err := node.New(mgr.Configuration.Startup.Name, mgr.Configuration)
+
+				if err != nil {
+					panic(err)
 				}
 
-				switch os.Args[2] {
+				switch helpers.GrabArg(2) {
 				case "cluster":
 					switch os.Args[3] {
-					case "start":
-						node.Start(mgr)
+					case "join":
+						nodes.Join(mgr)
 						break
-					case "add":
-						node.Add(mgr)
-						break
-					case "delete":
-						node.Delete(mgr)
-						break
-					case "get":
-						node.Get(mgr)
-						break
-					case "restore":
-						node.Restore(mgr)
+					case "leave":
+						nodes.Leave(mgr)
 						break
 					}
 				case "run":
-					node.Run(config, definitions.NodeDefinition(), viper.GetString("platform"))
+					err = nodes.Start(n)
+
+					if err != nil {
+						helpers.ExitWithErr(err)
+					}
+
+					if mgr.Configuration.Startup.W != "" {
+						err = n.Wait(mgr.Configuration.Startup.W)
+
+						if err != nil {
+							helpers.ExitWithErr(err)
+						}
+					}
+
+					fmt.Println(n.Container.GetId())
+					break
+				case "rename":
+					err = nodes.Rename(n, helpers.GrabArg(3))
+
+					if err != nil {
+						helpers.ExitWithErr(err)
+					}
+
+					if mgr.Configuration.Startup.W != "" {
+						err = n.Wait(mgr.Configuration.Startup.W)
+
+						if err != nil {
+							helpers.ExitWithErr(err)
+						}
+					}
+
+					fmt.Println("node renamed")
+					break
+				case "restart":
+					err = nodes.Restart(n)
+
+					if err != nil {
+						helpers.ExitWithErr(err)
+					}
+
+					if mgr.Configuration.Startup.W != "" {
+						err = n.Wait(mgr.Configuration.Startup.W)
+
+						if err != nil {
+							helpers.ExitWithErr(err)
+						}
+					}
+
+					fmt.Println("node restarted")
 					break
 				case "stop":
-					node.Stop(config, definitions.NodeDefinition(), viper.GetString("platform"))
+					err = nodes.Stop(n)
+
+					if err != nil {
+						helpers.ExitWithErr(err)
+					}
+
+					if mgr.Configuration.Startup.W != "" {
+						err = n.Wait(mgr.Configuration.Startup.W)
+
+						if err != nil {
+							helpers.ExitWithErr(err)
+						}
+					}
+
+					fmt.Println("node stopped")
 					break
 				}
 			},

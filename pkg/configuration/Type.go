@@ -7,12 +7,10 @@ import (
 )
 
 type Configuration struct {
-	Target      string `default:"development" json:"target"`
-	Root        string `json:"root"`
-	Log         string `json:"log"`
 	Environment *Environment
-	Flags       Flags
 	Flannel     *Flannel
+
+	Startup Startup
 }
 
 type Flannel struct {
@@ -34,9 +32,39 @@ type Flags struct {
 }
 
 type Environment struct {
-	HOMEDIR    string
-	FLANNELDIR string
-	ROOTDIR    string
-	LOGDIR     string
-	CLIENTIP   string
+	Home            string
+	LogsDirectory   string
+	ClientDirectory string
+}
+
+type Startup struct {
+	Platform string
+	Name     string
+	Context  string
+
+	LogLevel string
+	Domains  string
+	IPs      string
+
+	Y bool
+	F bool
+	O string
+	W string
+	G string
+
+	Image      string
+	Tag        string
+	Entrypoint string
+	Args       string
+
+	HostPort    string
+	OverlayPort string
+	EtcdPort    string
+
+	Node string
+	Join string
+
+	Fbackend   string
+	Fcidr      string
+	Finterface string
 }

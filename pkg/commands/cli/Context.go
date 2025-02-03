@@ -31,7 +31,7 @@ func Context() contracts.Command {
 					switch os.Args[2] {
 					case "connect":
 						if len(os.Args) > 4 {
-							err := context.Connect(os.Args[3], os.Args[4], mgr.Configuration.Environment.ROOTDIR)
+							err := context.Connect(os.Args[3], os.Args[4], mgr.Configuration.Environment.ClientDirectory)
 
 							if err != nil {
 								fmt.Println(err.Error())
@@ -65,7 +65,7 @@ func Context() contracts.Command {
 							os.Exit(1)
 						}
 
-						context.Export(contextName, mgr.Context, mgr.Configuration.Environment.ROOTDIR, API)
+						context.Export(contextName, mgr.Context, mgr.Configuration.Environment.ClientDirectory, API)
 					case "import":
 						encrypted := ""
 						if len(os.Args) > 3 {
@@ -80,7 +80,7 @@ func Context() contracts.Command {
 							os.Exit(1)
 						}
 
-						context.Import(encrypted, mgr.Context, mgr.Configuration.Environment.ROOTDIR, key)
+						context.Import(encrypted, mgr.Context, mgr.Configuration.Environment.ClientDirectory, key)
 					case "fetch":
 						block, _ := pem.Decode(mgr.Context.PrivateKey.Bytes())
 						PrivateKeyTmp, err := x509.ParsePKCS8PrivateKey(block.Bytes)
@@ -101,7 +101,7 @@ func Context() contracts.Command {
 						}
 
 						key := hex.EncodeToString(bytes[:32])
-						context.ImportCertificates(mgr.Context, mgr.Configuration.Environment.ROOTDIR, key)
+						context.ImportCertificates(mgr.Context, mgr.Configuration.Environment.ClientDirectory, key)
 					default:
 						fmt.Println("Available commands are: connect, switch")
 					}

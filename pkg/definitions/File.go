@@ -21,7 +21,7 @@ func ReadFile(filePath string) ([]byte, error) {
 		}
 
 		var body interface{}
-		if err = yaml.Unmarshal([]byte(YAML), &body); err != nil {
+		if err = yaml.Unmarshal(YAML, &body); err != nil {
 			return nil, err
 		}
 

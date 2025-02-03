@@ -94,7 +94,7 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 										split := strings.Split(string(event.Kv.Key), "/")
 										CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
 
-										NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJsonWithKind()
+										NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJson()
 										apply.Apply(smrCtx, NetworkDefinition)
 									}
 									break
@@ -103,7 +103,7 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 										split := strings.Split(string(event.Kv.Key), "/")
 										CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
 
-										NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJsonWithKind()
+										NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJson()
 										apply.Apply(smrCtx, NetworkDefinition)
 									}
 									break
