@@ -8,6 +8,7 @@ import (
 
 func FlannelDefinition(subnetCIDR string) *v1.NetworkDefinition {
 	return &v1.NetworkDefinition{
+		Kind:   static.KIND_NETWORK,
 		Prefix: static.SMR_PREFIX,
 		Meta: commonv1.Meta{
 			Group: "internal",
