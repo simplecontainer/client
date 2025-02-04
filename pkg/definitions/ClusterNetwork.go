@@ -7,7 +7,7 @@ import (
 )
 
 func FlannelDefinition(subnetCIDR string) *v1.NetworkDefinition {
-	return &v1.NetworkDefinition{
+	definition := &v1.NetworkDefinition{
 		Kind:   static.KIND_NETWORK,
 		Prefix: static.SMR_PREFIX,
 		Meta: commonv1.Meta{
@@ -18,5 +18,9 @@ func FlannelDefinition(subnetCIDR string) *v1.NetworkDefinition {
 			Driver:          "bridge",
 			IPV4AddressPool: subnetCIDR,
 		},
+		State: &commonv1.State{Options: make([]*commonv1.Opts, 0)},
 	}
+
+	definition.State.AddOpt("scope", "local")
+	return definition
 }
