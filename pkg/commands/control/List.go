@@ -30,8 +30,6 @@ func List() contracts.Command {
 
 				var objects []json.RawMessage
 
-				fmt.Println(format.ToString())
-
 				switch format.GetKind() {
 				case static.KIND_GITOPS:
 					objects, err = control.ListKind(mgr.Context, format.GetPrefix(), format.GetVersion(), static.CATEGORY_STATE, format.GetKind())

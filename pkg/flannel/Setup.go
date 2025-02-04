@@ -12,6 +12,7 @@ import (
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
+	"os"
 	"strings"
 	"time"
 
@@ -32,6 +33,9 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 	if err != nil {
 		return errors.Wrap(err, "failed to check netMode for flannel")
 	}
+
+	// Remove on start
+	os.Remove("/run/flannel/subnet.env")
 
 	go func() {
 		err = flannel(ctx, config, config.Flannel.InterfaceSpecified, config.Flannel.IPv6Masq, netMode)
