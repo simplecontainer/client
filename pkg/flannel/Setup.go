@@ -65,7 +65,6 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 					switch event.Type {
 					case mvccpb.PUT:
 						if strings.Contains(string(event.Kv.Key), "subnet") {
-							// Handle only case when it has lease because request came from local flannel
 							if event.Kv.Lease != 0 {
 								var subnet = Subnet{}
 								err = json.Unmarshal(event.Kv.Value, &subnet)
@@ -74,27 +73,15 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 									return err
 								}
 
-								go func() {
-									var kach <-chan *clientv3.LeaseKeepAliveResponse
-									kach, err = cli.KeepAlive(ctx, clientv3.LeaseID(event.Kv.Lease))
-
-									for {
-										select {
-										case data, ok := <-kach:
-											if ok {
-												fmt.Println(fmt.Sprintf("keep alived: %s", data.String()))
-												break
-											} else {
-												fmt.Println(fmt.Sprintf("closed keep alive channel for lease: %s", event.Kv.Lease))
-												return
-											}
-										}
-									}
-								}()
+								fmt.Println("got subnet ", subnet)
 
 								switch netMode {
 								case ipv4:
+									fmt.Println("checking if mine  ", config.Flannel.InterfaceFlannel.ExtAddr.String(), " == ", subnet.PublicIP)
+
 									if config.Flannel.InterfaceFlannel.ExtAddr.String() == subnet.PublicIP {
+										fmt.Println("adding it as my own subnet", string(event.Kv.Key))
+
 										split := strings.Split(string(event.Kv.Key), "/")
 										CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
 
@@ -114,6 +101,24 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 								case ipv4 | ipv6:
 									break
 								}
+
+								go func() {
+									var kach <-chan *clientv3.LeaseKeepAliveResponse
+									kach, err = cli.KeepAlive(ctx, clientv3.LeaseID(event.Kv.Lease))
+
+									for {
+										select {
+										case data, ok := <-kach:
+											if ok {
+												fmt.Println(fmt.Sprintf("keep alived: %s", data.String()))
+												break
+											} else {
+												fmt.Println(fmt.Sprintf("closed keep alive channel for lease: %s", event.Kv.Lease))
+												return
+											}
+										}
+									}
+								}()
 							}
 						}
 					}
