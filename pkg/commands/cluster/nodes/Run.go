@@ -11,5 +11,5 @@ func Start(n *node.Node) error {
 		return err
 	}
 
-	return n.Start()
+	return n.Run()
 }

@@ -110,6 +110,12 @@ func Definition(name string, config *configuration.Configuration) *v1.ContainerD
 }
 
 func (node *Node) Start() error {
+	err := node.Container.Start()
+
+	return err
+}
+
+func (node *Node) Run() error {
 	_, err := node.Container.Run()
 
 	return err
