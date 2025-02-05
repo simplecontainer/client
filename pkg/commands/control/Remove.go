@@ -13,7 +13,7 @@ import (
 
 func Remove() contracts.Command {
 	return command.Command{
-		Name: "remove",
+		Name: "xxx",
 		Condition: func(mgr *manager.Manager) bool {
 			return mgr.Context.ConnectionTest()
 		},
