@@ -7,7 +7,7 @@ import (
 	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/smr/pkg/definitions/commonv1"
 	v1 "github.com/simplecontainer/smr/pkg/definitions/v1"
-	"github.com/simplecontainer/smr/pkg/kinds/container/platforms/engines/docker"
+	"github.com/simplecontainer/smr/pkg/kinds/containers/platforms/engines/docker"
 	"github.com/simplecontainer/smr/pkg/static"
 	"golang.org/x/net/context"
 	"os"
@@ -44,65 +44,63 @@ func New(name string, config *configuration.Configuration) (*Node, error) {
 	}
 }
 
-func Definition(name string, config *configuration.Configuration) *v1.ContainerDefinition {
-	container := &v1.ContainerDefinition{
+func Definition(name string, config *configuration.Configuration) *v1.ContainersDefinition {
+	container := &v1.ContainersDefinition{
 		Meta: commonv1.Meta{
 			Name:   name,
 			Group:  "internal",
 			Labels: nil,
 		},
-		Spec: v1.ContainerSpec{
-			Container: v1.ContainerInternal{
-				Image: config.Startup.Image,
-				Tag:   config.Startup.Tag,
-				Envs: []string{
-					fmt.Sprintf("LOG_LEVEL=%s", config.Startup.LogLevel),
-				},
-				Entrypoint: strings.Split(config.Startup.Entrypoint, " "),
-				Args:       strings.Split(config.Startup.Args, " "),
-				Ports: []v1.ContainerPort{
-					{
-						Container: "1443",
-						Host:      config.Startup.HostPort,
-					},
-					{
-						Container: "2379",
-						Host:      fmt.Sprintf("127.0.0.1:%s", config.Startup.EtcdPort),
-					},
-					{
-						Container: "9212",
-						Host:      config.Startup.OverlayPort,
-					},
-				},
-				Volumes: []v1.ContainerVolume{
-					{
-						Name:       "docker-socket",
-						Type:       "bind",
-						HostPath:   "/var/run/docker.sock",
-						MountPoint: "/var/run/docker.sock",
-					},
-					{
-						Name:       "smr",
-						Type:       "bind",
-						HostPath:   fmt.Sprintf("%s/.%s", config.Environment.Home, name),
-						MountPoint: "/home/node/smr",
-					},
-					{
-						Name:       "ssh",
-						Type:       "bind",
-						HostPath:   fmt.Sprintf("%s/.ssh", config.Environment.Home),
-						MountPoint: "/home/node/.ssh",
-					},
-					{
-						Name:       "tmp",
-						Type:       "bind",
-						HostPath:   "/tmp",
-						MountPoint: "/tmp",
-					},
-				},
-				Replicas: 1,
-				Dns:      []string{"127.0.0.1"},
+		Spec: v1.ContainersInternal{
+			Image: config.Startup.Image,
+			Tag:   config.Startup.Tag,
+			Envs: []string{
+				fmt.Sprintf("LOG_LEVEL=%s", config.Startup.LogLevel),
 			},
+			Entrypoint: strings.Split(config.Startup.Entrypoint, " "),
+			Args:       strings.Split(config.Startup.Args, " "),
+			Ports: []v1.ContainersPort{
+				{
+					Container: "1443",
+					Host:      config.Startup.HostPort,
+				},
+				{
+					Container: "2379",
+					Host:      fmt.Sprintf("127.0.0.1:%s", config.Startup.EtcdPort),
+				},
+				{
+					Container: "9212",
+					Host:      config.Startup.OverlayPort,
+				},
+			},
+			Volumes: []v1.ContainersVolume{
+				{
+					Name:       "docker-socket",
+					Type:       "bind",
+					HostPath:   "/var/run/docker.sock",
+					MountPoint: "/var/run/docker.sock",
+				},
+				{
+					Name:       "smr",
+					Type:       "bind",
+					HostPath:   fmt.Sprintf("%s/.%s", config.Environment.Home, name),
+					MountPoint: "/home/node/smr",
+				},
+				{
+					Name:       "ssh",
+					Type:       "bind",
+					HostPath:   fmt.Sprintf("%s/.ssh", config.Environment.Home),
+					MountPoint: "/home/node/.ssh",
+				},
+				{
+					Name:       "tmp",
+					Type:       "bind",
+					HostPath:   "/tmp",
+					MountPoint: "/tmp",
+				},
+			},
+			Replicas: 1,
+			Dns:      []string{"127.0.0.1"},
 		},
 	}
 

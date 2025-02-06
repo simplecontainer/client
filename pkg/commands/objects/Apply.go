@@ -38,7 +38,6 @@ func Apply() contracts.Command {
 					fmt.Println(err)
 				} else {
 					if definition != nil {
-						fmt.Println(string(definition))
 						response := apply.Apply(mgr.Context, definition)
 
 						if response.Success {

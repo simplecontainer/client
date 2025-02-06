@@ -6,8 +6,8 @@ import (
 	"github.com/fatih/color"
 	"github.com/rodaine/table"
 	"github.com/simplecontainer/client/pkg/helpers"
-	"github.com/simplecontainer/smr/pkg/kinds/container/platforms"
-	"github.com/simplecontainer/smr/pkg/kinds/container/platforms/engines/docker"
+	"github.com/simplecontainer/smr/pkg/kinds/containers/platforms"
+	"github.com/simplecontainer/smr/pkg/kinds/containers/platforms/engines/docker"
 	"github.com/simplecontainer/smr/pkg/static"
 	"github.com/spf13/viper"
 	"time"
@@ -91,7 +91,7 @@ func Container(objects []json.RawMessage) {
 				}
 			}
 
-			for _, u := range ghost.Platform.(*docker.Docker).Definition.Spec.Container.Dependencies {
+			for _, u := range ghost.Platform.(*docker.Docker).Definition.Spec.Dependencies {
 				info.Dependencies += fmt.Sprintf("%s.%s ", u.Group, u.Name)
 			}
 
