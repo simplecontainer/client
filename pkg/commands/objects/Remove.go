@@ -11,7 +11,6 @@ import (
 	"github.com/simplecontainer/client/pkg/manager"
 	v1 "github.com/simplecontainer/smr/pkg/definitions/v1"
 	common "github.com/simplecontainer/smr/pkg/kinds/common"
-	"github.com/simplecontainer/smr/pkg/static"
 	"os"
 )
 
@@ -55,8 +54,8 @@ func Remove() contracts.Command {
 				if err != nil {
 					fmt.Println(err)
 				} else {
-					request.Definition.GetState().AddOpt("action", static.REMOVE_KIND)
-					bytes, err := request.Definition.ToJsonForUser()
+					var bytes []byte
+					bytes, err = request.Definition.ToJsonForUser()
 
 					if err != nil {
 						fmt.Println(err)

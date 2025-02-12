@@ -117,19 +117,17 @@ func Container(objects []json.RawMessage) {
 	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
 	columnFmt := color.New(color.FgYellow).SprintfFunc()
 
+	fmt.Println(viper.GetString("o"))
+
 	switch viper.GetString("o") {
 	case "d":
-		tbl := table.New("NODE", "GROUP", "NAME", "DOCKER NAME", "IMAGE", "IP", "PORTS", "DEPS", "ENGINE STATE", "SMR STATE")
+		tbl := table.New("NODE", "RESOURCE", "PORTS", "DEPS", "ENGINE STATE", "SMR STATE")
 		tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 		for _, container := range display {
 			tbl.AddRow(
 				fmt.Sprintf("%s", container.NodeName),
-				helpers.CliRemoveComa(container.Group),
-				helpers.CliRemoveComa(container.Name),
-				helpers.CliRemoveComa(container.GeneratedName),
-				fmt.Sprintf("%s:%s", container.Image, container.Tag),
-				helpers.CliRemoveComa(container.IPs),
+				fmt.Sprintf("%s/%s/%s", static.KIND_CONTAINERS, helpers.CliRemoveComa(container.Group), helpers.CliRemoveComa(container.GeneratedName)),
 				helpers.CliRemoveComa(container.Ports),
 				helpers.CliRemoveComa(container.Dependencies),
 				container.DockerState,
@@ -140,14 +138,13 @@ func Container(objects []json.RawMessage) {
 		tbl.Print()
 		break
 	case "s":
-		tbl := table.New("NODE", "GROUP", "DOCKER NAME", "ENGINE STATE", "SMR STATE")
+		tbl := table.New("NODE", "RESOURCE", "ENGINE STATE", "SMR STATE")
 		tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 		for _, container := range display {
 			tbl.AddRow(
 				fmt.Sprintf("%s", container.NodeName),
-				helpers.CliRemoveComa(container.Group),
-				helpers.CliRemoveComa(container.GeneratedName),
+				fmt.Sprintf("%s/%s/%s", static.KIND_CONTAINERS, helpers.CliRemoveComa(container.Group), helpers.CliRemoveComa(container.GeneratedName)),
 				container.DockerState,
 				fmt.Sprintf("%s%s (%s)", container.SmrState, helpers.CliMask(container.Recreated, " (*)", ""), container.LastUpdate),
 			)
