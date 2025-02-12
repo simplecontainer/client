@@ -1,7 +1,6 @@
 package alias
 
 import (
-	"fmt"
 	"github.com/simplecontainer/client/pkg/command"
 	"github.com/simplecontainer/client/pkg/commands/control"
 	"github.com/simplecontainer/client/pkg/contracts"
@@ -31,8 +30,6 @@ func Ps() contracts.Command {
 						os.Args[2] = "container"
 					}
 				}
-
-				fmt.Println(os.Args)
 
 				comm := control.List()
 
