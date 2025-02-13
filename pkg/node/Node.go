@@ -114,7 +114,7 @@ func (node *Node) Start() error {
 }
 
 func (node *Node) Run() error {
-	_, err := node.Container.Run()
+	err := node.Container.Run()
 
 	return err
 }
@@ -139,7 +139,7 @@ func (node *Node) Wait(desired string) error {
 
 func (node *Node) Check(desired string, ch chan bool) {
 	for {
-		state, _ := node.Container.GetContainerState()
+		state, _ := node.Container.GetState()
 
 		if desired == state.State {
 			ch <- true

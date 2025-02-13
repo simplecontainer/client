@@ -9,9 +9,11 @@ import (
 	smrContext "github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/definitions"
 	"github.com/simplecontainer/client/pkg/logger"
+	"github.com/simplecontainer/smr/pkg/network"
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -56,6 +58,8 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 
 	watcher := cli.Watch(ctx, "/coreos.com/network/subnets", clientv3.WithPrefix())
 	fmt.Println("client will wait for flannel to return subnet range")
+
+	recursion := make(map[string]string)
 
 	for {
 		select {
@@ -102,25 +106,38 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 									break
 								}
 
-								go func() {
-									var kach <-chan *clientv3.LeaseKeepAliveResponse
-									kach, err = cli.KeepAlive(ctx, clientv3.LeaseID(event.Kv.Lease))
+								if recursion[string(event.Kv.Key)] == string(event.Kv.Value) {
+									continue
+								}
 
-									for {
-										select {
-										case data, ok := <-kach:
-											if ok {
-												fmt.Println(fmt.Sprintf("keep alived: %s", data.String()))
-												break
-											} else {
-												fmt.Println(fmt.Sprintf("closed keep alive channel for lease: %s", event.Kv.Lease))
-												return
+								recursion[string(event.Kv.Key)] = string(event.Kv.Value)
+								response := network.Send(smrCtx.Client, fmt.Sprintf("%s/api/v1/key/propose/%s", smrCtx.ApiURL, event.Kv.Key), http.MethodPost, event.Kv.Value)
+
+								if response.Success {
+									go func() {
+										var kach <-chan *clientv3.LeaseKeepAliveResponse
+										kach, err = cli.KeepAlive(ctx, clientv3.LeaseID(event.Kv.Lease))
+
+										for {
+											select {
+											case data, ok := <-kach:
+												if ok {
+													fmt.Println(fmt.Sprintf("keep alived: %s", data.String()))
+													break
+												} else {
+													fmt.Println(fmt.Sprintf("closed keep alive channel for lease: %s", event.Kv.Lease))
+													return
+												}
 											}
 										}
-									}
-								}()
+									}()
+								} else {
+									fmt.Println("flannel failed to inform members about subnet decision - abort startup")
+									os.Exit(1)
+								}
 							}
 						}
+
 					}
 				}
 			}
