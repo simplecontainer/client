@@ -19,6 +19,7 @@ func Gitops(objects []json.RawMessage) {
 		err := json.Unmarshal(obj, &gitopsObj)
 
 		if err != nil {
+			fmt.Println(err)
 			continue
 		}
 

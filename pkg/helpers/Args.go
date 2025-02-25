@@ -3,7 +3,7 @@ package helpers
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/simplecontainer/smr/pkg/contracts"
+	"github.com/simplecontainer/smr/pkg/contracts/iformat"
 	"github.com/simplecontainer/smr/pkg/f"
 	"github.com/simplecontainer/smr/pkg/static"
 	"os"
@@ -20,11 +20,11 @@ func GrabArg(index int) string {
 	return ""
 }
 
-func BuildFormat(arg string, group string) (contracts.Format, error) {
+func BuildFormat(arg string, group string) (iformat.Format, error) {
 	// Build proper format from arg based on info provided
 	// Default to prefix=simplecontainer.io, category=kind if missing
 
-	var format contracts.Format
+	var format iformat.Format
 	var err error = nil
 
 	split := strings.Split(arg, "/")
