@@ -31,7 +31,7 @@ func Remove() contracts.Command {
 				if err != nil {
 					fmt.Println(err)
 				} else {
-					fmt.Println(static.STATUS_RESPONSE_DELETED)
+					fmt.Println(static.RESPONSE_DELETED)
 				}
 			},
 		},
