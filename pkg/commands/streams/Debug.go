@@ -30,7 +30,7 @@ func Debug() contracts.Command {
 					os.Exit(1)
 				}
 
-				resp, err := network.Raw(mgr.Context.Client, fmt.Sprintf("%s/api/v1/debug/%s/%s", mgr.Context.ApiURL, format.ToString(), strconv.FormatBool(viper.GetBool("f"))), http.MethodGet, nil)
+				resp, err := network.Raw(mgr.Context.Client, fmt.Sprintf("%s/api/v1/debug/%s/%s/%s", mgr.Context.ApiURL, format.ToString(), viper.GetString("container"), strconv.FormatBool(viper.GetBool("f"))), http.MethodGet, nil)
 
 				if err != nil {
 					fmt.Println(err)

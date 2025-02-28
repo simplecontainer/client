@@ -27,7 +27,7 @@ func Refresh() contracts.Command {
 					os.Exit(1)
 				}
 
-				event := events.New(events.EVENT_REFRESH, static.KIND_GITOPS, static.KIND_GITOPS, format.GetGroup(), format.GetName(), nil)
+				event := events.New(events.EVENT_REFRESH, static.SMR_PREFIX, static.KIND_GITOPS, static.KIND_GITOPS, format.GetGroup(), format.GetName(), nil)
 
 				var bytes []byte
 				bytes, err = event.ToJson()

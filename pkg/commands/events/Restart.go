@@ -27,7 +27,7 @@ func Restart() contracts.Command {
 					os.Exit(1)
 				}
 
-				event := events.New(events.EVENT_RESTART, static.KIND_CONTAINER, static.KIND_CONTAINER, format.GetGroup(), format.GetName(), nil)
+				event := events.New(events.EVENT_RESTART, static.SMR_PREFIX, static.KIND_CONTAINER, static.KIND_CONTAINER, format.GetGroup(), format.GetName(), nil)
 
 				var bytes []byte
 				bytes, err = event.ToJson()

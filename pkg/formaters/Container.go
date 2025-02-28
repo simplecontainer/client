@@ -6,7 +6,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/rodaine/table"
 	"github.com/simplecontainer/client/pkg/helpers"
-	"github.com/simplecontainer/smr/pkg/kinds/containers/platforms"
+	"github.com/simplecontainer/smr/pkg/kinds/containers/platforms/containers"
 	"github.com/simplecontainer/smr/pkg/kinds/containers/platforms/engines/docker"
 	"github.com/simplecontainer/smr/pkg/static"
 	"github.com/spf13/viper"
@@ -42,9 +42,9 @@ func Container(objects []json.RawMessage) {
 
 		switch container["Type"].(string) {
 		case static.PLATFORM_DOCKER:
-			ghost := &platforms.Container{
+			ghost := &containers.Container{
 				Platform: &docker.Docker{},
-				General:  &platforms.General{},
+				General:  &containers.General{},
 				Type:     static.PLATFORM_DOCKER,
 			}
 
@@ -69,7 +69,6 @@ func Container(objects []json.RawMessage) {
 				Ports:         "",
 				Dependencies:  "",
 				DockerState:   "",
-				Recreated:     ghost.General.Status.Recreated,
 				SmrState:      ghost.General.Status.State.State,
 			}
 
@@ -107,8 +106,8 @@ func Container(objects []json.RawMessage) {
 
 			info.LastUpdate = time.Since(ghost.GetStatus().LastUpdate).Round(time.Second)
 
-			info.NodeURL = ghost.General.Runtime.NodeURL
-			info.NodeName = ghost.General.Runtime.NodeName
+			info.NodeURL = ghost.General.Runtime.Node.URL
+			info.NodeName = ghost.General.Runtime.Node.NodeName
 
 			display = append(display, info)
 		}

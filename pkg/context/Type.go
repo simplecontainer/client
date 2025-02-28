@@ -10,6 +10,7 @@ type Context struct {
 	ApiURL        string
 	Name          string
 	CertBundle    string
+	PKCS12        string
 	Ca            *bytes.Buffer `json:"-"`
 	Cert          *bytes.Buffer `json:"-"`
 	PrivateKey    *bytes.Buffer `json:"-"`

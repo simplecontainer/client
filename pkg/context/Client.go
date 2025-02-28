@@ -32,9 +32,9 @@ func (context *Context) GenerateHttpClient(CertBundle []byte) (*http.Client, err
 				})
 			}
 
-		case "PRIVATE KEY":
+		case "EC PRIVATE KEY":
 			pem.Encode(context.PrivateKey, &pem.Block{
-				Type:  "PRIVATE KEY",
+				Type:  "EC PRIVATE KEY",
 				Bytes: block.Bytes,
 			})
 

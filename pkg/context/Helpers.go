@@ -84,19 +84,16 @@ func decrypt(encryptedString string, keyString string) (string, error) {
 	key, _ := hex.DecodeString(keyString)
 	enc, _ := hex.DecodeString(encryptedString)
 
-	//Create a new Cipher Block from the key
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return "", err
 	}
 
-	//Create a new GCM
 	aesGCM, err := cipher.NewGCM(block)
 	if err != nil {
 		return "", err
 	}
 
-	//Get the nonce size
 	nonceSize := aesGCM.NonceSize()
 
 	if nonceSize > len(enc) {

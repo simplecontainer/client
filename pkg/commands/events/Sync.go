@@ -27,7 +27,7 @@ func Sync() contracts.Command {
 					os.Exit(1)
 				}
 
-				event := events.New(events.EVENT_SYNC, static.KIND_GITOPS, static.KIND_GITOPS, format.GetGroup(), format.GetName(), nil)
+				event := events.New(events.EVENT_SYNC, static.SMR_PREFIX, static.KIND_GITOPS, static.KIND_GITOPS, format.GetGroup(), format.GetName(), nil)
 
 				var bytes []byte
 				bytes, err = event.ToJson()
