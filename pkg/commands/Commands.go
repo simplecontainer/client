@@ -32,7 +32,6 @@ func PreloadCommands() {
 	Commands = append(Commands, control.Get())
 	Commands = append(Commands, control.List())
 	Commands = append(Commands, control.Edit())
-	Commands = append(Commands, control.Remove())
 
 	Commands = append(Commands, alias.Ps())
 

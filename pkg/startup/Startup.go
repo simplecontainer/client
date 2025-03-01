@@ -68,7 +68,7 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.String("context", "", "Context name")
 
 	// Cli flags
-	flag.String("w", "exited", "Wait for container to be in defined state")
+	flag.String("w", "", "Wait for container to be in defined state")
 	flag.Bool("f", false, "Follow logs")
 	flag.String("o", "d", "Output type: d(efault),s(hort)")
 	flag.Bool("y", false, "Say yes to everything")
