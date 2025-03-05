@@ -26,6 +26,7 @@ func PreloadCommands() {
 	Commands = append(Commands, objects.Remove())
 	Commands = append(Commands, streams.Debug())
 	Commands = append(Commands, streams.Logs())
+	Commands = append(Commands, streams.Exec())
 
 	Commands = append(Commands, cluster.Node())
 

@@ -8,6 +8,7 @@ import (
 )
 
 func Event(context *context.Context, prefix string, version string, category string, kind string, group string, name string, data []byte) {
+	fmt.Println(fmt.Sprintf("%s/api/v1/kind/propose/%s/%s/%s/%s/%s/%s", context.ApiURL, prefix, version, category, kind, group, name))
 	response := network.Send(context.Client, fmt.Sprintf("%s/api/v1/kind/propose/%s/%s/%s/%s/%s/%s", context.ApiURL, prefix, version, category, kind, group, name), http.MethodPost, data)
 
 	if response.Success {

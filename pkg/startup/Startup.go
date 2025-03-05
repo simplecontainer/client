@@ -30,7 +30,7 @@ func Load(configObj *configuration.Configuration) {
 		EnableIPv4:         viper.GetBool("fenableIPv4"),
 		EnableIPv6:         viper.GetBool("fenableIPv6"),
 		IPv6Masq:           viper.GetBool("fmaskIPv6"),
-		//
+
 		ConfigFile:       "/run/flannel/subnet.env",
 		Network:          ip.IP4Net{},
 		Networkv6:        ip.IP6Net{},
@@ -73,6 +73,8 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.String("o", "d", "Output type: d(efault),s(hort)")
 	flag.Bool("y", false, "Say yes to everything")
 	flag.String("g", "default", "Group")
+	flag.Bool("it", false, "Interactive exec")
+	flag.String("c", "", "Command for exec")
 	flag.String("container", "main", "Which container to stream main or init?")
 
 	// Node flags
