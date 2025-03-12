@@ -3,10 +3,11 @@ package objects
 import (
 	"fmt"
 	"github.com/simplecontainer/client/pkg/command"
-	"github.com/simplecontainer/client/pkg/commands/objects/apply"
 	"github.com/simplecontainer/client/pkg/contracts"
-	"github.com/simplecontainer/client/pkg/definitions"
+	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/client/pkg/manager"
+	"github.com/simplecontainer/smr/pkg/packer"
+	"github.com/simplecontainer/smr/pkg/relations"
 	"net/url"
 	"os"
 )
@@ -20,34 +21,86 @@ func Apply() contracts.Command {
 		Functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
 				if len(os.Args) < 2 {
-					fmt.Println("try to specify a file")
+					fmt.Println("try to specify a path/url")
 					return
 				}
 
 				u, err := url.ParseRequestURI(args[2])
 
-				var definition []byte
+				var pack = packer.New()
 
 				if err != nil || !u.IsAbs() {
-					definition, err = definitions.ReadFile(args[2])
-				} else {
-					definition, err = definitions.DownloadFile(u)
-				}
+					var stat os.FileInfo
+					stat, err = os.Stat(args[2])
 
-				if err != nil {
-					fmt.Println(err)
-				} else {
-					if definition != nil {
-						response := apply.Apply(mgr.Context, definition)
+					if os.IsNotExist(err) {
+						fmt.Println("path does not exist")
+						return
+					}
 
-						if response.Success {
-							fmt.Println(response.Explanation)
-						} else {
-							fmt.Println(response.ErrorExplanation)
+					if stat.IsDir() {
+						kinds := relations.NewDefinitionRelationRegistry()
+						kinds.InTree()
+
+						pack, err = packer.Read(args[2], kinds)
+
+						if err != nil {
+							fmt.Println(err)
+							os.Exit(1)
 						}
 					} else {
-						fmt.Println("specified file/url is not valid definition")
+						var definitions []byte
+						definitions, err = packer.ReadYAMLFile(args[2])
+
+						if err != nil {
+							fmt.Println(err.Error())
+							os.Exit(1)
+						}
+
+						pack.Definitions, err = packer.Parse(definitions)
+
+						if err != nil {
+							fmt.Println(err.Error())
+							os.Exit(1)
+						}
 					}
+				} else {
+					var definitions []byte
+					definitions, err = packer.Download(u)
+
+					if err != nil {
+						fmt.Println(err.Error())
+						os.Exit(1)
+					}
+
+					pack.Definitions, err = packer.Parse(definitions)
+
+					if err != nil {
+						fmt.Println(err.Error())
+						os.Exit(1)
+					}
+				}
+
+				if len(pack.Definitions) != 0 {
+					for _, definition := range pack.Definitions {
+						var ApiURL string
+						ApiURL, err = helpers.GetDomainAndPort(mgr.Context.ApiURL)
+
+						if err != nil {
+							fmt.Println(err.Error())
+							os.Exit(1)
+						}
+
+						err = definition.ProposeApply(mgr.Context.Client, ApiURL)
+
+						if err != nil {
+							fmt.Println(err)
+						} else {
+							fmt.Println(fmt.Sprintf("object applied: %s", definition.Definition.GetKind()))
+						}
+					}
+				} else {
+					fmt.Println("specified file/url is not valid definition")
 				}
 			},
 		},

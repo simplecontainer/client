@@ -1,6 +1,7 @@
 package alias
 
 import (
+	"fmt"
 	"github.com/simplecontainer/client/pkg/command"
 	"github.com/simplecontainer/client/pkg/commands/control"
 	"github.com/simplecontainer/client/pkg/contracts"
@@ -26,8 +27,8 @@ func Ps() contracts.Command {
 					os.Args = append(os.Args, "container")
 				} else {
 					if !slices.Contains([]string{"containers", "gitops"}, helpers.GrabArg(2)) {
-						os.Args = append(os.Args[:3], os.Args[2:]...)
-						os.Args[2] = "container"
+						fmt.Println("please use format: smr ps containers/gitops")
+						os.Exit(1)
 					}
 				}
 
