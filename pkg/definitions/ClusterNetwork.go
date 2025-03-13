@@ -18,7 +18,7 @@ func FlannelDefinition(subnetCIDR string) *v1.NetworkDefinition {
 			Driver:          "bridge",
 			IPV4AddressPool: subnetCIDR,
 		},
-		State: &commonv1.State{Options: make([]*commonv1.Opts, 0)},
+		State: commonv1.NewState(),
 	}
 
 	definition.State.AddOpt("scope", "local")
