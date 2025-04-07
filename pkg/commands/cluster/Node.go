@@ -19,14 +19,7 @@ func Node() contracts.Command {
 		},
 		Functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				n, err := node.New(mgr.Configuration.Startup.Name, mgr.Configuration)
-
-				if err != nil {
-					panic(err)
-				}
-
-				switch helpers.GrabArg(2) {
-				case "cluster":
+				if helpers.GrabArg(2) == "cluster" {
 					switch os.Args[3] {
 					case "join":
 						nodes.Join(mgr)
@@ -35,74 +28,106 @@ func Node() contracts.Command {
 						nodes.Leave(mgr)
 						break
 					}
-				case "run":
-					err = nodes.Start(n)
+				} else {
+					n, err := node.New(mgr.Configuration.Setup.Node, mgr.Configuration)
 
 					if err != nil {
-						helpers.ExitWithErr(err)
+						panic(err)
 					}
 
-					if mgr.Configuration.Startup.W != "" {
-						err = n.Wait(mgr.Configuration.Startup.W)
+					err = node.Directory(n.Name, mgr.Configuration.Environment.Home)
+
+					if err != nil {
+						panic(err)
+					}
+
+					switch helpers.GrabArg(2) {
+					case "create":
+						err = nodes.Create(n, mgr.Configuration)
 
 						if err != nil {
 							helpers.ExitWithErr(err)
 						}
-					}
 
-					fmt.Println(n.Container.GetId())
-					break
-				case "rename":
-					err = nodes.Rename(n, helpers.GrabArg(3))
+						if mgr.Configuration.Flags.W != "" {
+							err = n.Wait(mgr.Configuration.Flags.W)
 
-					if err != nil {
-						helpers.ExitWithErr(err)
-					}
+							if err != nil {
+								helpers.ExitWithErr(err)
+							}
+						}
 
-					if mgr.Configuration.Startup.W != "" {
-						err = n.Wait(mgr.Configuration.Startup.W)
+						fmt.Println(n.Container.GetId())
+						break
+					case "run":
+						err = nodes.Run(n)
 
 						if err != nil {
 							helpers.ExitWithErr(err)
 						}
-					}
 
-					fmt.Println("node renamed")
-					break
-				case "restart":
-					err = nodes.Restart(n)
+						if mgr.Configuration.Flags.W != "" {
+							err = n.Wait(mgr.Configuration.Flags.W)
 
-					if err != nil {
-						helpers.ExitWithErr(err)
-					}
+							if err != nil {
+								helpers.ExitWithErr(err)
+							}
+						}
 
-					if mgr.Configuration.Startup.W != "" {
-						err = n.Wait(mgr.Configuration.Startup.W)
+						fmt.Println(n.Container.GetId())
+						break
+					case "rename":
+						err = nodes.Rename(n, helpers.GrabArg(3))
 
 						if err != nil {
 							helpers.ExitWithErr(err)
 						}
-					}
 
-					fmt.Println("node restarted")
-					break
-				case "stop":
-					err = nodes.Stop(n)
+						if mgr.Configuration.Flags.W != "" {
+							err = n.Wait(mgr.Configuration.Flags.W)
 
-					if err != nil {
-						helpers.ExitWithErr(err)
-					}
+							if err != nil {
+								helpers.ExitWithErr(err)
+							}
+						}
 
-					if mgr.Configuration.Startup.W != "" {
-						err = n.Wait(mgr.Configuration.Startup.W)
+						fmt.Println("node renamed")
+						break
+					case "restart":
+						err = nodes.Restart(n)
 
 						if err != nil {
 							helpers.ExitWithErr(err)
 						}
-					}
 
-					fmt.Println("node stopped")
-					break
+						if mgr.Configuration.Flags.W != "" {
+							err = n.Wait(mgr.Configuration.Flags.W)
+
+							if err != nil {
+								helpers.ExitWithErr(err)
+							}
+						}
+
+						fmt.Println("node restarted")
+						break
+					case "stop":
+						err = nodes.Stop(n)
+
+						if err != nil {
+							helpers.ExitWithErr(err)
+						}
+
+						if mgr.Configuration.Flags.W != "" {
+							err = n.Wait(mgr.Configuration.Flags.W)
+
+							if err != nil {
+								helpers.ExitWithErr(err)
+							}
+						}
+
+						fmt.Println("node stopped")
+						break
+					}
 				}
 			},
 		},

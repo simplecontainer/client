@@ -3,70 +3,90 @@ package startup
 import (
 	"flag"
 	"fmt"
-	"github.com/flannel-io/flannel/pkg/ip"
 	"github.com/simplecontainer/client/pkg/configuration"
 	"github.com/simplecontainer/smr/pkg/static"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"go.uber.org/zap"
-	"net"
+	"gopkg.in/yaml.v3"
 	"os"
 )
 
-func Load(configObj *configuration.Configuration) {
-	configObj.Environment = GetEnvironmentInfo()
-	ReadFlags(configObj)
-
-	err := viper.Unmarshal(&configObj.Startup)
-
-	if err != nil {
-		panic(err)
-	}
-
-	configObj.Flannel = &configuration.Flannel{
-		Backend:            viper.GetString("fbackend"),
-		CIDR:               make([]*net.IPNet, 0),
-		InterfaceSpecified: nil,
-		EnableIPv4:         viper.GetBool("fenableIPv4"),
-		EnableIPv6:         viper.GetBool("fenableIPv6"),
-		IPv6Masq:           viper.GetBool("fmaskIPv6"),
-
-		ConfigFile:       "/run/flannel/subnet.env",
-		Network:          ip.IP4Net{},
-		Networkv6:        ip.IP6Net{},
-		InterfaceFlannel: nil,
-	}
-
-	var CIDR *net.IPNet
-	_, CIDR, err = net.ParseCIDR(viper.GetString("fcidr"))
-
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	configObj.Flannel.CIDR = []*net.IPNet{CIDR}
-	configObj.Flannel.InterfaceSpecified, _ = net.InterfaceByName(viper.GetString("finterface"))
-
-	if viper.GetBool("fenableIPv4") {
-		if _, err = os.Stat("/proc/sys/net/bridge/bridge-nf-call-iptables"); os.IsNotExist(err) {
-			fmt.Println("Failed to check br_netfilter: ", zap.Error(err))
-			os.Exit(1)
-		}
-	}
-
-	if viper.GetBool("fenableIPv6") {
-		if _, err = os.Stat("/proc/sys/net/bridge/bridge-nf-call-ip6tables"); os.IsNotExist(err) {
-			fmt.Println("Failed to check br_netfilter: ", zap.Error(err))
-			os.Exit(1)
-		}
-	}
+func LoadFromFlagsDynamic(configObj *configuration.Configuration) {
+	_ = UnmarshalFields(viper.GetViper(), []string{
+		"api", "join", "node", "config",
+	}, &configObj.Dynamic)
 }
 
-func ReadFlags(configObj *configuration.Configuration) {
-	/* Operation mode */
-	flag.String("context", "", "Context name")
+func LoadFromFlags(configObj *configuration.Configuration) {
+	_ = UnmarshalFields(viper.GetViper(), []string{
+		"y", "f", "o", "w", "g",
+	}, &configObj.Flags)
 
+	_ = UnmarshalFields(viper.GetViper(), []string{
+		"platform", "node", "context", "log", "domains", "ips", "image", "tag", "entrypoint", "args", "hostport", "overlayport", "etcdport",
+	}, &configObj.Setup)
+
+	_ = UnmarshalFields(viper.GetViper(), []string{
+		"fbackend", "fcidr", "fiface",
+	}, &configObj.Network)
+
+	_ = UnmarshalFields(viper.GetViper(), []string{
+		"api", "join", "node",
+	}, &configObj.Dynamic)
+
+	_ = UnmarshalFields(viper.GetViper(), []string{
+		"fbackend", "fcidr", "finterface", "fenableIPv4", "fenableIPv6", "fmaskIPv6",
+	}, &configObj.Flannel)
+}
+
+func Load(node string, environment *configuration.Environment) (*configuration.Configuration, error) {
+	configObj := configuration.NewConfig()
+	path := fmt.Sprintf("%s/%s/%s/%s.yaml", environment.Home, static.ROOTSMR, static.CONFIGDIR, node)
+
+	file, err := os.Open(path)
+
+	defer func() {
+		file.Close()
+	}()
+
+	if err != nil {
+		return configObj, err
+	}
+
+	viper.SetConfigType("yaml")
+	err = viper.ReadConfig(file)
+
+	if err != nil {
+		return configObj, err
+	}
+
+	err = viper.Unmarshal(configObj)
+
+	if err != nil {
+		return configObj, err
+	}
+
+	return configObj, err
+}
+
+func Save(configObj *configuration.Configuration) error {
+	yamlObj, err := yaml.Marshal(*configObj)
+
+	if err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("%s/%s/%s/%s.yaml", configObj.Environment.Home, static.ROOTSMR, static.CONFIGDIR, configObj.Dynamic.Node)
+
+	err = os.WriteFile(path, yamlObj, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ReadFlags() {
 	// Cli flags
 	flag.String("w", "", "Wait for container to be in defined state")
 	flag.Bool("f", false, "Follow logs")
@@ -75,13 +95,12 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.String("g", "default", "Group")
 	flag.Bool("it", false, "Interactive exec")
 	flag.String("c", "", "Command for exec")
+	flag.String("context", "", "Context")
 	flag.String("container", "main", "Which container to stream main or init?")
 
-	// Node flags
+	// Node setup flags
 	flag.String("image", "quay.io/simplecontainer/smr", "The smr image repo")
 	flag.String("tag", "latest", "The smr image tag")
-	flag.String("entrypoint", "/opt/smr/smr", "Entrypoint for the smr")
-	flag.String("args", "create smr --agent smr-agent", "args")
 	flag.String("hostport", "1443", "Expose smr on hostport")
 	flag.String("overlayport", "", "Expose overlay on port")
 	flag.String("etcdport", "2379", "Etcd client port listen and advertise")
@@ -96,14 +115,27 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.String("fiface", "", "Network interface for flannel to use, if ommited default gateway will be used")
 
 	flag.String("platform", static.PLATFORM_DOCKER, "Container engine name. Supported: [docker]")
-	flag.String("name", "smr-agent", "Name of the smr agent container")
+	flag.String("node", "", "Name of the smr agent container")
 
-	// Cluster configuration
-	flag.String("node", "", "Reachable Node https://URL:PORT URL")
+	// Dynamic configuration (Not preserved in client config.yaml)
+	flag.String("api", "", "Reachable Node https://URL:PORT URL")
 	flag.String("join", "", "Reachable URL of one member of the cluster")
+	flag.String("config", "client", "Name of configuration for specific node (used for node management only)")
+	flag.String("entrypoint", "/opt/smr/smr", "Entrypoint for the smr")
+	flag.String("args", "create smr --node smr", "args")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()
 
 	viper.BindPFlags(pflag.CommandLine)
+
+	os.Args = append([]string{os.Args[0]}, pflag.Args()...)
+}
+
+func UnmarshalFields(v *viper.Viper, keys []string, target interface{}) error {
+	sub := viper.New()
+	for _, key := range keys {
+		sub.Set(key, v.Get(key))
+	}
+	return sub.Unmarshal(target)
 }

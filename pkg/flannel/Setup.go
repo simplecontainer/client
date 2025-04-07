@@ -31,16 +31,52 @@ const (
 func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.Configuration, agent string) error {
 	logger.LogFlannel.Info("starting flannel with backend", zap.String("backend", config.Flannel.Backend))
 
-	netMode, err := findNetMode(config.Flannel.CIDR)
+	f := New(subnetFile)
+	err := f.Clear()
+
+	if err != nil {
+		return err
+	}
+
+	err = f.SetBackend(config.Flannel.Backend)
+
+	if err != nil {
+		return err
+	}
+
+	err = f.EnableIPv4(config.Flannel.EnableIPv4)
+
+	if err != nil {
+		return err
+	}
+
+	err = f.EnableIPv6(config.Flannel.EnableIPv6)
+
+	if err != nil {
+		return err
+	}
+
+	f.MaskIPv6(config.Flannel.IPv6Masq)
+
+	err = f.SetCIDR(config.Flannel.CIDR)
+
+	if err != nil {
+		return err
+	}
+
+	err = f.SetInterface(config.Flannel.InterfaceSpecified)
+
+	if err != nil {
+		return err
+	}
+
+	netMode, err := findNetMode(f.CIDR)
 	if err != nil {
 		return errors.Wrap(err, "failed to check netMode for flannel")
 	}
 
-	// Remove on start
-	os.Remove("/run/flannel/subnet.env")
-
 	go func() {
-		err = flannel(ctx, config, config.Flannel.InterfaceSpecified, config.Flannel.IPv6Masq, netMode)
+		err = flannel(ctx, f, f.InterfaceSpecified, f.IPv6Masq, f.NetMode)
 		if err != nil {
 			fmt.Println("flannel exited: %v", zap.Error(err))
 		}
@@ -48,7 +84,7 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 
 	var cli *clientv3.Client
 	cli, err = clientv3.New(clientv3.Config{
-		Endpoints:   []string{"localhost:2379"},
+		Endpoints:   []string{fmt.Sprintf("localhost:%s", config.Setup.EtcdPort)},
 		DialTimeout: 5 * time.Second,
 	})
 
@@ -81,9 +117,9 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 
 								switch netMode {
 								case ipv4:
-									fmt.Println("checking if mine  ", config.Flannel.InterfaceFlannel.ExtAddr.String(), " == ", subnet.PublicIP)
+									fmt.Println("checking if mine  ", f.Interface.ExtAddr.String(), " == ", subnet.PublicIP)
 
-									if config.Flannel.InterfaceFlannel.ExtAddr.String() == subnet.PublicIP {
+									if f.Interface.ExtAddr.String() == subnet.PublicIP {
 										fmt.Println("adding it as my own subnet", string(event.Kv.Key))
 
 										split := strings.Split(string(event.Kv.Key), "/")
@@ -94,7 +130,7 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 									}
 									break
 								case ipv6:
-									if config.Flannel.InterfaceFlannel.ExtV6Addr.String() == subnet.PublicIPv6 {
+									if f.Interface.ExtV6Addr.String() == subnet.PublicIPv6 {
 										split := strings.Split(string(event.Kv.Key), "/")
 										CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
 

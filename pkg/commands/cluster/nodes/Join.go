@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/simplecontainer/client/pkg/flannel"
 	"github.com/simplecontainer/client/pkg/manager"
+	"github.com/simplecontainer/client/pkg/upgrader"
 	"github.com/simplecontainer/smr/pkg/network"
 	"golang.org/x/net/context"
 	"net/http"
@@ -13,11 +14,11 @@ import (
 
 func Join(mgr *manager.Manager) {
 	data, err := json.Marshal(map[string]any{
-		"join":     mgr.Configuration.Startup.Join,
-		"node":     mgr.Configuration.Startup.Node,
-		"nodeName": mgr.Configuration.Startup.Name,
-		"overlay":  mgr.Configuration.Startup.Fcidr,
-		"backend":  mgr.Configuration.Startup.Fbackend,
+		"join":     mgr.Configuration.Dynamic.Join,
+		"node":     mgr.Configuration.Dynamic.API,
+		"nodeName": mgr.Configuration.Setup.Node,
+		"overlay":  mgr.Configuration.Network.Fcidr,
+		"backend":  mgr.Configuration.Network.Fbackend,
 	})
 
 	if err != nil {
@@ -48,8 +49,9 @@ func Join(mgr *manager.Manager) {
 		}
 
 		if response.Success {
-			for {
-				ctx := context.Background()
+			ctx := context.Background()
+
+			go func() {
 				err = flannel.Run(ctx, mgr.Context, mgr.Configuration, data["name"])
 
 				if err != nil {
@@ -57,7 +59,9 @@ func Join(mgr *manager.Manager) {
 				}
 
 				fmt.Println("flannel exited - try to recover")
-			}
+			}()
+
+			upgrader.Upgrader(mgr)
 		} else {
 			fmt.Println(response.ErrorExplanation)
 		}

@@ -6,11 +6,5 @@ import (
 )
 
 func Rename(n *node.Node, name string) error {
-	err := n.Directory(n.Name, n.Home)
-
-	if err != nil {
-		return err
-	}
-
 	return n.Rename(fmt.Sprintf("%s", name))
 }

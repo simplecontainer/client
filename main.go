@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/simplecontainer/client/pkg/bootstrap"
 	"github.com/simplecontainer/client/pkg/commands"
 	_ "github.com/simplecontainer/client/pkg/commands"
@@ -11,24 +12,35 @@ import (
 	"github.com/simplecontainer/client/pkg/manager"
 	"github.com/simplecontainer/client/pkg/startup"
 	"github.com/simplecontainer/smr/pkg/static"
+	"github.com/spf13/viper"
 	"log"
 	"os"
 )
 
 func main() {
-	config := configuration.NewConfig()
-	startup.Load(config)
-
 	logLevel := os.Getenv("LOG_LEVEL")
 	if logLevel == "" {
 		logLevel = static.DEFAULT_LOG_LEVEL
 	}
 
+	startup.ReadFlags()
+	config, err := startup.Load(viper.GetString("node"), configuration.GetEnvironmentInfo())
+
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			startup.LoadFromFlags(config)
+		} else {
+			log.Fatal(err)
+		}
+	} else {
+		startup.LoadFromFlagsDynamic(config)
+	}
+
+	bootstrap.CreateDirectoryTree(config.Environment.ClientDirectory)
+
 	managerObj := &manager.Manager{}
 	managerObj.VersionClient = SMR_VERSION
 	managerObj.Configuration = config
-
-	bootstrap.CreateDirectoryTree(managerObj.Configuration.Environment.ClientDirectory)
 
 	logger.Log = logger.NewLogger(config.Environment.LogsDirectory, logLevel)
 	logger.LogFlannel = logger.NewLoggerFlannel(config.Environment.LogsDirectory, logLevel)
