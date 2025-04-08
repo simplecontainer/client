@@ -10,8 +10,8 @@ import (
 	"os"
 )
 
-func (context *Context) ImportCertificates(key string) error {
-	response := network.Send(context.Client, fmt.Sprintf("%s/fetch/certs", context.ApiURL), http.MethodGet, nil)
+func (c *Context) ImportCertificates(key string) error {
+	response := network.Send(c.Client, fmt.Sprintf("%s/fetch/certs", c.ApiURL), http.MethodGet, nil)
 
 	if response.Success {
 		keysEncrypted := keys.Encrypted{}

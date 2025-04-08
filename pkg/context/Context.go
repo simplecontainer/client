@@ -3,7 +3,7 @@ package context
 import (
 	"bytes"
 	"fmt"
-	"github.com/simplecontainer/client/pkg/logger"
+	"github.com/golang/glog"
 	"github.com/simplecontainer/client/pkg/static"
 	"go.uber.org/zap"
 )
@@ -21,18 +21,18 @@ func NewContext(projectDir string) *Context {
 	}
 }
 
-func (context *Context) LoadContext() *Context {
-	if context.GetActiveContext() {
-		if context.ReadFromFile() {
+func (c *Context) LoadContext() *Context {
+	if c.GetActiveContext() {
+		if c.ReadFromFile() {
 			var err error
-			context.Client, err = context.GenerateHttpClient([]byte(context.CertBundle))
+			c.Client, err = c.GenerateHttpClient([]byte(c.CertBundle))
 
 			if err != nil {
-				logger.Log.Info("failed to generate http client", zap.String("error", err.Error()))
+				glog.Info("failed to generate http client", zap.String("error", err.Error()))
 				return nil
 			}
 
-			return context
+			return c
 		}
 	}
 

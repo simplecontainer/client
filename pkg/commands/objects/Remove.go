@@ -22,7 +22,7 @@ func Remove() contracts.Command {
 		},
 		Functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				format, err := helpers.BuildFormat(helpers.GrabArg(2), mgr.Configuration.Flags.G)
+				format, err := helpers.BuildFormat(helpers.GrabArg(2), mgr.Configuration.G)
 
 				if err != nil {
 					fmt.Println(err)
@@ -55,7 +55,7 @@ func Remove() contracts.Command {
 					fmt.Println(err)
 				} else {
 					var bytes []byte
-					bytes, err = request.Definition.ToJsonForUser()
+					bytes, err = request.Definition.ToJSONForUser()
 
 					if err != nil {
 						fmt.Println(err)

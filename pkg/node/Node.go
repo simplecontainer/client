@@ -9,7 +9,6 @@ import (
 	v1 "github.com/simplecontainer/smr/pkg/definitions/v1"
 	"github.com/simplecontainer/smr/pkg/kinds/containers/platforms/engines/docker"
 	"github.com/simplecontainer/smr/pkg/static"
-	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 	"os"
 	"strings"
@@ -21,18 +20,18 @@ func New(name string, config *configuration.Configuration) (*Node, error) {
 		Name:       name,
 		Home:       config.Environment.Home,
 		Definition: Definition(name, config),
-		Platform:   config.Setup.Platform,
+		Platform:   config.Static.Platform,
 	}
 
 	var err error
 
-	switch config.Setup.Platform {
+	switch config.Static.Platform {
 	case static.PLATFORM_DOCKER:
 		if err = docker.IsDaemonRunning(); err != nil {
 			helpers.ExitWithErr(err)
 		}
 
-		node.Container, err = docker.New(config.Setup.Node, node.Definition)
+		node.Container, err = docker.New(config.Node, node.Definition)
 		break
 	default:
 		return nil, errors.New("platform not supported")
@@ -53,25 +52,25 @@ func Definition(name string, config *configuration.Configuration) *v1.Containers
 			Labels: nil,
 		},
 		Spec: v1.ContainersInternal{
-			Image: config.Setup.Image,
-			Tag:   config.Setup.Tag,
+			Image: config.Image,
+			Tag:   config.Tag,
 			Envs: []string{
-				fmt.Sprintf("LOG_LEVEL=%s", config.Setup.LogLevel),
+				fmt.Sprintf("LOG_LEVEL=%s", config.Static.LogLevel),
 			},
-			Entrypoint: strings.Split(viper.GetString("entrypoint"), " "),
-			Args:       strings.Split(viper.GetString("args"), " "),
+			Entrypoint: strings.Split(config.Entrypoint, " "),
+			Args:       strings.Split(config.Args, " "),
 			Ports: []v1.ContainersPort{
 				{
 					Container: "1443",
-					Host:      config.Setup.HostPort,
+					Host:      config.Static.HostPort,
 				},
 				{
 					Container: "2379",
-					Host:      fmt.Sprintf("127.0.0.1:%s", config.Setup.EtcdPort),
+					Host:      fmt.Sprintf("127.0.0.1:%s", config.Static.EtcdPort),
 				},
 				{
 					Container: "9212",
-					Host:      config.Setup.OverlayPort,
+					Host:      config.Static.OverlayPort,
 				},
 			},
 			Volumes: []v1.ContainersVolume{

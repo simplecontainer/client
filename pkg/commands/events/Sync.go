@@ -20,7 +20,7 @@ func Sync() contracts.Command {
 		},
 		Functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				format, err := helpers.BuildFormat(helpers.GrabArg(2), mgr.Configuration.Flags.G)
+				format, err := helpers.BuildFormat(helpers.GrabArg(2), mgr.Configuration.G)
 
 				if err != nil {
 					fmt.Println(err)
@@ -30,7 +30,7 @@ func Sync() contracts.Command {
 				event := events.New(events.EVENT_SYNC, static.KIND_GITOPS, static.SMR_PREFIX, static.KIND_GITOPS, format.GetGroup(), format.GetName(), nil)
 
 				var bytes []byte
-				bytes, err = event.ToJson()
+				bytes, err = event.ToJSON()
 
 				control.Event(mgr.Context, format.GetPrefix(), format.GetVersion(), static.CATEGORY_EVENT, format.GetKind(), format.GetGroup(), format.GetName(), bytes)
 			},

@@ -1,21 +1,22 @@
 package upgrader
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/golang/glog"
+	"github.com/simplecontainer/client/pkg/cluster"
 	"github.com/simplecontainer/client/pkg/commands/cluster/upgrade"
-	"github.com/simplecontainer/client/pkg/logger"
 	"github.com/simplecontainer/client/pkg/manager"
 	"github.com/simplecontainer/client/pkg/node"
-	"github.com/simplecontainer/smr/pkg/upgrader"
+	"github.com/simplecontainer/smr/pkg/controler"
 	clientv3 "go.etcd.io/etcd/client/v3"
+	"golang.org/x/net/context"
 	"time"
 )
 
 func Upgrader(mgr *manager.Manager) error {
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{fmt.Sprintf("localhost:%s", mgr.Configuration.Setup.EtcdPort)},
+		Endpoints:   []string{fmt.Sprintf("localhost:%s", mgr.Configuration.Static.EtcdPort)},
 		DialTimeout: 5 * time.Second,
 	})
 
@@ -23,41 +24,63 @@ func Upgrader(mgr *manager.Manager) error {
 		return err
 	}
 
-	fmt.Println("WATCHING UPGRADESSSS")
+	fmt.Println("listening for control events")
 
-	watcher := cli.Watch(context.Background(), "/smr/upgrade", clientv3.WithPrefix())
+	watcher := cli.Watch(context.Background(), "/smr/control", clientv3.WithPrefix())
 
 	for {
 		select {
 		case watchResp, ok := <-watcher:
 			if ok {
-				fmt.Println("XXXXXXXXXX")
-				var u *upgrader.Upgrade
 
-				err = json.Unmarshal(watchResp.Events[0].Kv.Value, &u)
+				var c *controler.Control
+
+				err = json.Unmarshal(watchResp.Events[0].Kv.Value, &c)
 
 				if err != nil {
-					logger.Log.Error(err.Error())
+					glog.Error(err.Error())
 					break
 				}
 
-				var n *node.Node
-				n, err = node.New(mgr.Configuration.Dynamic.Node, mgr.Configuration)
+				mgr.Configuration.Args = "start"
+
+				var n1 *node.Node
+				var n2 *node.Node
+
+				n1, err = node.New(mgr.Configuration.Node, mgr.Configuration)
 
 				if err != nil {
-					panic(err)
+					glog.Error(err.Error())
+					break
 				}
 
-				fmt.Println("GOT UPGRADE REQUEST")
+				mgr.Configuration.Image = c.Upgrade.Image
+				mgr.Configuration.Tag = c.Upgrade.Tag
 
-				err = upgrade.Upgrade(n, u.Image, u.Tag)
+				n2, err = node.New(mgr.Configuration.Node, mgr.Configuration)
+
+				if err != nil {
+					glog.Error(err.Error())
+					break
+				}
+
+				err = upgrade.Upgrader(mgr, n1, n2)
 
 				if err != nil {
 					fmt.Println(err)
 					break
 				}
 
-				fmt.Println("start cluster again")
+				glog.Info("node started again - attempt to join cluster will proceed after node is healthy")
+
+				err = mgr.Context.Connect(true)
+
+				if err != nil {
+					fmt.Println(err)
+					break
+				}
+
+				cluster.Join(mgr)
 			}
 			break
 		}

@@ -16,7 +16,7 @@ package flannel
 
 import (
 	"fmt"
-	"github.com/simplecontainer/client/pkg/logger"
+	"github.com/golang/glog"
 	"go.uber.org/zap"
 	"math/big"
 	"net"
@@ -31,7 +31,6 @@ import (
 	"github.com/flannel-io/flannel/pkg/trafficmngr/iptables"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 
 	// Backends need to be imported for their init() to get executed and them to register
@@ -123,16 +122,16 @@ func flannel(ctx context.Context, f *Flannel, flannelIface *net.Interface, flann
 
 	if err = WriteSubnetFile(subnetFile, flannelConfig.Network, flannelConfig.IPv6Network, true, bn, netMode); err != nil {
 		// Continue, even though it failed.
-		logger.LogFlannel.Warn("Failed to write flannel subnet file: %s", zap.Error(err))
+		glog.Warning("Failed to write flannel subnet file: %s", zap.Error(err))
 	} else {
-		logger.LogFlannel.Info("Wrote flannel subnet file to", zap.String("subnetFile", subnetFile))
+		glog.Info("Wrote flannel subnet file to", zap.String("subnetFile", subnetFile))
 	}
 
 	f.Network = flannelConfig.Network
 	f.V6Network = flannelConfig.IPv6Network
 
 	// Start "Running" the backend network. This will block until the context is done so run in another goroutine.
-	logrus.Info("Running flannel backend.")
+	glog.Info("Running flannel backend.")
 	bn.Run(ctx)
 	return nil
 }
@@ -143,7 +142,7 @@ func LookupExtInterface(iface *net.Interface, netMode int) (*backend.ExternalInt
 	var err error
 
 	if iface == nil {
-		logrus.Debug("No interface defined for flannel in the config. Fetching the default gateway interface")
+		glog.Info("No interface defined for flannel in the config. Fetching the default gateway interface")
 		if netMode == ipv4 || netMode == (ipv4+ipv6) {
 			if iface, err = ip.GetDefaultGatewayInterface(); err != nil {
 				return nil, errors.Wrap(err, "failed to get default interface")
@@ -154,7 +153,7 @@ func LookupExtInterface(iface *net.Interface, netMode int) (*backend.ExternalInt
 			}
 		}
 	}
-	logrus.Debugf("The interface %s will be used by flannel", iface.Name)
+	glog.Info("The interface %s will be used by flannel", zap.String("interface", iface.Name))
 
 	switch netMode {
 	case ipv4:
@@ -162,14 +161,14 @@ func LookupExtInterface(iface *net.Interface, netMode int) (*backend.ExternalInt
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to find IPv4 address for interface")
 		}
-		logger.LogFlannel.Info("The interface is selected for usage by flannel", zap.String("iface", iface.Name), zap.String("ifaceAddr", ifaceAddr[0].String()))
+		glog.Info("The interface is selected for usage by flannel", zap.String("iface", iface.Name), zap.String("ifaceAddr", ifaceAddr[0].String()))
 		ifacev6Addr = append(ifacev6Addr, nil)
 	case ipv6:
 		ifacev6Addr, err = ip.GetInterfaceIP6Addrs(iface)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to find IPv6 address for interface")
 		}
-		logger.LogFlannel.Info("The interface is selected for usage by flannel", zap.String("iface", iface.Name), zap.String("ifacev6Addr", ifacev6Addr[0].String()))
+		glog.Info("The interface is selected for usage by flannel", zap.String("iface", iface.Name), zap.String("ifacev6Addr", ifacev6Addr[0].String()))
 		ifaceAddr = append(ifaceAddr, nil)
 	case (ipv4 + ipv6):
 		ifaceAddr, err = ip.GetInterfaceIP4Addrs(iface)
@@ -180,7 +179,7 @@ func LookupExtInterface(iface *net.Interface, netMode int) (*backend.ExternalInt
 		if err != nil {
 			return nil, fmt.Errorf("failed to find IPv6 address for interface %s", iface.Name)
 		}
-		logger.LogFlannel.Info("Using dual-stack mode. The interface %s with ipv4 address %s and ipv6 address %s will be used by flannel", zap.String("iface", iface.Name), zap.String("ifaceAddr", ifaceAddr[0].String()), zap.String("ifacev6Addr", ifacev6Addr[0].String()))
+		glog.Info("Using dual-stack mode. The interface %s with ipv4 address %s and ipv6 address %s will be used by flannel", zap.String("iface", iface.Name), zap.String("ifaceAddr", ifaceAddr[0].String()), zap.String("ifacev6Addr", ifacev6Addr[0].String()))
 	default:
 		ifaceAddr = append(ifaceAddr, nil)
 		ifacev6Addr = append(ifacev6Addr, nil)
@@ -242,10 +241,10 @@ func WriteSubnetFile(path string, nw ip.IP4Net, nwv6 ip.IP6Net, ipMasq bool, bn 
 func ReadCIDRFromSubnetFile(path string, CIDRKey string) ip.IP4Net {
 	prevCIDRs := ReadCIDRsFromSubnetFile(path, CIDRKey)
 	if len(prevCIDRs) == 0 {
-		logger.LogFlannel.Warn("no subnet found", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path))
+		glog.Warning("no subnet found", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path))
 		return ip.IP4Net{IP: 0, PrefixLen: 0}
 	} else if len(prevCIDRs) > 1 {
-		logger.LogFlannel.Error("error reading subnet: more than 1 entry found for key", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path))
+		glog.Error("error reading subnet: more than 1 entry found for key", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path))
 		return ip.IP4Net{IP: 0, PrefixLen: 0}
 	} else {
 		return prevCIDRs[0]
@@ -257,14 +256,14 @@ func ReadCIDRsFromSubnetFile(path string, CIDRKey string) []ip.IP4Net {
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		prevSubnetVals, err := godotenv.Read(path)
 		if err != nil {
-			logger.LogFlannel.Error("Couldn't fetch previous CIDRKey from subnet file", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path), zap.Error(err))
+			glog.Error("Couldn't fetch previous CIDRKey from subnet file", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path), zap.Error(err))
 		} else if prevCIDRString, ok := prevSubnetVals[CIDRKey]; ok {
 			cidrs := strings.Split(prevCIDRString, ",")
 			prevCIDRs = make([]ip.IP4Net, 0)
 			for i := range cidrs {
 				_, cidr, err := net.ParseCIDR(cidrs[i])
 				if err != nil {
-					logger.LogFlannel.Error("Couldn't parse previous CIDRKey from subnet file", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path), zap.Error(err))
+					glog.Error("Couldn't parse previous CIDRKey from subnet file", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path), zap.Error(err))
 				}
 				prevCIDRs = append(prevCIDRs, ip.FromIPNet(cidr))
 			}
@@ -278,10 +277,10 @@ func ReadCIDRsFromSubnetFile(path string, CIDRKey string) []ip.IP4Net {
 func ReadIP6CIDRFromSubnetFile(path string, CIDRKey string) ip.IP6Net {
 	prevCIDRs := ReadIP6CIDRsFromSubnetFile(path, CIDRKey)
 	if len(prevCIDRs) == 0 {
-		logger.LogFlannel.Info("no subnet found", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path))
+		glog.Info("no subnet found", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path))
 		return ip.IP6Net{IP: (*ip.IP6)(big.NewInt(0)), PrefixLen: 0}
 	} else if len(prevCIDRs) > 1 {
-		logger.LogFlannel.Error("error reading subnet: more than 1 entry found for key", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path))
+		glog.Error("error reading subnet: more than 1 entry found for key", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path))
 		return ip.IP6Net{IP: (*ip.IP6)(big.NewInt(0)), PrefixLen: 0}
 	} else {
 		return prevCIDRs[0]
@@ -293,14 +292,14 @@ func ReadIP6CIDRsFromSubnetFile(path string, CIDRKey string) []ip.IP6Net {
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		prevSubnetVals, err := godotenv.Read(path)
 		if err != nil {
-			logger.LogFlannel.Error("Couldn't fetch previous CIDRKey from subnet file", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path), zap.Error(err))
+			glog.Error("Couldn't fetch previous CIDRKey from subnet file", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path), zap.Error(err))
 		} else if prevCIDRString, ok := prevSubnetVals[CIDRKey]; ok {
 			cidrs := strings.Split(prevCIDRString, ",")
 			prevCIDRs = make([]ip.IP6Net, 0)
 			for i := range cidrs {
 				_, cidr, err := net.ParseCIDR(cidrs[i])
 				if err != nil {
-					logger.LogFlannel.Error("Couldn't parse previous CIDRKey from subnet file", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path), zap.Error(err))
+					glog.Error("Couldn't parse previous CIDRKey from subnet file", zap.String("CIDRKey", CIDRKey), zap.String("filePath", path), zap.Error(err))
 				}
 				prevCIDRs = append(prevCIDRs, ip.FromIP6Net(cidr))
 			}

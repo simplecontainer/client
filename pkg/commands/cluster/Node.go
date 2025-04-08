@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/simplecontainer/client/pkg/command"
 	"github.com/simplecontainer/client/pkg/commands/cluster/nodes"
+	"github.com/simplecontainer/client/pkg/commands/cluster/upgrade"
 	"github.com/simplecontainer/client/pkg/contracts"
 	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/client/pkg/manager"
@@ -21,6 +22,9 @@ func Node() contracts.Command {
 			func(mgr *manager.Manager, args []string) {
 				if helpers.GrabArg(2) == "cluster" {
 					switch os.Args[3] {
+					case "upgrade":
+						upgrade.Upgrade(mgr, mgr.Configuration.Id, mgr.Configuration.Image, mgr.Configuration.Tag)
+						break
 					case "join":
 						nodes.Join(mgr)
 						break
@@ -29,7 +33,7 @@ func Node() contracts.Command {
 						break
 					}
 				} else {
-					n, err := node.New(mgr.Configuration.Setup.Node, mgr.Configuration)
+					n, err := node.New(mgr.Configuration.Node, mgr.Configuration)
 
 					if err != nil {
 						panic(err)
@@ -49,8 +53,8 @@ func Node() contracts.Command {
 							helpers.ExitWithErr(err)
 						}
 
-						if mgr.Configuration.Flags.W != "" {
-							err = n.Wait(mgr.Configuration.Flags.W)
+						if mgr.Configuration.W != "" {
+							err = n.Wait(mgr.Configuration.W)
 
 							if err != nil {
 								helpers.ExitWithErr(err)
@@ -66,8 +70,8 @@ func Node() contracts.Command {
 							helpers.ExitWithErr(err)
 						}
 
-						if mgr.Configuration.Flags.W != "" {
-							err = n.Wait(mgr.Configuration.Flags.W)
+						if mgr.Configuration.W != "" {
+							err = n.Wait(mgr.Configuration.W)
 
 							if err != nil {
 								helpers.ExitWithErr(err)
@@ -83,8 +87,8 @@ func Node() contracts.Command {
 							helpers.ExitWithErr(err)
 						}
 
-						if mgr.Configuration.Flags.W != "" {
-							err = n.Wait(mgr.Configuration.Flags.W)
+						if mgr.Configuration.W != "" {
+							err = n.Wait(mgr.Configuration.W)
 
 							if err != nil {
 								helpers.ExitWithErr(err)
@@ -100,8 +104,8 @@ func Node() contracts.Command {
 							helpers.ExitWithErr(err)
 						}
 
-						if mgr.Configuration.Flags.W != "" {
-							err = n.Wait(mgr.Configuration.Flags.W)
+						if mgr.Configuration.W != "" {
+							err = n.Wait(mgr.Configuration.W)
 
 							if err != nil {
 								helpers.ExitWithErr(err)
@@ -117,8 +121,8 @@ func Node() contracts.Command {
 							helpers.ExitWithErr(err)
 						}
 
-						if mgr.Configuration.Flags.W != "" {
-							err = n.Wait(mgr.Configuration.Flags.W)
+						if mgr.Configuration.W != "" {
+							err = n.Wait(mgr.Configuration.W)
 
 							if err != nil {
 								helpers.ExitWithErr(err)

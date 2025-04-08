@@ -18,7 +18,7 @@ func Edit() contracts.Command {
 		},
 		Functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				format, err := helpers.BuildFormat(helpers.GrabArg(2), mgr.Configuration.Flags.G)
+				format, err := helpers.BuildFormat(helpers.GrabArg(2), mgr.Configuration.G)
 
 				if err != nil {
 					fmt.Println(err)

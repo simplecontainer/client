@@ -14,13 +14,13 @@ import (
 	"software.sslmate.com/src/go-pkcs12"
 )
 
-func (context *Context) Export(API string) (string, string, error) {
+func (c *Context) Export(API string) (string, string, error) {
 	var cert *x509.Certificate
 	var ca *x509.Certificate
 	var tmp *x509.Certificate
 	var err error
 
-	for block, rest := pem.Decode([]byte(context.CertBundle)); block != nil; block, rest = pem.Decode(rest) {
+	for block, rest := pem.Decode([]byte(c.CertBundle)); block != nil; block, rest = pem.Decode(rest) {
 		switch block.Type {
 		case "CERTIFICATE":
 			tmp, err = x509.ParseCertificate(block.Bytes)
@@ -31,20 +31,20 @@ func (context *Context) Export(API string) (string, string, error) {
 
 			if tmp.IsCA {
 				ca = tmp
-				pem.Encode(context.Ca, &pem.Block{
+				pem.Encode(c.Ca, &pem.Block{
 					Type:  "CERTIFICATE",
 					Bytes: tmp.Raw,
 				})
 			} else {
 				cert = tmp
-				pem.Encode(context.Cert, &pem.Block{
+				pem.Encode(c.Cert, &pem.Block{
 					Type:  "CERTIFICATE",
 					Bytes: tmp.Raw,
 				})
 			}
 
 		case "EC PRIVATE KEY":
-			pem.Encode(context.PrivateKey, &pem.Block{
+			pem.Encode(c.PrivateKey, &pem.Block{
 				Type:  "PRIVATE KEY",
 				Bytes: block.Bytes,
 			})
@@ -54,7 +54,7 @@ func (context *Context) Export(API string) (string, string, error) {
 		}
 	}
 
-	x509KeyCert, err := tls.X509KeyPair(context.Cert.Bytes(), context.PrivateKey.Bytes())
+	x509KeyCert, err := tls.X509KeyPair(c.Cert.Bytes(), c.PrivateKey.Bytes())
 
 	if err != nil {
 		return "", "", err
@@ -67,10 +67,10 @@ func (context *Context) Export(API string) (string, string, error) {
 		os.Exit(1)
 	}
 
-	context.ApiURL = API
-	context.PKCS12 = b64.StdEncoding.EncodeToString(pfxData)
+	c.ApiURL = API
+	c.PKCS12 = b64.StdEncoding.EncodeToString(pfxData)
 
-	bytes, err := json.Marshal(context)
+	bytes, err := json.Marshal(c)
 
 	if err != nil {
 		panic(err)
@@ -85,7 +85,7 @@ func (context *Context) Export(API string) (string, string, error) {
 
 	key := hex.EncodeToString(randbytes)
 
-	contextPath := fmt.Sprintf("%s/%s.key", context.Directory, context.Name)
+	contextPath := fmt.Sprintf("%s/%s.key", c.Directory, c.Name)
 	err = os.WriteFile(contextPath, []byte(key), 0600)
 	if err != nil {
 		return "", "", err

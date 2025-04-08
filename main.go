@@ -32,9 +32,9 @@ func main() {
 		} else {
 			log.Fatal(err)
 		}
-	} else {
-		startup.LoadFromFlagsDynamic(config)
 	}
+
+	startup.LoadFromFlagsDynamic(config)
 
 	bootstrap.CreateDirectoryTree(config.Environment.ClientDirectory)
 

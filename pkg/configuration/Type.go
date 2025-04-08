@@ -2,15 +2,20 @@ package configuration
 
 type Configuration struct {
 	Environment *Environment
-	Flannel     *Flannel
 
-	Flags   Flags `yaml:"-"`
-	Setup   Setup
-	Network Network
-	Dynamic Dynamic `yaml:"-"`
-}
+	Static  Static
+	Flannel *Flannel
 
-type Flags struct {
+	Id   uint64 `yaml:"-"`
+	Node string `yaml:"-"`
+	API  string `yaml:"-"`
+	Join string `yaml:"-"`
+
+	Image      string `yaml:"-"`
+	Tag        string `yaml:"-"`
+	Entrypoint string `yaml:"-"`
+	Args       string `yaml:"-"`
+
 	Y bool   `yaml:"-"`
 	F bool   `yaml:"-"`
 	O string `yaml:"-"`
@@ -18,7 +23,7 @@ type Flags struct {
 	G string `yaml:"-"`
 }
 
-type Setup struct {
+type Static struct {
 	Platform string
 	Node     string
 	Context  string
@@ -27,10 +32,8 @@ type Setup struct {
 	Domains  string
 	IPs      string
 
-	Image      string
-	Tag        string
-	Entrypoint string `yaml:"-"`
-	Args       string `yaml:"-"`
+	Image string
+	Tag   string
 
 	HostPort    string
 	OverlayPort string
@@ -50,16 +53,4 @@ type Environment struct {
 	Home            string
 	LogsDirectory   string
 	ClientDirectory string
-}
-
-type Network struct {
-	Fbackend   string
-	Fcidr      string
-	Finterface string
-}
-
-type Dynamic struct {
-	Node string
-	API  string
-	Join string
 }

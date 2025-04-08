@@ -3,12 +3,13 @@ package context
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/golang/glog"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
 
-func (context *Context) Import(encrypted string, key string) error {
-	ctx := NewContext(context.Directory)
+func (c *Context) Import(encrypted string, key string) error {
+	ctx := NewContext(c.Directory)
 
 	if key == "" {
 		return errors.New("key is empty")
@@ -36,7 +37,12 @@ func (context *Context) Import(encrypted string, key string) error {
 
 	if ctx.ConnectionTest() {
 		viper.Set("y", true)
-		ctx.SaveToFile()
+		err = ctx.SaveToFile()
+
+		if err != nil {
+			glog.Fatal(err.Error())
+		}
+
 		fmt.Println("Successfully imported context and connected to simplecontainer!")
 	} else {
 		fmt.Println(fmt.Sprintf("Failed to connect to the %s with imported context", ctx.ApiURL))

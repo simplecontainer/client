@@ -13,30 +13,24 @@ import (
 
 func LoadFromFlagsDynamic(configObj *configuration.Configuration) {
 	_ = UnmarshalFields(viper.GetViper(), []string{
-		"api", "join", "node", "config",
-	}, &configObj.Dynamic)
+		"api", "join", "id", "node", "entrypoint", "args", "image", "tag", "w", "f", "o", "y", "g", "it", "c",
+	}, &configObj)
+
+	if configObj.Image == "" {
+		configObj.Image = configObj.Static.Image
+	}
+
+	if configObj.Tag == "" {
+		configObj.Tag = configObj.Static.Tag
+	}
 }
 
 func LoadFromFlags(configObj *configuration.Configuration) {
-	_ = UnmarshalFields(viper.GetViper(), []string{
-		"y", "f", "o", "w", "g",
-	}, &configObj.Flags)
+	err := viper.Unmarshal(configObj)
 
-	_ = UnmarshalFields(viper.GetViper(), []string{
-		"platform", "node", "context", "log", "domains", "ips", "image", "tag", "entrypoint", "args", "hostport", "overlayport", "etcdport",
-	}, &configObj.Setup)
-
-	_ = UnmarshalFields(viper.GetViper(), []string{
-		"fbackend", "fcidr", "fiface",
-	}, &configObj.Network)
-
-	_ = UnmarshalFields(viper.GetViper(), []string{
-		"api", "join", "node",
-	}, &configObj.Dynamic)
-
-	_ = UnmarshalFields(viper.GetViper(), []string{
-		"fbackend", "fcidr", "finterface", "fenableIPv4", "fenableIPv6", "fmaskIPv6",
-	}, &configObj.Flannel)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func Load(node string, environment *configuration.Environment) (*configuration.Configuration, error) {
@@ -76,7 +70,7 @@ func Save(configObj *configuration.Configuration) error {
 		return err
 	}
 
-	path := fmt.Sprintf("%s/%s/%s/%s.yaml", configObj.Environment.Home, static.ROOTSMR, static.CONFIGDIR, configObj.Dynamic.Node)
+	path := fmt.Sprintf("%s/%s/%s/%s.yaml", configObj.Environment.Home, static.ROOTSMR, static.CONFIGDIR, configObj.Node)
 
 	err = os.WriteFile(path, yamlObj, 0644)
 	if err != nil {
@@ -87,7 +81,38 @@ func Save(configObj *configuration.Configuration) error {
 }
 
 func ReadFlags() {
-	// Cli flags
+	// Node setup flags
+	flag.String("static.image", "quay.io/simplecontainer/smr", "The smr image repo")
+	flag.String("static.tag", "latest", "The smr image tag")
+	flag.String("static.hostport", "1443", "Expose smr on hostport")
+	flag.String("static.overlayport", "", "Expose overlay on port")
+	flag.String("static.etcdport", "2379", "Etcd client port listen and advertise")
+
+	flag.String("static.log", "info", "Log level: debug, info, warn, error, dpanic, panic, fatal")
+	flag.String("static.domains", "localhost", "Comma separated list of the domains to add to the certs")
+	flag.String("static.ips", "127.0.0.1", "Comma separated list of the IPs to add to the certs")
+
+	// Flannel configuration
+	flag.String("flannel.backend", "wireguard", "Flannel backend: vxlan, wireguard")
+	flag.String("flannel.cidr", "10.10.0.0/16", "Flannel overlay network CIDR")
+	flag.String("flannel.iface", "", "Network interface for flannel to use, if ommited default gateway will be used")
+
+	flag.String("static.platform", static.PLATFORM_DOCKER, "Container engine name. Supported: [docker]")
+
+	// Dynamic configuration (Not preserved in client config.yaml)
+	flag.String("context", "", "Context")
+	flag.String("container", "main", "Which container to stream main or init?")
+	flag.Uint64("id", 0, "Id of the node")
+	flag.String("node", "", "Name of the smr agent container")
+	flag.String("api", "", "Reachable Node https://URL:PORT URL")
+	flag.String("join", "", "Reachable URL of one member of the cluster")
+	flag.String("config", "client", "Name of configuration for specific node (used for node management only)")
+	flag.String("image", "", "Image to run")
+	flag.String("tag", "", "Image to run")
+	flag.String("entrypoint", "/opt/smr/smr", "Entrypoint for the smr")
+	flag.String("args", "create smr --node smr", "args")
+
+	// Dynamic - Cli flags
 	flag.String("w", "", "Wait for container to be in defined state")
 	flag.Bool("f", false, "Follow logs")
 	flag.String("o", "d", "Output type: d(efault),s(hort)")
@@ -95,34 +120,6 @@ func ReadFlags() {
 	flag.String("g", "default", "Group")
 	flag.Bool("it", false, "Interactive exec")
 	flag.String("c", "", "Command for exec")
-	flag.String("context", "", "Context")
-	flag.String("container", "main", "Which container to stream main or init?")
-
-	// Node setup flags
-	flag.String("image", "quay.io/simplecontainer/smr", "The smr image repo")
-	flag.String("tag", "latest", "The smr image tag")
-	flag.String("hostport", "1443", "Expose smr on hostport")
-	flag.String("overlayport", "", "Expose overlay on port")
-	flag.String("etcdport", "2379", "Etcd client port listen and advertise")
-
-	flag.String("log", "info", "Log level: debug, info, warn, error, dpanic, panic, fatal")
-	flag.String("domains", "localhost", "Comma separated list of the domains to add to the certs")
-	flag.String("ips", "127.0.0.1", "Comma separated list of the IPs to add to the certs")
-
-	// Flannel configuration
-	flag.String("fbackend", "wireguard", "Flannel backend: vxlan, wireguard")
-	flag.String("fcidr", "10.10.0.0/16", "Flannel overlay network CIDR")
-	flag.String("fiface", "", "Network interface for flannel to use, if ommited default gateway will be used")
-
-	flag.String("platform", static.PLATFORM_DOCKER, "Container engine name. Supported: [docker]")
-	flag.String("node", "", "Name of the smr agent container")
-
-	// Dynamic configuration (Not preserved in client config.yaml)
-	flag.String("api", "", "Reachable Node https://URL:PORT URL")
-	flag.String("join", "", "Reachable URL of one member of the cluster")
-	flag.String("config", "client", "Name of configuration for specific node (used for node management only)")
-	flag.String("entrypoint", "/opt/smr/smr", "Entrypoint for the smr")
-	flag.String("args", "create smr --node smr", "args")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()
