@@ -105,7 +105,7 @@ func ReadFlags() {
 	flag.Uint64("id", 0, "Id of the node")
 	flag.String("node", "", "Name of the smr agent container")
 	flag.String("api", "", "Reachable Node https://URL:PORT URL")
-	flag.String("join", "", "Reachable URL of one member of the cluster")
+	flag.String("peer", "", "Reachable API of one member of the cluster (Format: https://domain:port)")
 	flag.String("config", "client", "Name of configuration for specific node (used for node management only)")
 	flag.String("image", "", "Image to run")
 	flag.String("tag", "", "Image to run")

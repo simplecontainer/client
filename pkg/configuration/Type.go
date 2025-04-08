@@ -9,7 +9,7 @@ type Configuration struct {
 	Id   uint64 `yaml:"-"`
 	Node string `yaml:"-"`
 	API  string `yaml:"-"`
-	Join string `yaml:"-"`
+	Peer string `yaml:"-"`
 
 	Image      string `yaml:"-"`
 	Tag        string `yaml:"-"`

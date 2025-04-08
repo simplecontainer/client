@@ -29,7 +29,7 @@ func Node() contracts.Command {
 						nodes.Join(mgr)
 						break
 					case "leave":
-						nodes.Leave(mgr)
+						nodes.Leave(mgr, mgr.Configuration.Id)
 						break
 					}
 				} else {
