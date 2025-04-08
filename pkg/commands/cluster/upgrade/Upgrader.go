@@ -2,12 +2,11 @@ package upgrade
 
 import (
 	"fmt"
-	"github.com/simplecontainer/client/pkg/manager"
 	"github.com/simplecontainer/client/pkg/node"
 	"time"
 )
 
-func Upgrader(mgr *manager.Manager, n1 *node.Node, n2 *node.Node) error {
+func Upgrader(n1 *node.Node, n2 *node.Node) error {
 	err := n1.Stop()
 
 	if err != nil {
@@ -47,6 +46,5 @@ func Upgrader(mgr *manager.Manager, n1 *node.Node, n2 *node.Node) error {
 		time.Sleep(30 * time.Second)
 	}
 
-	mgr.Context.ConnectionTest()
 	return nil
 }

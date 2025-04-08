@@ -64,7 +64,7 @@ func Upgrader(mgr *manager.Manager) error {
 					break
 				}
 
-				err = upgrade.Upgrader(mgr, n1, n2)
+				err = upgrade.Upgrader(n1, n2)
 
 				if err != nil {
 					fmt.Println(err)
