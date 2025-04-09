@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/simplecontainer/client/pkg/command"
 	"github.com/simplecontainer/client/pkg/contracts"
-	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/client/pkg/manager"
 	"github.com/simplecontainer/smr/pkg/packer"
 	"github.com/simplecontainer/smr/pkg/relations"
@@ -83,15 +82,7 @@ func Apply() contracts.Command {
 
 				if len(pack.Definitions) != 0 {
 					for _, definition := range pack.Definitions {
-						var ApiURL string
-						ApiURL, err = helpers.GetDomainAndPort(mgr.Context.ApiURL)
-
-						if err != nil {
-							fmt.Println(err.Error())
-							os.Exit(1)
-						}
-
-						err = definition.ProposeApply(mgr.Context.Client, ApiURL)
+						err = definition.ProposeApply(mgr.Context.Client, mgr.Context.ApiURL)
 
 						if err != nil {
 							fmt.Println(err)

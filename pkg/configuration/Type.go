@@ -1,70 +1,56 @@
 package configuration
 
-import (
-	"github.com/flannel-io/flannel/pkg/backend"
-	"github.com/flannel-io/flannel/pkg/ip"
-	"net"
-)
-
 type Configuration struct {
 	Environment *Environment
-	Flannel     *Flannel
 
-	Startup Startup
+	Static  Static
+	Flannel *Flannel
+
+	Id   uint64 `yaml:"-"`
+	Node string `yaml:"-"`
+	API  string `yaml:"-"`
+	Peer string `yaml:"-"`
+
+	Image      string `yaml:"-"`
+	Tag        string `yaml:"-"`
+	Entrypoint string `yaml:"-"`
+	Args       string `yaml:"-"`
+
+	Y bool   `yaml:"-"`
+	F bool   `yaml:"-"`
+	O string `yaml:"-"`
+	W string `yaml:"-"`
+	G string `yaml:"-"`
 }
 
-type Flannel struct {
-	Backend            string
-	CIDR               []*net.IPNet
-	InterfaceSpecified *net.Interface
-	EnableIPv4         bool
-	EnableIPv6         bool
-	IPv6Masq           bool
-	ConfigFile         string
-	InterfaceFlannel   *backend.ExternalInterface
-	Network            ip.IP4Net
-	Networkv6          ip.IP6Net
-}
-
-type Flags struct {
-	Context string
-	Y       bool
-}
-
-type Environment struct {
-	Home            string
-	LogsDirectory   string
-	ClientDirectory string
-}
-
-type Startup struct {
+type Static struct {
 	Platform string
-	Name     string
+	Node     string
 	Context  string
 
 	LogLevel string
 	Domains  string
 	IPs      string
 
-	Y bool
-	F bool
-	O string
-	W string
-	G string
-
-	Image      string
-	Tag        string
-	Entrypoint string
-	Args       string
+	Image string
+	Tag   string
 
 	HostPort    string
 	OverlayPort string
 	EtcdPort    string
+}
 
-	Node string
-	Join string
+type Flannel struct {
+	Backend            string
+	CIDR               string
+	InterfaceSpecified string
+	EnableIPv4         bool
+	EnableIPv6         bool
+	IPv6Masq           bool
+}
 
-	Fbackend   string
-	Fcidr      string
-	Finterface string
+type Environment struct {
+	Home            string
+	LogsDirectory   string
+	ClientDirectory string
 }

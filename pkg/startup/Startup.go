@@ -3,71 +3,116 @@ package startup
 import (
 	"flag"
 	"fmt"
-	"github.com/flannel-io/flannel/pkg/ip"
 	"github.com/simplecontainer/client/pkg/configuration"
 	"github.com/simplecontainer/smr/pkg/static"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"go.uber.org/zap"
-	"net"
+	"gopkg.in/yaml.v3"
 	"os"
 )
 
-func Load(configObj *configuration.Configuration) {
-	configObj.Environment = GetEnvironmentInfo()
-	ReadFlags(configObj)
+func LoadFromFlagsDynamic(configObj *configuration.Configuration) {
+	_ = UnmarshalFields(viper.GetViper(), []string{
+		"api", "join", "id", "node", "entrypoint", "args", "image", "tag", "w", "f", "o", "y", "g", "it", "c",
+	}, &configObj)
 
-	err := viper.Unmarshal(&configObj.Startup)
+	if configObj.Image == "" {
+		configObj.Image = configObj.Static.Image
+	}
+
+	if configObj.Tag == "" {
+		configObj.Tag = configObj.Static.Tag
+	}
+}
+
+func LoadFromFlags(configObj *configuration.Configuration) {
+	err := viper.Unmarshal(configObj)
 
 	if err != nil {
 		panic(err)
 	}
-
-	configObj.Flannel = &configuration.Flannel{
-		Backend:            viper.GetString("fbackend"),
-		CIDR:               make([]*net.IPNet, 0),
-		InterfaceSpecified: nil,
-		EnableIPv4:         viper.GetBool("fenableIPv4"),
-		EnableIPv6:         viper.GetBool("fenableIPv6"),
-		IPv6Masq:           viper.GetBool("fmaskIPv6"),
-
-		ConfigFile:       "/run/flannel/subnet.env",
-		Network:          ip.IP4Net{},
-		Networkv6:        ip.IP6Net{},
-		InterfaceFlannel: nil,
-	}
-
-	var CIDR *net.IPNet
-	_, CIDR, err = net.ParseCIDR(viper.GetString("fcidr"))
-
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	configObj.Flannel.CIDR = []*net.IPNet{CIDR}
-	configObj.Flannel.InterfaceSpecified, _ = net.InterfaceByName(viper.GetString("finterface"))
-
-	if viper.GetBool("fenableIPv4") {
-		if _, err = os.Stat("/proc/sys/net/bridge/bridge-nf-call-iptables"); os.IsNotExist(err) {
-			fmt.Println("Failed to check br_netfilter: ", zap.Error(err))
-			os.Exit(1)
-		}
-	}
-
-	if viper.GetBool("fenableIPv6") {
-		if _, err = os.Stat("/proc/sys/net/bridge/bridge-nf-call-ip6tables"); os.IsNotExist(err) {
-			fmt.Println("Failed to check br_netfilter: ", zap.Error(err))
-			os.Exit(1)
-		}
-	}
 }
 
-func ReadFlags(configObj *configuration.Configuration) {
-	/* Operation mode */
-	flag.String("context", "", "Context name")
+func Load(node string, environment *configuration.Environment) (*configuration.Configuration, error) {
+	configObj := configuration.NewConfig()
+	path := fmt.Sprintf("%s/%s/%s/%s.yaml", environment.Home, static.ROOTSMR, static.CONFIGDIR, node)
 
-	// Cli flags
+	file, err := os.Open(path)
+
+	defer func() {
+		file.Close()
+	}()
+
+	if err != nil {
+		return configObj, err
+	}
+
+	viper.SetConfigType("yaml")
+	err = viper.ReadConfig(file)
+
+	if err != nil {
+		return configObj, err
+	}
+
+	err = viper.Unmarshal(configObj)
+
+	if err != nil {
+		return configObj, err
+	}
+
+	return configObj, err
+}
+
+func Save(configObj *configuration.Configuration) error {
+	yamlObj, err := yaml.Marshal(*configObj)
+
+	if err != nil {
+		return err
+	}
+
+	path := fmt.Sprintf("%s/%s/%s/%s.yaml", configObj.Environment.Home, static.ROOTSMR, static.CONFIGDIR, configObj.Node)
+
+	err = os.WriteFile(path, yamlObj, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ReadFlags() {
+	// Node setup flags
+	flag.String("static.image", "quay.io/simplecontainer/smr", "The smr image repo")
+	flag.String("static.tag", "latest", "The smr image tag")
+	flag.String("static.hostport", "1443", "Expose smr on hostport")
+	flag.String("static.overlayport", "", "Expose overlay on port")
+	flag.String("static.etcdport", "2379", "Etcd client port listen and advertise")
+
+	flag.String("static.log", "info", "Log level: debug, info, warn, error, dpanic, panic, fatal")
+	flag.String("static.domains", "localhost", "Comma separated list of the domains to add to the certs")
+	flag.String("static.ips", "127.0.0.1", "Comma separated list of the IPs to add to the certs")
+
+	// Flannel configuration
+	flag.String("flannel.backend", "wireguard", "Flannel backend: vxlan, wireguard")
+	flag.String("flannel.cidr", "10.10.0.0/16", "Flannel overlay network CIDR")
+	flag.String("flannel.iface", "", "Network interface for flannel to use, if ommited default gateway will be used")
+
+	flag.String("static.platform", static.PLATFORM_DOCKER, "Container engine name. Supported: [docker]")
+
+	// Dynamic configuration (Not preserved in client config.yaml)
+	flag.String("context", "", "Context")
+	flag.String("container", "main", "Which container to stream main or init?")
+	flag.Uint64("id", 0, "Id of the node")
+	flag.String("node", "", "Name of the smr agent container")
+	flag.String("api", "", "Reachable Node https://URL:PORT URL")
+	flag.String("peer", "", "Reachable API of one member of the cluster (Format: https://domain:port)")
+	flag.String("config", "client", "Name of configuration for specific node (used for node management only)")
+	flag.String("image", "", "Image to run")
+	flag.String("tag", "", "Image to run")
+	flag.String("entrypoint", "/opt/smr/smr", "Entrypoint for the smr")
+	flag.String("args", "create smr --node smr", "args")
+
+	// Dynamic - Cli flags
 	flag.String("w", "", "Wait for container to be in defined state")
 	flag.Bool("f", false, "Follow logs")
 	flag.String("o", "d", "Output type: d(efault),s(hort)")
@@ -75,35 +120,19 @@ func ReadFlags(configObj *configuration.Configuration) {
 	flag.String("g", "default", "Group")
 	flag.Bool("it", false, "Interactive exec")
 	flag.String("c", "", "Command for exec")
-	flag.String("container", "main", "Which container to stream main or init?")
-
-	// Node flags
-	flag.String("image", "quay.io/simplecontainer/smr", "The smr image repo")
-	flag.String("tag", "latest", "The smr image tag")
-	flag.String("entrypoint", "/opt/smr/smr", "Entrypoint for the smr")
-	flag.String("args", "create smr --agent smr-agent", "args")
-	flag.String("hostport", "1443", "Expose smr on hostport")
-	flag.String("overlayport", "", "Expose overlay on port")
-	flag.String("etcdport", "2379", "Etcd client port listen and advertise")
-
-	flag.String("log", "info", "Log level: debug, info, warn, error, dpanic, panic, fatal")
-	flag.String("domains", "localhost", "Comma separated list of the domains to add to the certs")
-	flag.String("ips", "127.0.0.1", "Comma separated list of the IPs to add to the certs")
-
-	// Flannel configuration
-	flag.String("fbackend", "wireguard", "Flannel backend: vxlan, wireguard")
-	flag.String("fcidr", "10.10.0.0/16", "Flannel overlay network CIDR")
-	flag.String("fiface", "", "Network interface for flannel to use, if ommited default gateway will be used")
-
-	flag.String("platform", static.PLATFORM_DOCKER, "Container engine name. Supported: [docker]")
-	flag.String("name", "smr-agent", "Name of the smr agent container")
-
-	// Cluster configuration
-	flag.String("node", "", "Reachable Node https://URL:PORT URL")
-	flag.String("join", "", "Reachable URL of one member of the cluster")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.Parse()
 
 	viper.BindPFlags(pflag.CommandLine)
+
+	os.Args = append([]string{os.Args[0]}, pflag.Args()...)
+}
+
+func UnmarshalFields(v *viper.Viper, keys []string, target interface{}) error {
+	sub := viper.New()
+	for _, key := range keys {
+		sub.Set(key, v.Get(key))
+	}
+	return sub.Unmarshal(target)
 }

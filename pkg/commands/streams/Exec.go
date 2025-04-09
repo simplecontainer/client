@@ -6,11 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/golang/glog"
 	"github.com/gorilla/websocket"
 	"github.com/simplecontainer/client/pkg/command"
 	"github.com/simplecontainer/client/pkg/contracts"
 	"github.com/simplecontainer/client/pkg/helpers"
-	"github.com/simplecontainer/client/pkg/logger"
 	"github.com/simplecontainer/client/pkg/manager"
 	"github.com/simplecontainer/smr/pkg/kinds/containers/platforms/types"
 	"github.com/simplecontainer/smr/pkg/network/wss"
@@ -33,9 +33,9 @@ func Exec() contracts.Command {
 		},
 		Functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				format, err := helpers.BuildFormat(helpers.GrabArg(2), mgr.Configuration.Startup.G)
+				format, err := helpers.BuildFormat(helpers.GrabArg(2), mgr.Configuration.G)
 				if err != nil {
-					logger.Log.Error("error building format:", zap.Error(err))
+					glog.Error("error building format:", zap.Error(err))
 					os.Exit(1)
 				}
 
@@ -44,7 +44,7 @@ func Exec() contracts.Command {
 				conn, err := wss.Request(mgr.Context.Client, url)
 
 				if err != nil {
-					logger.Log.Error("error connecting to WebSocket", zap.Error(err))
+					glog.Error("error connecting to WebSocket", zap.Error(err))
 					os.Exit(1)
 				}
 
@@ -58,7 +58,7 @@ func Exec() contracts.Command {
 							t, msg, err := conn.ReadMessage()
 
 							if err != nil {
-								logger.Log.Error("error reading WebSocket message", zap.Error(err))
+								glog.Error("error reading WebSocket message", zap.Error(err))
 								break
 							}
 

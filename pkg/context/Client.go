@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-func (context *Context) GenerateHttpClient(CertBundle []byte) (*http.Client, error) {
+func (c *Context) GenerateHttpClient(CertBundle []byte) (*http.Client, error) {
 	for block, rest := pem.Decode(CertBundle); block != nil; block, rest = pem.Decode(rest) {
 		switch block.Type {
 		case "CERTIFICATE":
@@ -21,19 +21,19 @@ func (context *Context) GenerateHttpClient(CertBundle []byte) (*http.Client, err
 			}
 
 			if cert.IsCA {
-				pem.Encode(context.Ca, &pem.Block{
+				pem.Encode(c.Ca, &pem.Block{
 					Type:  "CERTIFICATE",
 					Bytes: cert.Raw,
 				})
 			} else {
-				pem.Encode(context.Cert, &pem.Block{
+				pem.Encode(c.Cert, &pem.Block{
 					Type:  "CERTIFICATE",
 					Bytes: cert.Raw,
 				})
 			}
 
 		case "EC PRIVATE KEY":
-			pem.Encode(context.PrivateKey, &pem.Block{
+			pem.Encode(c.PrivateKey, &pem.Block{
 				Type:  "EC PRIVATE KEY",
 				Bytes: block.Bytes,
 			})
@@ -43,15 +43,15 @@ func (context *Context) GenerateHttpClient(CertBundle []byte) (*http.Client, err
 		}
 	}
 
-	context.CertBundle = string(CertBundle)
+	c.CertBundle = string(CertBundle)
 
-	cert, err := tls.X509KeyPair(context.Cert.Bytes(), context.PrivateKey.Bytes())
+	cert, err := tls.X509KeyPair(c.Cert.Bytes(), c.PrivateKey.Bytes())
 	if err != nil {
 		return nil, err
 	}
 
 	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(context.Ca.Bytes())
+	caCertPool.AppendCertsFromPEM(c.Ca.Bytes())
 
 	return &http.Client{
 		Transport: &http.Transport{
@@ -63,13 +63,13 @@ func (context *Context) GenerateHttpClient(CertBundle []byte) (*http.Client, err
 	}, nil
 }
 
-func (context *Context) ConnectionTest() bool {
-	if context.Client == nil {
+func (c *Context) ConnectionTest() bool {
+	if c.Client == nil {
 		fmt.Println("no active context found - please add least one context")
 		os.Exit(1)
 	}
 
-	response := network.Send(context.Client, fmt.Sprintf("%s/connect", context.ApiURL), http.MethodGet, nil)
+	response := network.Send(c.Client, fmt.Sprintf("%s/connect", c.ApiURL), http.MethodGet, nil)
 
 	if response != nil && response.HttpStatus == http.StatusOK {
 		return true

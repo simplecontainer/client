@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/simplecontainer/client/pkg/commands/objects/apply"
 	"github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/helpers"
+	"github.com/simplecontainer/smr/pkg/kinds/common"
 	"github.com/simplecontainer/smr/pkg/network"
 	"net/http"
 )
@@ -28,14 +28,21 @@ func Edit(context *context.Context, prefix string, version string, category stri
 		return nil, err
 	}
 
+	request, err := common.NewRequest(kind)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = request.Definition.FromJson(data)
+
+	if err != nil {
+		return nil, err
+	}
+
 	if changed {
-		response = apply.Apply(context, data)
-
-		if !response.Success {
-			return nil, errors.New(response.ErrorExplanation)
-		}
-
-		return data, nil
+		err = request.ProposeApply(context.Client, context.ApiURL)
+		return data, err
 	}
 
 	return nil, errors.New("nothing changed")

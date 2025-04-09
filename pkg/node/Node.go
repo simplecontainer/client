@@ -20,18 +20,18 @@ func New(name string, config *configuration.Configuration) (*Node, error) {
 		Name:       name,
 		Home:       config.Environment.Home,
 		Definition: Definition(name, config),
-		Platform:   config.Startup.Platform,
+		Platform:   config.Static.Platform,
 	}
 
 	var err error
 
-	switch config.Startup.Platform {
+	switch config.Static.Platform {
 	case static.PLATFORM_DOCKER:
 		if err = docker.IsDaemonRunning(); err != nil {
 			helpers.ExitWithErr(err)
 		}
 
-		node.Container, err = docker.New(config.Startup.Name, node.Definition)
+		node.Container, err = docker.New(config.Node, node.Definition)
 		break
 	default:
 		return nil, errors.New("platform not supported")
@@ -52,25 +52,25 @@ func Definition(name string, config *configuration.Configuration) *v1.Containers
 			Labels: nil,
 		},
 		Spec: v1.ContainersInternal{
-			Image: config.Startup.Image,
-			Tag:   config.Startup.Tag,
+			Image: config.Image,
+			Tag:   config.Tag,
 			Envs: []string{
-				fmt.Sprintf("LOG_LEVEL=%s", config.Startup.LogLevel),
+				fmt.Sprintf("LOG_LEVEL=%s", config.Static.LogLevel),
 			},
-			Entrypoint: strings.Split(config.Startup.Entrypoint, " "),
-			Args:       strings.Split(config.Startup.Args, " "),
+			Entrypoint: strings.Split(config.Entrypoint, " "),
+			Args:       strings.Split(config.Args, " "),
 			Ports: []v1.ContainersPort{
 				{
 					Container: "1443",
-					Host:      config.Startup.HostPort,
+					Host:      config.Static.HostPort,
 				},
 				{
 					Container: "2379",
-					Host:      fmt.Sprintf("127.0.0.1:%s", config.Startup.EtcdPort),
+					Host:      fmt.Sprintf("127.0.0.1:%s", config.Static.EtcdPort),
 				},
 				{
 					Container: "9212",
-					Host:      config.Startup.OverlayPort,
+					Host:      config.Static.OverlayPort,
 				},
 			},
 			Volumes: []v1.ContainersVolume{
@@ -114,9 +114,7 @@ func (node *Node) Start() error {
 }
 
 func (node *Node) Run() error {
-	err := node.Container.Run()
-
-	return err
+	return node.Container.Run()
 }
 
 func (node *Node) Wait(desired string) error {
@@ -156,7 +154,7 @@ func (node *Node) Rename(name string) error {
 	return node.Container.Rename(name)
 }
 
-func (node *Node) Directory(name string, homedir string) error {
+func Directory(name string, homedir string) error {
 	smrDir := fmt.Sprintf("%s/.%s", homedir, name)
 	return os.MkdirAll(smrDir, 0750)
 }

@@ -3,15 +3,15 @@ package context
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/golang/glog"
+	"github.com/pkg/errors"
 	"github.com/simplecontainer/client/pkg/helpers"
-	"github.com/simplecontainer/client/pkg/logger"
 	"github.com/spf13/viper"
-	"go.uber.org/zap"
 	"os"
 )
 
-func (context *Context) GetActiveContext() bool {
-	activeContextPath := fmt.Sprintf("%s/%s", context.Directory, ".active")
+func (c *Context) GetActiveContext() bool {
+	activeContextPath := fmt.Sprintf("%s/%s", c.Directory, ".active")
 
 	activeContext, err := os.ReadFile(activeContextPath)
 	if err != nil {
@@ -22,87 +22,84 @@ func (context *Context) GetActiveContext() bool {
 		activeContext = []byte("default")
 	}
 
-	context.ActiveContext = fmt.Sprintf("%s/%s", context.Directory, string(activeContext))
+	c.ActiveContext = fmt.Sprintf("%s/%s", c.Directory, string(activeContext))
 	return true
 }
 
-func (context *Context) SetActiveContext(contextName string) bool {
-	activeContextPath := fmt.Sprintf("%s/%s", context.Directory, ".active")
+func (c *Context) SetActiveContext(contextName string) bool {
+	activeContextPath := fmt.Sprintf("%s/%s", c.Directory, ".active")
 
 	err := os.WriteFile(activeContextPath, []byte(contextName), 0755)
 	if err != nil {
-		logger.Log.Fatal("active context file not saved", zap.String("error", err.Error()))
+		glog.Fatal("active context file not saved", err.Error())
 	}
 
 	return true
 }
 
-func (context *Context) ReadFromFile() bool {
-	activeContext, err := os.ReadFile(context.ActiveContext)
+func (c *Context) ReadFromFile() bool {
+	activeContext, err := os.ReadFile(c.ActiveContext)
 	if err != nil {
-		logger.Log.Info("active context file not found", zap.String("error", err.Error()))
+		glog.Info("active context file not found", err.Error())
 		return false
 	}
 
-	if err = json.Unmarshal(activeContext, &context); err != nil {
-		logger.Log.Info("active context file not valid json", zap.String("error", err.Error()))
+	if err = json.Unmarshal(activeContext, &c); err != nil {
+		glog.Info("active context file not valid json", err.Error())
 		return false
 	}
 
 	return true
 }
 
-func (context *Context) SaveToFile() bool {
-	if context.Name == "" {
-		context.Name = viper.GetString("context")
+func (c *Context) SaveToFile() error {
+	if c.Name == "" {
+		c.Name = viper.GetString("context")
 	}
 
-	if context.Name == "" {
-		fmt.Println("context name cannot be empty")
-		return false
+	if c.Name == "" {
+		return errors.New("context name cannot be empty")
 	}
 
-	jsonData, err := json.Marshal(context)
+	jsonData, err := json.Marshal(c)
 
 	if err != nil {
-		logger.Log.Fatal(err.Error())
-		return false
+		return err
 	}
 
-	contextPath := fmt.Sprintf("%s/%s", context.Directory, context.Name)
+	contextPath := fmt.Sprintf("%s/%s", c.Directory, c.Name)
 
 	if _, err = os.Stat(contextPath); err == nil {
 		if viper.GetBool("y") || helpers.Confirm("Context with the same name already exists. Do you want to overwrite it?") {
 			err = os.WriteFile(contextPath, jsonData, 0600)
 			if err != nil {
-				logger.Log.Fatal("active context file not saved", zap.String("error", err.Error()))
+				glog.Fatal("active context file not saved", err.Error())
 			}
 
-			activeContextPath := fmt.Sprintf("%s/%s", context.Directory, ".active")
+			activeContextPath := fmt.Sprintf("%s/%s", c.Directory, ".active")
 
-			err = os.WriteFile(activeContextPath, []byte(context.Name), 0755)
+			err = os.WriteFile(activeContextPath, []byte(c.Name), 0755)
 			if err != nil {
-				logger.Log.Fatal("active context file not saved", zap.String("error", err.Error()))
+				glog.Fatal("active context file not saved", err.Error())
 			}
 
-			return true
+			return nil
 		} else {
-			logger.Log.Info("action aborted")
-			return false
+			return errors.New("action aborted")
 		}
 	} else {
 		err = os.WriteFile(contextPath, jsonData, 0600)
 		if err != nil {
-			logger.Log.Fatal("active context file not saved", zap.String("error", err.Error()))
+			return err
 		}
 
-		activeContextPath := fmt.Sprintf("%s/%s", context.Directory, ".active")
+		activeContextPath := fmt.Sprintf("%s/%s", c.Directory, ".active")
 
-		err = os.WriteFile(activeContextPath, []byte(context.Name), 0755)
+		err = os.WriteFile(activeContextPath, []byte(c.Name), 0755)
 		if err != nil {
-			logger.Log.Fatal("active context file not saved", zap.String("error", err.Error()))
+			return err
 		}
 
-		return true
+		return nil
 	}
 }

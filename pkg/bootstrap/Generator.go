@@ -2,7 +2,7 @@ package bootstrap
 
 import (
 	"fmt"
-	"github.com/simplecontainer/client/pkg/logger"
+	"github.com/golang/glog"
 	"github.com/simplecontainer/client/pkg/static"
 	"os"
 )
@@ -14,11 +14,11 @@ func CreateDirectoryTree(projectDir string) {
 		err := os.MkdirAll(dir, 0750)
 
 		if err != nil {
-			logger.Log.Fatal(err.Error())
+			glog.Fatal(err.Error())
 
 			err = os.RemoveAll(projectDir)
 			if err != nil {
-				logger.Log.Fatal(err.Error())
+				glog.Fatal(err.Error())
 			}
 		}
 	}
