@@ -107,7 +107,7 @@ func Leave(mgr *manager.Manager, node uint64) {
 		os.Exit(1)
 	}
 
-	response := network.Send(mgr.Context.Client, fmt.Sprintf("%s/api/v1/cluster/drain", mgr.Context.ApiURL), http.MethodPost, data)
+	response := network.Send(mgr.Context.Client, fmt.Sprintf("%s/api/v1/cluster/control", mgr.Context.ApiURL), http.MethodPost, data)
 
 	if response.Success {
 		fmt.Println(response.Explanation)
@@ -130,7 +130,7 @@ func Upgrade(mgr *manager.Manager, node uint64, image string, tag string) {
 		os.Exit(1)
 	}
 
-	response := network.Send(mgr.Context.Client, fmt.Sprintf("%s/api/v1/cluster/upgrade", mgr.Context.ApiURL), http.MethodPost, data)
+	response := network.Send(mgr.Context.Client, fmt.Sprintf("%s/api/v1/cluster/control", mgr.Context.ApiURL), http.MethodPost, data)
 
 	if response.Success {
 		fmt.Println(response.Explanation)

@@ -38,16 +38,15 @@ func Upgrader(mgr *manager.Manager) error {
 					case mvccpb.PUT:
 						fmt.Println("new control event")
 						var c *controler.Control
+						err = json.Unmarshal(watchResp.Events[0].Kv.Value, &c)
+
+						if err != nil {
+							glog.Error(err.Error())
+							break
+						}
 
 						if c.GetUpgrade() != nil {
 							// Currently react only to upgrade control (drain and start are ignored)
-							err = json.Unmarshal(watchResp.Events[0].Kv.Value, &c)
-
-							if err != nil {
-								glog.Error(err.Error())
-								break
-							}
-
 							mgr.Configuration.Args = "start"
 
 							var n1 *node.Node
