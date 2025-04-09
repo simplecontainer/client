@@ -75,6 +75,26 @@ func Join(mgr *manager.Manager) {
 	}
 }
 
+func ReJoin(mgr *manager.Manager) {
+	control := controler.New()
+	control.SetStart(controler.NewStart(mgr.Configuration.API, mgr.Configuration.Flannel.CIDR, mgr.Configuration.Flannel.Backend))
+
+	data, err := control.ToJSON()
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	response := network.Send(mgr.Context.Client, fmt.Sprintf("%s/api/v1/cluster/start", mgr.Context.ApiURL), http.MethodPost, data)
+
+	if response.HttpStatus == http.StatusOK {
+		fmt.Println(response.Explanation)
+	} else {
+		fmt.Println(response.ErrorExplanation)
+	}
+}
+
 func Leave(mgr *manager.Manager, node uint64) {
 	control := controler.New()
 	control.SetDrain(controler.NewDrain(node))
@@ -101,6 +121,7 @@ func Upgrade(mgr *manager.Manager, node uint64, image string, tag string) {
 	control.SetDrain(controler.NewDrain(node))
 	control.SetUpgrade(controler.NewUpgrade(image, tag))
 	control.SetStart(nil)
+	control.Time()
 
 	data, err := control.ToJSON()
 
