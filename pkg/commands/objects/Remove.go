@@ -1,16 +1,13 @@
 package objects
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/simplecontainer/client/pkg/command"
-	"github.com/simplecontainer/client/pkg/commands/control/control"
-	"github.com/simplecontainer/client/pkg/commands/objects/remove"
 	"github.com/simplecontainer/client/pkg/contracts"
-	"github.com/simplecontainer/client/pkg/helpers"
 	"github.com/simplecontainer/client/pkg/manager"
-	v1 "github.com/simplecontainer/smr/pkg/definitions/v1"
-	common "github.com/simplecontainer/smr/pkg/kinds/common"
+	"github.com/simplecontainer/smr/pkg/packer"
+	"github.com/simplecontainer/smr/pkg/relations"
+	"net/url"
 	"os"
 )
 
@@ -22,47 +19,79 @@ func Remove() contracts.Command {
 		},
 		Functions: []func(*manager.Manager, []string){
 			func(mgr *manager.Manager, args []string) {
-				format, err := helpers.BuildFormat(helpers.GrabArg(2), mgr.Configuration.G)
-
-				if err != nil {
-					fmt.Println(err)
-					os.Exit(1)
+				if len(os.Args) < 2 {
+					fmt.Println("try to specify a path/url")
+					return
 				}
 
-				get, err := control.Get(mgr.Context, format.GetPrefix(), format.GetVersion(), format.GetCategory(), format.GetKind(), format.GetGroup(), format.GetName())
+				u, err := url.ParseRequestURI(args[2])
 
-				fmt.Println(string(get))
+				var pack = packer.New()
 
-				c := v1.CommonDefinition{}
+				if err != nil || !u.IsAbs() {
+					var stat os.FileInfo
+					stat, err = os.Stat(args[2])
 
-				err = json.Unmarshal(get, &c)
+					if os.IsNotExist(err) {
+						fmt.Println("path does not exist")
+						return
+					}
 
-				if err != nil {
-					fmt.Println(err)
-					os.Exit(1)
-				}
+					if stat.IsDir() {
+						kinds := relations.NewDefinitionRelationRegistry()
+						kinds.InTree()
 
-				request, err := common.NewRequest(c.GetKind())
+						pack, err = packer.Read(args[2], kinds)
 
-				if err != nil {
-					fmt.Println(err)
-					os.Exit(1)
-				}
+						if err != nil {
+							fmt.Println(err)
+							os.Exit(1)
+						}
+					} else {
+						var definitions []byte
+						definitions, err = packer.ReadYAMLFile(args[2])
 
-				err = request.Definition.FromJson(get)
+						if err != nil {
+							fmt.Println(err.Error())
+							os.Exit(1)
+						}
 
-				if err != nil {
-					fmt.Println(err)
+						pack.Definitions, err = packer.Parse(definitions)
+
+						if err != nil {
+							fmt.Println(err.Error())
+							os.Exit(1)
+						}
+					}
 				} else {
-					var bytes []byte
-					bytes, err = request.Definition.ToJSONForUser()
+					var definitions []byte
+					definitions, err = packer.Download(u)
 
 					if err != nil {
-						fmt.Println(err)
+						fmt.Println(err.Error())
 						os.Exit(1)
 					}
 
-					remove.Remove(mgr.Context, bytes)
+					pack.Definitions, err = packer.Parse(definitions)
+
+					if err != nil {
+						fmt.Println(err.Error())
+						os.Exit(1)
+					}
+				}
+
+				if len(pack.Definitions) != 0 {
+					for _, definition := range pack.Definitions {
+						err = definition.ProposeRemove(mgr.Context.Client, mgr.Context.ApiURL)
+
+						if err != nil {
+							fmt.Println(err)
+						} else {
+							fmt.Println(fmt.Sprintf("object removed: %s", definition.Definition.GetKind()))
+						}
+					}
+				} else {
+					fmt.Println("specified file/url is not valid definition")
 				}
 			},
 		},

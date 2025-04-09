@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/golang/glog"
-	"github.com/simplecontainer/client/pkg/commands/objects/apply"
 	"github.com/simplecontainer/client/pkg/configuration"
 	smrContext "github.com/simplecontainer/client/pkg/context"
 	"github.com/simplecontainer/client/pkg/definitions"
+	"github.com/simplecontainer/smr/pkg/kinds/common"
 	"github.com/simplecontainer/smr/pkg/network"
+	"github.com/simplecontainer/smr/pkg/static"
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.uber.org/zap"
@@ -124,7 +125,28 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 										CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
 
 										NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJSON()
-										apply.Apply(smrCtx, NetworkDefinition)
+
+										req, err := common.NewRequest(static.KIND_NETWORK)
+
+										if err != nil {
+											fmt.Println(err)
+											break
+										}
+
+										err = req.Definition.FromJson(NetworkDefinition)
+
+										if err != nil {
+											fmt.Println(err)
+											break
+										}
+
+										err = req.ProposeApply(smrCtx.Client, smrCtx.ApiURL)
+
+										if err != nil {
+											fmt.Println(err)
+										} else {
+											fmt.Println("network object applied")
+										}
 									}
 									break
 								case ipv6:
@@ -133,7 +155,28 @@ func Run(ctx context.Context, smrCtx *smrContext.Context, config *configuration.
 										CIDR := strings.Replace(split[len(split)-1], "-", "/", 1)
 
 										NetworkDefinition, _ := definitions.FlannelDefinition(CIDR).ToJSON()
-										apply.Apply(smrCtx, NetworkDefinition)
+
+										req, err := common.NewRequest(static.KIND_NETWORK)
+
+										if err != nil {
+											fmt.Println(err)
+											break
+										}
+
+										err = req.Definition.FromJson(NetworkDefinition)
+
+										if err != nil {
+											fmt.Println(err)
+											break
+										}
+
+										err = req.ProposeApply(smrCtx.Client, smrCtx.ApiURL)
+
+										if err != nil {
+											fmt.Println(err)
+										} else {
+											fmt.Println("network object applied")
+										}
 									}
 									break
 								case ipv4 | ipv6:
