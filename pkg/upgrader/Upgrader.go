@@ -39,52 +39,55 @@ func Upgrader(mgr *manager.Manager) error {
 						fmt.Println("new control event")
 						var c *controler.Control
 
-						err = json.Unmarshal(watchResp.Events[0].Kv.Value, &c)
+						if c.GetUpgrade() != nil {
+							// Currently react only to upgrade control (drain and start are ignored)
+							err = json.Unmarshal(watchResp.Events[0].Kv.Value, &c)
 
-						if err != nil {
-							glog.Error(err.Error())
-							break
+							if err != nil {
+								glog.Error(err.Error())
+								break
+							}
+
+							mgr.Configuration.Args = "start"
+
+							var n1 *node.Node
+							var n2 *node.Node
+
+							n1, err = node.New(mgr.Configuration.Node, mgr.Configuration)
+
+							if err != nil {
+								glog.Error(err.Error())
+								break
+							}
+
+							mgr.Configuration.Image = c.Upgrade.Image
+							mgr.Configuration.Tag = c.Upgrade.Tag
+
+							n2, err = node.New(mgr.Configuration.Node, mgr.Configuration)
+
+							if err != nil {
+								glog.Error(err.Error())
+								break
+							}
+
+							err = upgrade.Upgrader(n1, n2)
+
+							if err != nil {
+								fmt.Println(err)
+								break
+							}
+
+							glog.Info("node started again - attempt to join cluster will proceed after node is healthy")
+
+							err = mgr.Context.Connect(true)
+
+							if err != nil {
+								fmt.Println(err)
+								break
+							}
+
+							cluster.ReJoin(mgr)
 						}
-
-						mgr.Configuration.Args = "start"
-
-						var n1 *node.Node
-						var n2 *node.Node
-
-						n1, err = node.New(mgr.Configuration.Node, mgr.Configuration)
-
-						if err != nil {
-							glog.Error(err.Error())
-							break
-						}
-
-						mgr.Configuration.Image = c.Upgrade.Image
-						mgr.Configuration.Tag = c.Upgrade.Tag
-
-						n2, err = node.New(mgr.Configuration.Node, mgr.Configuration)
-
-						if err != nil {
-							glog.Error(err.Error())
-							break
-						}
-
-						err = upgrade.Upgrader(n1, n2)
-
-						if err != nil {
-							fmt.Println(err)
-							break
-						}
-
-						glog.Info("node started again - attempt to join cluster will proceed after node is healthy")
-
-						err = mgr.Context.Connect(true)
-
-						if err != nil {
-							fmt.Println(err)
-							break
-						}
-
-						cluster.ReJoin(mgr)
 					}
 					break
 				}
