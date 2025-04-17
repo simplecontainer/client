@@ -1,18 +1,17 @@
 package upgrader
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/golang/glog"
-	"github.com/simplecontainer/client/pkg/cluster"
-	"github.com/simplecontainer/client/pkg/commands/cluster/upgrade"
 	"github.com/simplecontainer/client/pkg/manager"
-	"github.com/simplecontainer/client/pkg/node"
 	"github.com/simplecontainer/smr/pkg/controler"
+
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	clientv3 "go.etcd.io/etcd/client/v3"
-	"golang.org/x/net/context"
-	"time"
 )
 
 func Upgrader(mgr *manager.Manager) error {
@@ -22,75 +21,43 @@ func Upgrader(mgr *manager.Manager) error {
 	})
 
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create etcd client: %w", err)
 	}
+	defer cli.Close()
 
-	fmt.Println("listening for control events")
+	fmt.Println("Listening for control events...")
 
-	watcher := cli.Watch(context.Background(), "/smr/control/", clientv3.WithPrefix())
+	watchCh := cli.Watch(context.Background(), "/smr/control/", clientv3.WithPrefix())
 
-	for {
-		select {
-		case watchResp, ok := <-watcher:
-			if ok {
-				for _, event := range watchResp.Events {
-					switch event.Type {
-					case mvccpb.PUT:
-						fmt.Println("new control event")
-						var c *controler.Control
-						err = json.Unmarshal(watchResp.Events[0].Kv.Value, &c)
+	for watchResp := range watchCh {
+		for _, event := range watchResp.Events {
+			if event.Type != mvccpb.PUT {
+				continue
+			}
 
-						if err != nil {
-							glog.Error(err.Error())
-							break
-						}
+			fmt.Println("New control event received")
 
-						if c.GetUpgrade() != nil {
-							// Currently react only to upgrade control (drain and start are ignored)
-							mgr.Configuration.Args = "start"
+			var c controler.Control
 
-							var n1 *node.Node
-							var n2 *node.Node
+			if err := json.Unmarshal(event.Kv.Value, &c); err != nil {
+				glog.Errorf("Failed to unmarshal control: %v", err)
+				continue
+			}
 
-							n1, err = node.New(mgr.Configuration.Node, mgr.Configuration)
-
-							if err != nil {
-								glog.Error(err.Error())
-								break
-							}
-
-							mgr.Configuration.Image = c.Upgrade.Image
-							mgr.Configuration.Tag = c.Upgrade.Tag
-
-							n2, err = node.New(mgr.Configuration.Node, mgr.Configuration)
-
-							if err != nil {
-								glog.Error(err.Error())
-								break
-							}
-
-							err = upgrade.Upgrader(n1, n2)
-
-							if err != nil {
-								fmt.Println(err)
-								break
-							}
-
-							glog.Info("node started again - attempt to join cluster will proceed after node is healthy")
-
-							err = mgr.Context.Connect(true)
-
-							if err != nil {
-								fmt.Println(err)
-								break
-							}
-
-							cluster.ReJoin(mgr)
-						}
-					}
-					break
+			switch {
+			case c.GetDrain() != nil && c.GetUpgrade() == nil:
+				if err := handleDrain(mgr); err != nil {
+					glog.Errorf("Drain handling failed: %v", err)
 				}
+				break
+			case c.GetUpgrade() != nil:
+				if err := handleUpgrade(mgr, c); err != nil {
+					glog.Errorf("Upgrade handling failed: %v", err)
+				}
+				break
 			}
 		}
 	}
+
+	return nil
 }
