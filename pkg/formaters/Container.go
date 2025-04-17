@@ -56,6 +56,7 @@ func Container(objects []json.RawMessage) {
 
 			err = json.Unmarshal(bytes, ghost)
 			if err != nil {
+				fmt.Println(err)
 				continue
 			}
 
